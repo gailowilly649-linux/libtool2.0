@@ -17,4 +17,6 @@ public class NativeMethods {
     public static native void onDrawFrame();
     public static native void onTouchEvent(int action, float x, int x_orig, float y, int y_orig);
     public static native String getWindowRect();
+    public static native boolean isMenuMinimized();
+    public static native void setMenuMinimized(boolean minimized);
 }

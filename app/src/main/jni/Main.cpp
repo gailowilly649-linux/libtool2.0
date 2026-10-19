@@ -57,6 +57,7 @@ int selectedTheme = 0;
 
 bool doChangeScale = false;
 bool doChangeTheme = false;
+bool isFloatingBubble = false;
 
 
 constexpr std::array<const char *, 7> possibleScale = {
@@ -77,7 +78,6 @@ void draw_thread()
 {
     static ImVec2 lastSize = ImVec2(0, 0);
     static ImVec2 lastPos = ImVec2(0, 0);
-    static bool isFloatingBubble = false;
 
     if (isFloatingBubble)
     {
@@ -509,17 +509,6 @@ void ConfigInit()
 void on_init()
 {
     LOGD(__FUNCTION__);
-    while (!isLibraryLoaded(targetLibName))
-    {
-        sleep(1);
-    }
-
-    LOGI("%s has been loaded", (const char *)targetLibName);
-
-    Il2cpp::Init();
-    Il2cpp::EnsureAttached();
-
-    Keyboard::Init();
 
     initialStyle = ImGui::GetStyle();
     ConfigInit();
@@ -538,6 +527,44 @@ void on_init()
     doChangeTheme = true;
     doChangeScale = true;
 
+    // Check if game library is currently loaded in this process
+    bool hasTargetLib = isLibraryLoaded(targetLibName) || isLibraryLoaded("libil2cpp.so");
+    if (!hasTargetLib)
+    {
+        LOGI("Target library (%s) not found in process. Running in standalone overlay mode.", (const char *)targetLibName);
+        std::thread([]() {
+            int retries = 0;
+            while (!isLibraryLoaded(targetLibName) && !isLibraryLoaded("libil2cpp.so") && retries < 20)
+            {
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                retries++;
+            }
+            if (isLibraryLoaded(targetLibName) || isLibraryLoaded("libil2cpp.so"))
+            {
+                LOGI("Target library loaded dynamically. Initializing IL2CPP hooks...");
+                Il2cpp::Init();
+                Il2cpp::EnsureAttached();
+                Keyboard::Init();
+                Stealth::Init();
+                ConfigManager::Init();
+                ModFeatures::Init();
+                MemorySearcherTab::Init();
+                ESP::Init();
+#ifndef LIB_INPUT
+                Unity::HookInput();
+#endif
+                Tool::ReloadImages();
+            }
+        }).detach();
+        return;
+    }
+
+    LOGI("%s has been loaded", (const char *)targetLibName);
+
+    Il2cpp::Init();
+    Il2cpp::EnsureAttached();
+
+    Keyboard::Init();
     Stealth::Init();
     ConfigManager::Init();
     ModFeatures::Init();
@@ -552,12 +579,12 @@ void on_init()
 
     Il2CppAssembly *assembly = nullptr;
     int retries = 0;
-    while (!assembly && retries < 30)
+    while (!assembly && retries < 5)
     {
         assembly = Il2cpp::GetAssembly("Assembly-CSharp");
         if (!assembly)
         {
-            LOGD("Waiting for Assembly-CSharp... (%d/30)", retries + 1);
+            LOGD("Waiting for Assembly-CSharp... (%d/5)", retries + 1);
             sleep(1);
             retries++;
         }
@@ -581,7 +608,7 @@ void on_init()
     }
     else
     {
-        LOGE("Failed to obtain any Il2CppImage!");
+        LOGW("Failed to obtain any Il2CppImage!");
     }
 
     for (auto image : images)
@@ -597,18 +624,21 @@ void on_init()
         }
     }
     LOGD("%zu methods", g_Methods.size());
-    LOGD("SORTING");
-    std::sort(g_Methods.begin(), g_Methods.end(),
-              [](const auto &a, const auto &b) { return a->methodPointer < b->methodPointer; });
-    LOGPTR(g_Methods.front()->methodPointer);
-    LOGPTR(g_Methods.back()->methodPointer);
-    LOGD("SORTED");
+    if (!g_Methods.empty())
+    {
+        LOGD("SORTING");
+        std::sort(g_Methods.begin(), g_Methods.end(),
+                  [](const auto &a, const auto &b) { return a->methodPointer < b->methodPointer; });
+        LOGPTR(g_Methods.front()->methodPointer);
+        LOGPTR(g_Methods.back()->methodPointer);
+        LOGD("SORTED");
+    }
 
     std::thread([assembly]() {
         if (!assembly)
         {
             int checkCount = 0;
-            while (checkCount < 60)
+            while (checkCount < 30)
             {
                 std::this_thread::sleep_for(std::chrono::seconds(2));
                 checkCount++;
@@ -626,16 +656,16 @@ void on_init()
 }
 
 // we will run our hacks in a new thread so our while loop doesn't block process main thread
-bool useJava = false;
+bool useJava = true;
 void *hack_thread(void *)
 {
     logger::Clear();
 
     LOGI("pthread created");
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
     LOGINT(useJava);
     if (!useJava)
-        initModMenu((void *)draw_thread, (void *)on_init);
+        initModMenu((void *)draw_thread, (void *)on_init, false);
     return nullptr;
 }
 
@@ -690,6 +720,16 @@ extern "C"
     JNIEXPORT jstring JNICALL Java_imgui_il2cpp_tool_NativeMethods_getWindowRect(JNIEnv *env, jclass clazz)
     {
         return env->NewStringUTF(Tool::GetWindowRect().c_str());
+    }
+
+    JNIEXPORT jboolean JNICALL Java_imgui_il2cpp_tool_NativeMethods_isMenuMinimized(JNIEnv *env, jclass clazz)
+    {
+        return (jboolean)isFloatingBubble;
+    }
+
+    JNIEXPORT void JNICALL Java_imgui_il2cpp_tool_NativeMethods_setMenuMinimized(JNIEnv *env, jclass clazz, jboolean min)
+    {
+        isFloatingBubble = (bool)min;
     }
 }
 __attribute__((constructor)) void lib_main()

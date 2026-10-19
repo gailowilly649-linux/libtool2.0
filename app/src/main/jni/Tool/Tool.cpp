@@ -282,7 +282,11 @@ namespace Tool
             }
             else
             {
-                ImGuiWindow *window = ImGui::FindWindowByName(OBFUSCATE("IL2CPP Tool v0.9 By mIsmanXP @ Platinmods.com | Discord : @cat.ll"));
+                ImGuiWindow *window = ImGui::FindWindowByName(OBFUSCATE("Willy LibTool - Mobile Legends"));
+                if (!window)
+                {
+                    window = ImGui::FindWindowByName("##FloatingBubble");
+                }
                 if (window && !collapsed)
                 {
                     sprintf(result, "%d|%d|%d|%d", (int)window->Pos.x, (int)window->Pos.y, (int)window->Size.x, (int)window->Size.y);

@@ -22,14 +22,19 @@ bool Input_GetMouseButton(int n)
     ImVec2 size{ImGui::GetFrameHeight() * 2.f, ImGui::GetFrameHeight() * 2.f};
     if (io.WantCaptureMouse && !(collapsed && fullScreen && (io.MousePos.x > size.x && io.MousePos.y > size.y)))
         return false;
-    return oInput_GetMouseButton(n);
+    if (oInput_GetMouseButton)
+        return oInput_GetMouseButton(n);
+    return false;
 }
 int get_touchCount()
 {
+    if (!o_get_touchCount)
+        return 0;
+
     ImGuiIO &io = ImGui::GetIO();
 
     auto count = o_get_touchCount();
-    if (count > 0)
+    if (count > 0 && Input)
     {
         // auto mousePresent = Input->invoke_static_method<bool>("get_mousePresent");
         // if (mousePresent)
@@ -77,9 +82,20 @@ namespace Unity
     void HookInput()
     {
         g_Image = Il2cpp::GetImage("UnityEngine.InputLegacyModule"); // hack
+        if (!g_Image)
+        {
+            LOGW("InputLegacyModule image not found, skipping HookInput");
+            return;
+        }
+        auto klass = g_Image->getClass("UnityEngine.Input");
+        if (!klass)
+        {
+            LOGW("UnityEngine.Input class not found, skipping HookInput");
+            return;
+        }
         REPLACE_NAME_ORIG("UnityEngine.Input", "get_touchCount", get_touchCount,
                           o_get_touchCount); // TODO: pass image to REPLACE macro
         REPLACE_NAME_ORIG("UnityEngine.Input", "GetMouseButton", Input_GetMouseButton, oInput_GetMouseButton);
-        Input = g_Image->getClass("UnityEngine.Input");
+        Input = klass;
     }
 } // namespace Unity

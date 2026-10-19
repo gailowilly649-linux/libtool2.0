@@ -56,7 +56,7 @@ public class MainActivity extends Activity {
             updateUiState();
         });
 
-        btnLaunchMLBB.setOnClickListener(v -> launchGame(MLBB_PACKAGE));
+        btnLaunchMLBB.setOnClickListener(v -> launchGame());
 
         checkAndRequestStoragePermission();
     }
@@ -117,30 +117,65 @@ public class MainActivity extends Activity {
         }
     }
 
+    private static final String[] MLBB_PACKAGES = {
+            "com.mobile.legends",
+            "com.vng.mlbbvn"
+    };
+
     private void startOverlayService() {
-        Intent intent = new Intent(this, OverlayService.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(intent);
-        } else {
-            startService(intent);
+        try {
+            Intent intent = new Intent(this, OverlayService.class);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(intent);
+            } else {
+                startService(intent);
+            }
+            Toast.makeText(this, "Willy LibTool Started!", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(this, "Failed to start service: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            e.printStackTrace();
         }
-        Toast.makeText(this, "Willy LibTool Started!", Toast.LENGTH_SHORT).show();
     }
 
     private void stopOverlayService() {
-        Intent intent = new Intent(this, OverlayService.class);
-        intent.setAction("STOP");
-        startService(intent);
-        Toast.makeText(this, "Willy LibTool Stopped", Toast.LENGTH_SHORT).show();
+        try {
+            Intent intent = new Intent(this, OverlayService.class);
+            intent.setAction("STOP");
+            startService(intent);
+            Toast.makeText(this, "Willy LibTool Stopped", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(this, "Error stopping service: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
     }
 
-    private void launchGame(String packageName) {
+    private void launchGame() {
         PackageManager pm = getPackageManager();
-        Intent launchIntent = pm.getLaunchIntentForPackage(packageName);
+        Intent launchIntent = null;
+        String foundPackage = null;
+
+        for (String pkg : MLBB_PACKAGES) {
+            try {
+                launchIntent = pm.getLaunchIntentForPackage(pkg);
+                if (launchIntent != null) {
+                    foundPackage = pkg;
+                    break;
+                }
+            } catch (Exception ignored) {
+            }
+        }
+
         if (launchIntent != null) {
-            startActivity(launchIntent);
+            try {
+                launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                startActivity(launchIntent);
+                Toast.makeText(this, "Launching Mobile Legends (" + foundPackage + ")...", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                Toast.makeText(this, "Error launching Mobile Legends: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                e.printStackTrace();
+            }
         } else {
-            Toast.makeText(this, "Game (" + packageName + ") not installed!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Mobile Legends not installed on this device!", Toast.LENGTH_LONG).show();
         }
     }
 
