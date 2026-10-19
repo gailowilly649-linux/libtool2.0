@@ -519,6 +519,61 @@ public final class MlbbModInjector {
                 {"Art/android/h/hero_feilun_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_feilun_skin01_add.unity3d"},
                 {"UI/android/Hero401_add.unity3d", PATCHED_SKINS_DIR + "/Hero401_add.unity3d"}
         }));
+
+        // 8. Chou (Fighter) - Iori Yagami (KOF Collab / Skin 09)
+        HERO_SKINS.add(new HeroSkinOption("chou", "Chou", "Iori Yagami (KOF)", "Fighter", new String[][]{
+                {"Art/android/h/hero_chou_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_chou_skin_high_add.unity3d"},
+                {"Art/android/h/hero_chou_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_chou_skin01_high_add.unity3d"},
+                {"Art/android/h/hero_chou_skin.unity3d", PATCHED_SKINS_DIR + "/hero_chou_skin.unity3d"},
+                {"Art/android/h/hero_chou_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_chou_skin_shadow_high_add.unity3d"},
+                {"Art/android/h/hero_chou_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_chou_skin01_shadow_high_add.unity3d"},
+                {"Art/android/h/hero_chou_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_chou_skin01_add.unity3d"},
+                {"UI/android/Hero026_add.unity3d", PATCHED_SKINS_DIR + "/Hero026_add.unity3d"}
+        }));
+
+        // 9. Hayabusa (Assassin) - Shadow of Obscurity (Collector / Skin 05)
+        HERO_SKINS.add(new HeroSkinOption("hayabusa", "Hayabusa", "Shadow of Obscurity", "Assassin", new String[][]{
+                {"Art/android/h/hero_haya_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_haya_skin_high_add.unity3d"},
+                {"Art/android/h/hero_haya_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_haya_skin01_high_add.unity3d"},
+                {"Art/android/h/hero_haya_skin.unity3d", PATCHED_SKINS_DIR + "/hero_haya_skin.unity3d"},
+                {"Art/android/h/hero_haya_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_haya_skin_shadow_high_add.unity3d"},
+                {"Art/android/h/hero_haya_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_haya_skin01_shadow_high_add.unity3d"},
+                {"Art/android/h/hero_haya_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_haya_skin01_add.unity3d"},
+                {"UI/android/Hero021_add.unity3d", PATCHED_SKINS_DIR + "/Hero021_add.unity3d"}
+        }));
+
+        // 10. Lancelot (Assassin) - Bren Esports (M2 Champion / Skin 06)
+        HERO_SKINS.add(new HeroSkinOption("lancelot", "Lancelot", "Bren Esports (M2)", "Assassin", new String[][]{
+                {"Art/android/h/hero_lance_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_lance_skin_high_add.unity3d"},
+                {"Art/android/h/hero_lance_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_lance_skin01_high_add.unity3d"},
+                {"Art/android/h/hero_lance_skin.unity3d", PATCHED_SKINS_DIR + "/hero_lance_skin.unity3d"},
+                {"Art/android/h/hero_lance_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_lance_skin_shadow_high_add.unity3d"},
+                {"Art/android/h/hero_lance_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_lance_skin01_shadow_high_add.unity3d"},
+                {"Art/android/h/hero_lance_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_lance_skin01_add.unity3d"},
+                {"UI/android/Hero047_add.unity3d", PATCHED_SKINS_DIR + "/Hero047_add.unity3d"}
+        }));
+
+        // 11. Granger (Marksman) - Starfall Knight (Legend / Skin 05)
+        HERO_SKINS.add(new HeroSkinOption("granger", "Granger", "Starfall Knight (Legend)", "Marksman", new String[][]{
+                {"Art/android/h/hero_granger_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_granger_skin_high_add.unity3d"},
+                {"Art/android/h/hero_granger_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_granger_skin01_high_add.unity3d"},
+                {"Art/android/h/hero_granger_skin.unity3d", PATCHED_SKINS_DIR + "/hero_granger_skin.unity3d"},
+                {"Art/android/h/hero_granger_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_granger_skin_shadow_high_add.unity3d"},
+                {"Art/android/h/hero_granger_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_granger_skin01_shadow_high_add.unity3d"},
+                {"Art/android/h/hero_granger_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_granger_skin01_add.unity3d"},
+                {"UI/android/Hero079_add.unity3d", PATCHED_SKINS_DIR + "/Hero079_add.unity3d"}
+        }));
+
+        // 12. Benedetta (Assassin) - Death Oath (Collector / Skin 03)
+        HERO_SKINS.add(new HeroSkinOption("benedetta", "Benedetta", "Death Oath (Collector)", "Assassin", new String[][]{
+                {"Art/android/h/hero_benedetta_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_benedetta_skin_high_add.unity3d"},
+                {"Art/android/h/hero_benedetta_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_benedetta_skin01_high_add.unity3d"},
+                {"Art/android/h/hero_benedetta_skin.unity3d", PATCHED_SKINS_DIR + "/hero_benedetta_skin.unity3d"},
+                {"Art/android/h/hero_benedetta_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_benedetta_skin_shadow_high_add.unity3d"},
+                {"Art/android/h/hero_benedetta_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_benedetta_skin01_shadow_high_add.unity3d"},
+                {"Art/android/h/hero_benedetta_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_benedetta_skin01_add.unity3d"},
+                {"UI/android/Hero097_add.unity3d", PATCHED_SKINS_DIR + "/Hero097_add.unity3d"}
+        }));
     }
 
     public static void unlockHeroSkin(Context context, String heroId, Callback callback) {
@@ -602,14 +657,22 @@ public final class MlbbModInjector {
                     postProgress(callback, "Injecting " + h.heroName + " (" + h.skinName + ")...");
                     applyHeroSwapInternal(context, h);
                 }
-                postComplete(callback, true, "⚡ All 7 Skins unlocked successfully!\n" +
-                        "💡 In Hero Pick: Select DEFAULT Skin for any of the 7 heroes!\n" +
+                postComplete(callback, true, "⚡ All " + HERO_SKINS.size() + " Skins unlocked successfully!\n" +
+                        "💡 In Hero Pick: Select DEFAULT Skin for any of the " + HERO_SKINS.size() + " heroes!\n" +
                         "Works in Practice, Custom, Classic, and Rank.");
             } catch (Throwable t) {
                 Log.e(TAG, "Error unlocking all skins", t);
                 postComplete(callback, false, "Unlock error: " + t.getMessage());
             }
         });
+    }
+
+    public static void unlockAllHeroSkins(Context context, Callback callback) {
+        unlockAll7Heroes(context, callback);
+    }
+
+    public static void unlockAllHeroSkins(Callback callback) {
+        unlockAll7Heroes(null, callback);
     }
 
     public static void unlockAll7Heroes(Callback callback) {

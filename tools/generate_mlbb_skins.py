@@ -85,6 +85,56 @@ HERO_SWAP_CONFIG = [
         "ui_card": "Hero1140_add.unity3d",
         "ui_target": "Hero401_add.unity3d",
         "ui_prefab_target": "hero401_add.prefab"
+    },
+    {
+        "id": "chou",
+        "name": "Chou",
+        "num_id": "26",
+        "prefix": "hero_chou",
+        "source_skin": "skin09",     # Iori Yagami (KOF) / Thunderfist
+        "ui_card": "Hero926_add.unity3d",
+        "ui_target": "Hero026_add.unity3d",
+        "ui_prefab_target": "hero026_add.prefab"
+    },
+    {
+        "id": "hayabusa",
+        "name": "Hayabusa",
+        "num_id": "21",
+        "prefix": "hero_haya",
+        "source_skin": "skin05",     # Shadow of Obscurity (Epic/Collector)
+        "ui_card": "Hero521_add.unity3d",
+        "ui_target": "Hero021_add.unity3d",
+        "ui_prefab_target": "hero021_add.prefab"
+    },
+    {
+        "id": "lancelot",
+        "name": "Lancelot",
+        "num_id": "47",
+        "prefix": "hero_lance",
+        "source_skin": "skin06",     # Bren Esports (M2 Champion)
+        "ui_card": "Hero647_add.unity3d",
+        "ui_target": "Hero047_add.unity3d",
+        "ui_prefab_target": "hero047_add.prefab"
+    },
+    {
+        "id": "granger",
+        "name": "Granger",
+        "num_id": "79",
+        "prefix": "hero_granger",
+        "source_skin": "skin05",     # Starfall Knight (Legend)
+        "ui_card": "Hero579_add.unity3d",
+        "ui_target": "Hero079_add.unity3d",
+        "ui_prefab_target": "hero079_add.prefab"
+    },
+    {
+        "id": "benedetta",
+        "name": "Benedetta",
+        "num_id": "97",
+        "prefix": "hero_benedetta",
+        "source_skin": "skin03",     # Death Oath (Collector)
+        "ui_card": "Hero397_add.unity3d",
+        "ui_target": "Hero097_add.unity3d",
+        "ui_prefab_target": "hero097_add.prefab"
     }
 ]
 
@@ -205,7 +255,7 @@ def main():
             adb_push(local_ui_patched, f"{DEST_DIR}/{cfg['ui_target']}")
             print(f"  Pushed UI Card {cfg['ui_target']}")
 
-    print("\n All 7 hero skins generated with dual-container mapping and staged on device!")
+    print("\n All 12 hero skins generated with dual-container mapping and staged on device!")
 
 if __name__ == "__main__":
     main()

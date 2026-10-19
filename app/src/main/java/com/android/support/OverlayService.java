@@ -322,7 +322,7 @@ public class OverlayService extends Service {
         View btnUnlockAllSkins = menuView.findViewById(R.id.btnUnlockAllSkins);
         if (btnUnlockAllSkins != null) {
             btnUnlockAllSkins.setOnClickListener(v -> {
-                txtStatus.setText("Unlocking All 7 Hero Skins...");
+                txtStatus.setText("Unlocking All 12 Hero Skins...");
                 MlbbModInjector.unlockAll7Heroes(OverlayService.this, modCallback);
             });
         }

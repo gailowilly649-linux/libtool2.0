@@ -419,7 +419,7 @@
                     android:layout_height="44dp"
                     android:layout_weight="1"
                     android:background="#1E3324"
-                    android:text="★ UNLOCK ALL 7 SKINS"
+                    android:text="★ UNLOCK ALL 12 SKINS"
                     android:textColor="#00E676"
                     android:textSize="11sp"
                     android:textStyle="bold" />

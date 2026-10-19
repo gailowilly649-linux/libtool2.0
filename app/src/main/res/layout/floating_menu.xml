@@ -215,17 +215,17 @@
                     android:textSize="9sp" />
             </LinearLayout>
 
-            <!-- 3. UNLOCK HERO SKINS SECTION (7 HEROES) -->
+            <!-- 3. UNLOCK HERO SKINS SECTION (12 HEROES) -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="UNLOCK HERO SKINS (7 HEROES)"
+                android:text="UNLOCK HERO SKINS (12 HEROES)"
                 android:textColor="#FFD54F"
                 android:textSize="10sp"
                 android:textStyle="bold" />
 
-            <!-- Quick Action: All 7 Heroes -->
+            <!-- Quick Action: All 12 Heroes -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -238,7 +238,7 @@
                     android:layout_height="34dp"
                     android:layout_weight="1"
                     android:background="#1E3324"
-                    android:text="★ UNLOCK ALL 7"
+                    android:text="★ UNLOCK ALL 12"
                     android:textColor="#00E676"
                     android:textSize="10sp"
                     android:textStyle="bold" />
