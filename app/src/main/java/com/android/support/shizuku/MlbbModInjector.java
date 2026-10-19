@@ -445,49 +445,77 @@ public final class MlbbModInjector {
     static {
         // 1. Fanny (Assassin) - Mikasa Ackerman (Attack on Titan / Skin 12)
         HERO_SKINS.add(new HeroSkinOption("fanny", "Fanny", "Mikasa Ackerman (AoT)", "Assassin", new String[][]{
+                {"Art/android/h/hero_fanny_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_fanny_skin_high_add.unity3d"},
                 {"Art/android/h/hero_fanny_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_fanny_skin01_high_add.unity3d"},
+                {"Art/android/h/hero_fanny_skin.unity3d", PATCHED_SKINS_DIR + "/hero_fanny_skin.unity3d"},
+                {"Art/android/h/hero_fanny_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_fanny_skin_shadow_high_add.unity3d"},
+                {"Art/android/h/hero_fanny_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_fanny_skin01_shadow_high_add.unity3d"},
                 {"Art/android/h/hero_fanny_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_fanny_skin01_add.unity3d"},
                 {"UI/android/Hero171_add.unity3d", PATCHED_SKINS_DIR + "/Hero171_add.unity3d"}
         }));
 
         // 2. Gusion (Assassin) - K' (KOF Collab / Skin 06)
         HERO_SKINS.add(new HeroSkinOption("gusion", "Gusion", "K' (KOF Collab)", "Assassin", new String[][]{
+                {"Art/android/h/hero_Gusin_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_Gusin_skin_high_add.unity3d"},
                 {"Art/android/h/hero_Gusin_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_Gusin_skin01_high_add.unity3d"},
+                {"Art/android/h/hero_Gusin_skin.unity3d", PATCHED_SKINS_DIR + "/hero_Gusin_skin.unity3d"},
+                {"Art/android/h/hero_Gusin_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_Gusin_skin_shadow_high_add.unity3d"},
+                {"Art/android/h/hero_Gusin_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_Gusin_skin01_shadow_high_add.unity3d"},
                 {"Art/android/h/hero_Gusin_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_Gusin_skin01_add.unity3d"},
                 {"UI/android/Hero056_add.unity3d", PATCHED_SKINS_DIR + "/Hero056_add.unity3d"}
         }));
 
-        // 3. Ling (Assassin) - Seraphic Scourge (Collector / Skin 04)
+        // 3. Ling (Assassin) - Seraphic Scourge (Collector / Skin 05)
         HERO_SKINS.add(new HeroSkinOption("ling", "Ling", "Seraphic Scourge (Collector)", "Assassin", new String[][]{
+                {"Art/android/h/hero_pofa_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_pofa_skin_high_add.unity3d"},
                 {"Art/android/h/hero_pofa_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_pofa_skin01_high_add.unity3d"},
+                {"Art/android/h/hero_pofa_skin.unity3d", PATCHED_SKINS_DIR + "/hero_pofa_skin.unity3d"},
+                {"Art/android/h/hero_pofa_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_pofa_skin_shadow_high_add.unity3d"},
+                {"Art/android/h/hero_pofa_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_pofa_skin01_shadow_high_add.unity3d"},
                 {"Art/android/h/hero_pofa_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_pofa_skin01_add.unity3d"},
                 {"UI/android/Hero084_add.unity3d", PATCHED_SKINS_DIR + "/Hero084_add.unity3d"}
         }));
 
         // 4. Nolan (Assassin) - The Navigator (Skin 03)
         HERO_SKINS.add(new HeroSkinOption("nolan", "Nolan", "The Navigator", "Assassin", new String[][]{
+                {"Art/android/h/hero_NolanOsborne_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_NolanOsborne_skin_high_add.unity3d"},
                 {"Art/android/h/hero_NolanOsborne_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_NolanOsborne_skin01_high_add.unity3d"},
+                {"Art/android/h/hero_NolanOsborne_skin.unity3d", PATCHED_SKINS_DIR + "/hero_NolanOsborne_skin.unity3d"},
+                {"Art/android/h/hero_NolanOsborne_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_NolanOsborne_skin_shadow_high_add.unity3d"},
+                {"Art/android/h/hero_NolanOsborne_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_NolanOsborne_skin01_shadow_high_add.unity3d"},
                 {"Art/android/h/hero_NolanOsborne_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_NolanOsborne_skin01_add.unity3d"},
                 {"UI/android/Hero1221_add.unity3d", PATCHED_SKINS_DIR + "/Hero1221_add.unity3d"}
         }));
 
         // 5. Miya (Marksman) - Doom Catalyst (Collector / Skin 14)
         HERO_SKINS.add(new HeroSkinOption("miya", "Miya", "Doom Catalyst (Collector)", "Marksman", new String[][]{
+                {"Art/android/h/hero_gongjianshou_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_gongjianshou_skin_high_add.unity3d"},
                 {"Art/android/h/hero_gongjianshou_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_gongjianshou_skin01_high_add.unity3d"},
+                {"Art/android/h/hero_gongjianshou_skin.unity3d", PATCHED_SKINS_DIR + "/hero_gongjianshou_skin.unity3d"},
+                {"Art/android/h/hero_gongjianshou_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_gongjianshou_skin_shadow_high_add.unity3d"},
+                {"Art/android/h/hero_gongjianshou_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_gongjianshou_skin01_shadow_high_add.unity3d"},
                 {"Art/android/h/hero_gongjianshou_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_gongjianshou_skin01_add.unity3d"},
                 {"UI/android/Hero1001_add.unity3d", PATCHED_SKINS_DIR + "/Hero1001_add.unity3d"}
         }));
 
         // 6. Claude (Marksman) - Bad Bro (Sanrio Collab / Skin 08)
         HERO_SKINS.add(new HeroSkinOption("claude", "Claude", "Bad Bro (Sanrio)", "Marksman", new String[][]{
+                {"Art/android/h/hero_claude_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_claude_skin_high_add.unity3d"},
                 {"Art/android/h/hero_claude_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_claude_skin01_high_add.unity3d"},
+                {"Art/android/h/hero_claude_skin.unity3d", PATCHED_SKINS_DIR + "/hero_claude_skin.unity3d"},
+                {"Art/android/h/hero_claude_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_claude_skin_shadow_high_add.unity3d"},
+                {"Art/android/h/hero_claude_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_claude_skin01_shadow_high_add.unity3d"},
                 {"Art/android/h/hero_claude_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_claude_skin01_add.unity3d"},
                 {"UI/android/Hero065_add.unity3d", PATCHED_SKINS_DIR + "/Hero065_add.unity3d"}
         }));
 
         // 7. Karrie (Marksman) - Starstruck (M5 Champion / Skin 11)
         HERO_SKINS.add(new HeroSkinOption("karrie", "Karrie", "Starstruck (M5 Champion)", "Marksman", new String[][]{
+                {"Art/android/h/hero_feilun_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_feilun_skin_high_add.unity3d"},
                 {"Art/android/h/hero_feilun_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_feilun_skin01_high_add.unity3d"},
+                {"Art/android/h/hero_feilun_skin.unity3d", PATCHED_SKINS_DIR + "/hero_feilun_skin.unity3d"},
+                {"Art/android/h/hero_feilun_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_feilun_skin_shadow_high_add.unity3d"},
+                {"Art/android/h/hero_feilun_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_feilun_skin01_shadow_high_add.unity3d"},
                 {"Art/android/h/hero_feilun_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_feilun_skin01_add.unity3d"},
                 {"UI/android/Hero401_add.unity3d", PATCHED_SKINS_DIR + "/Hero401_add.unity3d"}
         }));
@@ -516,7 +544,9 @@ public final class MlbbModInjector {
             try {
                 postProgress(callback, "Unlocking " + target.heroName + " (" + target.skinName + ")...");
                 applyHeroSwapInternal(context, target);
-                postComplete(callback, true, "Unlocked " + target.heroName + " (" + target.skinName + ")!\nCustom model, VFX, and audio active.");
+                postComplete(callback, true, "⚡ Unlocked " + target.heroName + " (" + target.skinName + ")!\n" +
+                        "💡 In Hero Pick: Select DEFAULT Skin!\n" +
+                        "Your screen will render " + target.skinName + " with custom 3D model & VFX.");
             } catch (Throwable t) {
                 Log.e(TAG, "Error unlocking " + heroId, t);
                 postComplete(callback, false, "Unlock error: " + t.getMessage());
@@ -572,7 +602,9 @@ public final class MlbbModInjector {
                     postProgress(callback, "Injecting " + h.heroName + " (" + h.skinName + ")...");
                     applyHeroSwapInternal(context, h);
                 }
-                postComplete(callback, true, "All 7 Skins unlocked successfully!\n(Fanny, Gusion, Ling, Nolan, Miya, Claude, Karrie)");
+                postComplete(callback, true, "⚡ All 7 Skins unlocked successfully!\n" +
+                        "💡 In Hero Pick: Select DEFAULT Skin for any of the 7 heroes!\n" +
+                        "Works in Practice, Custom, Classic, and Rank.");
             } catch (Throwable t) {
                 Log.e(TAG, "Error unlocking all skins", t);
                 postComplete(callback, false, "Unlock error: " + t.getMessage());
