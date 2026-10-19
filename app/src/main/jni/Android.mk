@@ -68,7 +68,6 @@ LOCAL_SRC_FILES := \
     Tool/MemoryGuard.cpp \
     Tool/AOBScanner.cpp \
     Tool/MemorySearcherTab.cpp \
-    Tool/ESP.cpp \
     Includes/Utils.cpp \
     Includes/Logger.cpp \
     KittyMemory/KittyMemory.cpp \

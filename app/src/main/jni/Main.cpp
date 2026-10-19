@@ -24,7 +24,6 @@
 #include "Tool/MemoryGuard.h"
 #include "Tool/AOBScanner.h"
 #include "Tool/MemorySearcherTab.h"
-#include "Tool/ESP.h"
 
 void logcatJson(nlohmann::ordered_json &json)
 {
@@ -99,8 +98,6 @@ void draw_thread()
         ModFeatures::Update();
         ModFeatures::DrawOverlayHUD();
         MemorySearcherTab::Update();
-        ESP::Update();
-        ESP::DrawOverlay();
         return;
     }
 
@@ -169,8 +166,6 @@ void draw_thread()
     ModFeatures::Update();
     ModFeatures::DrawOverlayHUD();
     MemorySearcherTab::Update();
-    ESP::Update();
-    ESP::DrawOverlay();
 
     collapsed = !ImGui::Begin(title, nullptr, (fullScreen ? ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove : 0));
     if (fullScreen)
@@ -553,7 +548,6 @@ void on_init()
                 ConfigManager::Init();
                 ModFeatures::Init();
                 MemorySearcherTab::Init();
-                ESP::Init();
 #ifndef LIB_INPUT
                 Unity::HookInput();
 #endif
@@ -573,7 +567,6 @@ void on_init()
     ConfigManager::Init();
     ModFeatures::Init();
     MemorySearcherTab::Init();
-    ESP::Init();
 
     LOGD("HOOKING...");
 

@@ -1,5 +1,4 @@
 #include "ModFeatures.h"
-#include "ESP.h"
 #include "Il2cpp/Il2cpp.h"
 #include "Il2cpp/il2cpp-class.h"
 #include "Tool/Tool.h"
@@ -349,15 +348,6 @@ namespace ModFeatures
                 SetOverlayHUDEnabled(hud);
             }
             ImGui::TextDisabled("Displays a non-intrusive HUD in the top-left corner during battle.");
-        }
-
-        ImGui::Spacing();
-        ImGui::Separator();
-
-        // 4. Hero ESP Overlay Section
-        if (ImGui::CollapsingHeader("Hero ESP & Visuals", ImGuiTreeNodeFlags_DefaultOpen))
-        {
-            ESP::DrawSettings();
         }
     }
 } // namespace ModFeatures
