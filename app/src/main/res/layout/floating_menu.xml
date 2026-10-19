@@ -146,15 +146,45 @@
                 android:textColor="#D8DEE9"
                 android:textSize="9sp" />
 
-            <!-- 2. FPS & REFRESH RATE SECTION -->
+            <!-- 2. REAL 165 FPS & FAKE SPOOF SECTION -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="⚡ ULTRA 165 FPS (FAKE SPOOF)"
+                    android:textColor="#00E5FF"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvFpsStatusBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#2E3440"
+                    android:paddingStart="4dp"
+                    android:paddingTop="1dp"
+                    android:paddingEnd="4dp"
+                    android:paddingBottom="1dp"
+                    android:text="ROG 8 PRO"
+                    android:textColor="#76FF03"
+                    android:textSize="7sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="120 FPS / ULTRA GRAPHICS"
-                android:textColor="#00E5FF"
-                android:textSize="10sp"
-                android:textStyle="bold" />
+                android:layout_marginTop="1dp"
+                android:text="Uncaps 165 FPS in engine + ASUS ROG 8 Pro spoof + 144Hz panel sync"
+                android:textColor="#90A4AE"
+                android:textSize="8sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -163,12 +193,12 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/btnUnlock120Fps"
+                    android:id="@+id/btnUnlock165Fps"
                     android:layout_width="0dp"
                     android:layout_height="32dp"
-                    android:layout_weight="1"
+                    android:layout_weight="1.2"
                     android:background="#1E232E"
-                    android:text="UNLOCK 120 FPS"
+                    android:text="⚡ UNLOCK 165 FPS"
                     android:textColor="#00E676"
                     android:textSize="9sp"
                     android:textStyle="bold" />
@@ -178,9 +208,9 @@
                     android:layout_width="0dp"
                     android:layout_height="32dp"
                     android:layout_marginStart="3dp"
-                    android:layout_weight="1"
-                    android:background="#1E232E"
-                    android:text="RESET 60 FPS"
+                    android:layout_weight="0.8"
+                    android:background="#2E3440"
+                    android:text="RESET 60 HZ"
                     android:textColor="#D8DEE9"
                     android:textSize="9sp" />
             </LinearLayout>

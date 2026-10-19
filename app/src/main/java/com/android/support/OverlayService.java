@@ -301,16 +301,22 @@ public class OverlayService extends Service {
             MlbbModInjector.restoreDefaultDrone(modCallback);
         });
 
-        // Section 2: 120 FPS
-        menuView.findViewById(R.id.btnUnlock120Fps).setOnClickListener(v -> {
-            txtStatus.setText("Unlocking 120 FPS...");
-            MlbbModInjector.unlock120Fps(this, true, modCallback);
-        });
+        // Section 2: Real 165 FPS & ASUS ROG Phone 8 Pro Fake Spoof
+        View btnUnlock165 = menuView.findViewById(R.id.btnUnlock165Fps);
+        if (btnUnlock165 != null) {
+            btnUnlock165.setOnClickListener(v -> {
+                txtStatus.setText("Unlocking Real 165 FPS & Spoofing ROG 8 Pro...");
+                MlbbModInjector.unlockReal165Fps(this, true, modCallback);
+            });
+        }
 
-        menuView.findViewById(R.id.btnResetFps).setOnClickListener(v -> {
-            txtStatus.setText("Resetting FPS...");
-            MlbbModInjector.unlock120Fps(this, false, modCallback);
-        });
+        View btnResetFps = menuView.findViewById(R.id.btnResetFps);
+        if (btnResetFps != null) {
+            btnResetFps.setOnClickListener(v -> {
+                txtStatus.setText("Restoring stock 60 Hz display & settings...");
+                MlbbModInjector.unlockReal165Fps(this, false, modCallback);
+            });
+        }
 
         // Section 3: 7 Heroes Skins Unlocker
         View btnUnlockAllSkins = menuView.findViewById(R.id.btnUnlockAllSkins);

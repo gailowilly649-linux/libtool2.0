@@ -155,10 +155,15 @@ public final class MlbbModInjector {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // 2. 120 FPS & ULTRA GRAPHICS UNLOCK
+    // 2. REAL 165 FPS & ULTRA GRAPHICS UNLOCK (ASUS ROG PHONE 8 PRO FAKE SPOOF)
     // ─────────────────────────────────────────────────────────────────────────
 
-    public static void unlock120Fps(Context context, boolean unlock, Callback callback) {
+    public static final String BACKUP_FPS_DIR = FILES + "/dragon2017/backup_fps";
+    public static final String FAKE_SPOOF_MODEL = "ASUS_AI2401_A";
+    public static final String FAKE_SPOOF_MANUFACTURER = "asus";
+    public static final String FAKE_SPOOF_NAME = "ASUS ROG Phone 8 Pro (165Hz)";
+
+    public static void unlockReal165Fps(Context context, boolean unlock, Callback callback) {
         EXECUTOR.execute(() -> {
             if (!ShizukuShell.hasPermission()) {
                 postComplete(callback, false, "Shizuku permission not granted.");
@@ -167,46 +172,173 @@ public final class MlbbModInjector {
 
             try {
                 if (unlock) {
-                    postProgress(callback, "Unlocking 120 FPS display refresh rate...");
-                    // Force system refresh rate to 120Hz/144Hz
-                    ShizukuShell.exec("settings put system peak_refresh_rate 120.0");
-                    ShizukuShell.exec("settings put system min_refresh_rate 120.0");
-                    ShizukuShell.exec("settings put system user_refresh_rate 120 2>/dev/null");
+                    postProgress(callback, "1/4: Locking display panel to 144 Hz (hardware ceiling)...");
+                    // 1. Force SurfaceFlinger & Transsion display controller to 144Hz
+                    String displayCmd = 
+                            "settings put system peak_refresh_rate 144.0; " +
+                            "settings put system min_refresh_rate 144.0; " +
+                            "settings put system user_refresh_rate 144; " +
+                            "settings put system tran_refresh_mode 144; " +
+                            "settings put system tran_refresh_rate 144; " +
+                            "settings put system tran_screen_refresh_rate_mode 144; " +
+                            "settings put system refresh_rate_setting 144; " +
+                            "settings put system tecno_refresh_rate 144; " +
+                            "settings put system infinix_refresh_rate 144; " +
+                            "settings put system max_refresh_rate 165; " +
+                            "settings put system game_fps_override 165; " +
+                            "settings put system display_refresh_rate 165; " +
+                            "settings put global peak_refresh_rate 144.0; " +
+                            "settings put global min_refresh_rate 144.0; " +
+                            "settings put global user_refresh_rate 144; " +
+                            "settings put global game_overlay_refresh_rate 165; " +
+                            "settings put global preferred_refresh_rate 165; " +
+                            "settings put global force_refresh_rate 165; " +
+                            "settings put global refresh_rate_force_high 1; " +
+                            "settings put global tran_high_temperature_limit_refresh_rate 0; " +
+                            "settings put global game_refresh_rate_pkgs com.mobile.legends; " +
+                            "settings put global game_refresh_rate_values 165";
+                    ShizukuShell.exec(displayCmd);
 
-                    postProgress(callback, "Writing 120 FPS config to MLBB...");
-                    // Build PlayerPrefs XML snippet to enable high FPS mode (3 = 120FPS)
+                    postProgress(callback, "2/4: Injecting Unity boot.config (165 FPS & VSync disabled)...");
+                    File stage = new File(STAGE_DIR);
+                    stage.mkdirs();
+                    stageAsset(context, "mlbb_fps/boot.config", stage, "boot.config");
+
+                    String stageBoot = stage.getAbsolutePath() + "/boot.config";
+                    if (new File(stageBoot).exists()) {
+                        ShizukuShell.exec("cp -f \"" + stageBoot + "\" \"" + FILES + "/boot.config\"");
+                        ShizukuShell.exec("cp -f \"" + stageBoot + "\" \"" + DRAGON_ASSETS + "/boot.config\"");
+                    }
+
+                    postProgress(callback, "3/4: Patching GameSettings_Rank table (Ultra 165 FPS tier)...");
+                    stageAsset(context, "mlbb_fps/GameSettings_Rank_165.bytes", stage, "GameSettings_Rank.bytes");
+                    File stageRank = new File(stage, "GameSettings_Rank.bytes");
+                    if (stageRank.exists()) {
+                        String docDir = DRAGON_ASSETS + "/Document/android";
+                        ShizukuShell.exec("mkdir -p \"" + docDir + "\"");
+                        ShizukuShell.exec("mkdir -p \"" + BACKUP_FPS_DIR + "\"");
+                        // Backup original stock table if not already backed up
+                        ShizukuShell.exec("if [ ! -f \"" + BACKUP_FPS_DIR + "/GameSettings_Rank.bytes\" ] && [ -f \"" + docDir + "/GameSettings_Rank.bytes\" ]; then cp -f \"" + docDir + "/GameSettings_Rank.bytes\" \"" + BACKUP_FPS_DIR + "/GameSettings_Rank.bytes\"; fi");
+                        // Copy patched table
+                        ShizukuShell.exec("cp -f \"" + stageRank.getAbsolutePath() + "\" \"" + docDir + "/GameSettings_Rank.bytes\"");
+
+                        // Also patch into active mini_patch slots
+                        List<String> slots = discoverActiveSlots();
+                        for (String slot : slots) {
+                            String slotDoc = slot + "/Document/android";
+                            ShizukuShell.exec("if [ -d \"" + slotDoc + "\" ]; then cp -f \"" + stageRank.getAbsolutePath() + "\" \"" + slotDoc + "/GameSettings_Rank.bytes\"; fi");
+                        }
+                    }
+
+                    postProgress(callback, "4/4: Spoofing ASUS ROG 8 Pro & Ultra PlayerPrefs...");
+                    // Write high FPS and ASUS spoof parameters to prefs_int and prefs_string
+                    String prefsIntScript = 
+                            "INT_FILE=\"" + DRAGON_ASSETS + "/prefs_int\"; " +
+                            "touch \"$INT_FILE\"; " +
+                            "for k in high_fps_mode:4 fps_level:4 __FrameRateLevel__:4 __MaxFrameRateLevel__:4 __FrameRateLevel__\\$AI:4 resolution_high:1 hd_mode:1 shadow:1 outline:1; do " +
+                            "  key=$(echo \"$k\" | cut -d: -f1); " +
+                            "  val=$(echo \"$k\" | cut -d: -f2); " +
+                            "  sed -i \"/^$key:/d\" \"$INT_FILE\"; " +
+                            "  echo \"$key:$val\" >> \"$INT_FILE\"; " +
+                            "done";
+                    ShizukuShell.exec(prefsIntScript);
+
+                    String prefsStringScript = 
+                            "STR_FILE=\"" + DRAGON_ASSETS + "/prefs_string\"; " +
+                            "touch \"$STR_FILE\"; " +
+                            "for k in ro.product.model:" + FAKE_SPOOF_MODEL + " ro.product.manufacturer:" + FAKE_SPOOF_MANUFACTURER + " deviceModel:\"" + FAKE_SPOOF_NAME + "\"; do " +
+                            "  key=$(echo \"$k\" | cut -d: -f1); " +
+                            "  val=$(echo \"$k\" | cut -d: -f2); " +
+                            "  sed -i \"/^$key:/d\" \"$STR_FILE\"; " +
+                            "  echo \"$key:$val\" >> \"$STR_FILE\"; " +
+                            "done";
+                    ShizukuShell.exec(prefsStringScript);
+
+                    // Also generate shared_prefs XML for extra persistence
                     String prefsXml = "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>\n"
                             + "<map>\n"
-                            + "    <int name=\"high_fps_mode\" value=\"3\" />\n"
-                            + "    <int name=\"fps_level\" value=\"3\" />\n"
+                            + "    <int name=\"high_fps_mode\" value=\"4\" />\n"
+                            + "    <int name=\"fps_level\" value=\"4\" />\n"
+                            + "    <int name=\"__FrameRateLevel__\" value=\"4\" />\n"
+                            + "    <int name=\"__MaxFrameRateLevel__\" value=\"4\" />\n"
                             + "    <int name=\"resolution_high\" value=\"1\" />\n"
                             + "    <int name=\"outline\" value=\"1\" />\n"
                             + "    <int name=\"shadow\" value=\"1\" />\n"
                             + "    <int name=\"hd_mode\" value=\"1\" />\n"
-                            + "    <int name=\"render_scale\" value=\"120\" />\n"
+                            + "    <int name=\"render_scale\" value=\"165\" />\n"
+                            + "    <string name=\"device_model\">" + FAKE_SPOOF_MODEL + "</string>\n"
+                            + "    <string name=\"device_manufacturer\">" + FAKE_SPOOF_MANUFACTURER + "</string>\n"
                             + "</map>";
-
-                    File stage = new File(STAGE_DIR);
-                    stage.mkdirs();
-                    File prefsFile = new File(stage, "120fps_prefs.xml");
+                    File prefsFile = new File(stage, "165fps_prefs.xml");
                     writeFile(prefsFile, prefsXml.getBytes("UTF-8"));
-
-                    // Copy to shared_prefs if directory exists or accessible
                     String targetPrefs = "/data/data/" + PKG + "/shared_prefs/" + PKG + "_preferences.xml";
                     ShizukuShell.exec("cp -f \"" + prefsFile.getAbsolutePath() + "\" \"" + targetPrefs + "\" 2>/dev/null");
+
+                    // Cleanup stage
                     ShizukuShell.exec("rm -rf \"" + STAGE_DIR + "\"");
 
-                    postComplete(callback, true, "120 FPS & Ultra Graphics unlocked!\nDisplay locked to 120 Hz.");
+                    postComplete(callback, true, 
+                            "⚡ Real 165 FPS & Ultra Unlocked!\n" +
+                            "• Spoofed Device: ASUS ROG Phone 8 Pro\n" +
+                            "• Screen Display: Locked to 144 Hz\n" +
+                            "• Engine Target: 165 FPS (VSync Off)\n" +
+                            "• Game Table: Ultra Tier 5 Active\n" +
+                            "Launch MLBB to enjoy ultra-smooth gameplay!");
                 } else {
-                    postProgress(callback, "Restoring default FPS...");
-                    ShizukuShell.exec("settings put system peak_refresh_rate 60.0");
-                    ShizukuShell.exec("settings put system min_refresh_rate 60.0");
-                    postComplete(callback, true, "Display refresh rate restored to default.");
+                    postProgress(callback, "Restoring stock 60 Hz display & settings...");
+                    // 1. Revert display refresh rate
+                    String revertDisplayCmd = 
+                            "settings put system peak_refresh_rate 60.0; " +
+                            "settings put system min_refresh_rate 60.0; " +
+                            "settings put system user_refresh_rate 60; " +
+                            "settings put system tran_refresh_mode 60; " +
+                            "settings put system tran_refresh_rate 60; " +
+                            "settings put system tran_screen_refresh_rate_mode 60; " +
+                            "settings put system refresh_rate_setting 60; " +
+                            "settings put global peak_refresh_rate 60.0; " +
+                            "settings put global min_refresh_rate 60.0; " +
+                            "settings put global user_refresh_rate 60";
+                    ShizukuShell.exec(revertDisplayCmd);
+
+                    // 2. Remove boot.config
+                    ShizukuShell.exec("rm -f \"" + FILES + "/boot.config\" 2>/dev/null; rm -f \"" + DRAGON_ASSETS + "/boot.config\" 2>/dev/null");
+
+                    // 3. Restore stock GameSettings_Rank.bytes
+                    stageAsset(context, "mlbb_fps/GameSettings_Rank_stock.bytes", new File(STAGE_DIR), "GameSettings_Rank_stock.bytes");
+                    File stageStock = new File(STAGE_DIR, "GameSettings_Rank_stock.bytes");
+                    String docDir = DRAGON_ASSETS + "/Document/android";
+                    if (new File(BACKUP_FPS_DIR + "/GameSettings_Rank.bytes").exists()) {
+                        ShizukuShell.exec("cp -f \"" + BACKUP_FPS_DIR + "/GameSettings_Rank.bytes\" \"" + docDir + "/GameSettings_Rank.bytes\"");
+                    } else if (stageStock.exists()) {
+                        ShizukuShell.exec("cp -f \"" + stageStock.getAbsolutePath() + "\" \"" + docDir + "/GameSettings_Rank.bytes\"");
+                    }
+
+                    // Also restore into active mini_patch slots
+                    List<String> slots = discoverActiveSlots();
+                    for (String slot : slots) {
+                        String slotDoc = slot + "/Document/android";
+                        if (stageStock.exists()) {
+                            ShizukuShell.exec("if [ -f \"" + slotDoc + "/GameSettings_Rank.bytes\" ]; then cp -f \"" + stageStock.getAbsolutePath() + "\" \"" + slotDoc + "/GameSettings_Rank.bytes\"; fi");
+                        }
+                    }
+
+                    // 4. Remove spoof lines from prefs_int and prefs_string
+                    ShizukuShell.exec("sed -i '/__FrameRateLevel__/d; /__MaxFrameRateLevel__/d; /high_fps_mode/d; /fps_level/d' \"" + DRAGON_ASSETS + "/prefs_int\" 2>/dev/null");
+                    ShizukuShell.exec("sed -i '/ASUS/d; /asus/d' \"" + DRAGON_ASSETS + "/prefs_string\" 2>/dev/null");
+
+                    ShizukuShell.exec("rm -rf \"" + STAGE_DIR + "\"");
+
+                    postComplete(callback, true, "Stock 60 Hz display & default MLBB FPS restored!");
                 }
             } catch (Throwable t) {
-                postComplete(callback, false, "120 FPS error: " + t.getMessage());
+                Log.e(TAG, "165 FPS injection error", t);
+                postComplete(callback, false, "165 FPS error: " + t.getMessage());
             }
         });
+    }
+
+    public static void unlock120Fps(Context context, boolean unlock, Callback callback) {
+        unlockReal165Fps(context, unlock, callback);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
