@@ -317,7 +317,7 @@ public class OverlayService extends Service {
         if (btnUnlockAllSkins != null) {
             btnUnlockAllSkins.setOnClickListener(v -> {
                 txtStatus.setText("Unlocking All 7 Hero Skins...");
-                MlbbModInjector.unlockAll7Heroes(modCallback);
+                MlbbModInjector.unlockAll7Heroes(OverlayService.this, modCallback);
             });
         }
 
@@ -333,7 +333,7 @@ public class OverlayService extends Service {
         if (btnSkinFanny != null) {
             btnSkinFanny.setOnClickListener(v -> {
                 txtStatus.setText("Unlocking Fanny Mikasa...");
-                MlbbModInjector.unlockHeroSkin("fanny", modCallback);
+                MlbbModInjector.unlockHeroSkin(OverlayService.this, "fanny", modCallback);
             });
         }
 
@@ -341,15 +341,15 @@ public class OverlayService extends Service {
         if (btnSkinGusion != null) {
             btnSkinGusion.setOnClickListener(v -> {
                 txtStatus.setText("Unlocking Gusion KOF...");
-                MlbbModInjector.unlockHeroSkin("gusion", modCallback);
+                MlbbModInjector.unlockHeroSkin(OverlayService.this, "gusion", modCallback);
             });
         }
 
         View btnSkinLing = menuView.findViewById(R.id.btnSkinLing);
         if (btnSkinLing != null) {
             btnSkinLing.setOnClickListener(v -> {
-                txtStatus.setText("Unlocking Ling Lord Shen...");
-                MlbbModInjector.unlockHeroSkin("ling", modCallback);
+                txtStatus.setText("Unlocking Ling Seraphic Scourge...");
+                MlbbModInjector.unlockHeroSkin(OverlayService.this, "ling", modCallback);
             });
         }
 
@@ -357,7 +357,7 @@ public class OverlayService extends Service {
         if (btnSkinNolan != null) {
             btnSkinNolan.setOnClickListener(v -> {
                 txtStatus.setText("Unlocking Nolan Navigator...");
-                MlbbModInjector.unlockHeroSkin("nolan", modCallback);
+                MlbbModInjector.unlockHeroSkin(OverlayService.this, "nolan", modCallback);
             });
         }
 
@@ -365,7 +365,7 @@ public class OverlayService extends Service {
         if (btnSkinMiya != null) {
             btnSkinMiya.setOnClickListener(v -> {
                 txtStatus.setText("Unlocking Miya Collector...");
-                MlbbModInjector.unlockHeroSkin("miya", modCallback);
+                MlbbModInjector.unlockHeroSkin(OverlayService.this, "miya", modCallback);
             });
         }
 
@@ -373,7 +373,7 @@ public class OverlayService extends Service {
         if (btnSkinClaude != null) {
             btnSkinClaude.setOnClickListener(v -> {
                 txtStatus.setText("Unlocking Claude Sanrio...");
-                MlbbModInjector.unlockHeroSkin("claude", modCallback);
+                MlbbModInjector.unlockHeroSkin(OverlayService.this, "claude", modCallback);
             });
         }
 
@@ -381,7 +381,7 @@ public class OverlayService extends Service {
         if (btnSkinKarrie != null) {
             btnSkinKarrie.setOnClickListener(v -> {
                 txtStatus.setText("Unlocking Karrie M5...");
-                MlbbModInjector.unlockHeroSkin("karrie", modCallback);
+                MlbbModInjector.unlockHeroSkin(OverlayService.this, "karrie", modCallback);
             });
         }
 

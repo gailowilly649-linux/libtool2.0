@@ -291,6 +291,7 @@ public final class MlbbModInjector {
     // ─────────────────────────────────────────────────────────────────────────
 
     public static final String BACKUP_SKINS_DIR = FILES + "/dragon2017/backup_skins";
+    public static final String PATCHED_SKINS_DIR = "/sdcard/Download/WillyLibTool/skins";
 
     public static class HeroSkinOption {
         public final String heroId;
@@ -310,67 +311,57 @@ public final class MlbbModInjector {
 
     public static final List<HeroSkinOption> HERO_SKINS = new ArrayList<>();
     static {
-        // 1. Fanny (Assassin) - Mikasa Ackerman (Attack on Titan)
+        // 1. Fanny (Assassin) - Mikasa Ackerman (Attack on Titan / Skin 12)
         HERO_SKINS.add(new HeroSkinOption("fanny", "Fanny", "Mikasa Ackerman (AoT)", "Assassin", new String[][]{
-                {"Art/android/h/hero_fanny_skin_high_add.unity3d", "Art/android/h/hero_fanny_skin12_high_add.unity3d"},
-                {"Art/android/h/hero_fanny.unity3d", "Art/android/h/hero_fanny_skin12_add.unity3d"},
-                {"Art/android/h/hero_fanny_skin_shadow_high_add.unity3d", "Art/android/h/hero_fanny_skin12_shadow_high_add.unity3d"},
-                {"UI/android/Hero171_add.unity3d", "UI/android/Hero101712_add.unity3d"},
-                {"UI/android/Hero117_add.unity3d", "UI/android/Hero101712_add.unity3d"}
+                {"Art/android/h/hero_fanny_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_fanny_skin01_high_add.unity3d"},
+                {"Art/android/h/hero_fanny_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_fanny_skin01_add.unity3d"},
+                {"UI/android/Hero171_add.unity3d", PATCHED_SKINS_DIR + "/Hero171_add.unity3d"}
         }));
 
-        // 2. Gusion (Assassin) - K' (KOF Collab)
+        // 2. Gusion (Assassin) - K' (KOF Collab / Skin 06)
         HERO_SKINS.add(new HeroSkinOption("gusion", "Gusion", "K' (KOF Collab)", "Assassin", new String[][]{
-                {"Art/android/h/hero_Gusin_skin_high_add.unity3d", "Art/android/h/hero_Gusin_skin06_high_add.unity3d"},
-                {"Art/android/h/hero_Gusin.unity3d", "Art/android/h/hero_Gusin_skin06_add.unity3d"},
-                {"Art/android/h/hero_Gusin_skin_shadow_high_add.unity3d", "Art/android/h/hero_Gusin_skin06_shadow_high_add.unity3d"},
-                {"UI/android/Hero056_add.unity3d", "UI/android/Hero656_add.unity3d"},
-                {"UI/android/Hero1056_add.unity3d", "UI/android/Hero656_add.unity3d"}
+                {"Art/android/h/hero_Gusin_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_Gusin_skin01_high_add.unity3d"},
+                {"Art/android/h/hero_Gusin_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_Gusin_skin01_add.unity3d"},
+                {"UI/android/Hero056_add.unity3d", PATCHED_SKINS_DIR + "/Hero056_add.unity3d"}
         }));
 
-        // 3. Ling (Assassin) - Lord Shen (Kung Fu Panda Collab)
-        HERO_SKINS.add(new HeroSkinOption("ling", "Ling", "Lord Shen (Kung Fu Panda)", "Assassin", new String[][]{
-                {"Art/android/h/hero_pofa_skin_high_add.unity3d", "Art/android/h/hero_pofa_skin07_high_add.unity3d"},
-                {"Art/android/h/hero_pofa.unity3d", "Art/android/h/hero_pofa_skin07_add.unity3d"},
-                {"Art/android/h/hero_pofa_skin_shadow_high_add.unity3d", "Art/android/h/hero_pofa_skin07_shadow_high_add.unity3d"},
-                {"UI/android/Hero084_add.unity3d", "UI/android/Hero784_add.unity3d"},
-                {"UI/android/Hero1084_add.unity3d", "UI/android/Hero784_add.unity3d"}
+        // 3. Ling (Assassin) - Seraphic Scourge (Collector / Skin 04)
+        HERO_SKINS.add(new HeroSkinOption("ling", "Ling", "Seraphic Scourge (Collector)", "Assassin", new String[][]{
+                {"Art/android/h/hero_pofa_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_pofa_skin01_high_add.unity3d"},
+                {"Art/android/h/hero_pofa_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_pofa_skin01_add.unity3d"},
+                {"UI/android/Hero084_add.unity3d", PATCHED_SKINS_DIR + "/Hero084_add.unity3d"}
         }));
 
         // 4. Nolan (Assassin) - The Navigator (Skin 03)
         HERO_SKINS.add(new HeroSkinOption("nolan", "Nolan", "The Navigator", "Assassin", new String[][]{
-                {"Art/android/h/hero_NolanOsborne_skin_high_add.unity3d", "Art/android/h/hero_NolanOsborne_skin03_high_add.unity3d"},
-                {"Art/android/h/hero_NolanOsborne.unity3d", "Art/android/h/hero_NolanOsborne_skin03_add.unity3d"},
-                {"Art/android/h/hero_NolanOsborne_skin_shadow_high_add.unity3d", "Art/android/h/hero_NolanOsborne_skin03_shadow_high_add.unity3d"},
-                {"UI/android/Hero1221_add.unity3d", "UI/android/Hero1223_add.unity3d"},
-                {"UI/android/Hero1122_add.unity3d", "UI/android/Hero1223_add.unity3d"}
+                {"Art/android/h/hero_NolanOsborne_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_NolanOsborne_skin01_high_add.unity3d"},
+                {"Art/android/h/hero_NolanOsborne_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_NolanOsborne_skin01_add.unity3d"},
+                {"UI/android/Hero1221_add.unity3d", PATCHED_SKINS_DIR + "/Hero1221_add.unity3d"}
         }));
 
-        // 5. Miya (Marksman) - Modesty Goddess (Collector)
-        HERO_SKINS.add(new HeroSkinOption("miya", "Miya", "Modesty Goddess (Collector)", "Marksman", new String[][]{
-                {"Art/android/h/hero_gongjianshou_skin_high_add.unity3d", "Art/android/h/hero_gongjianshou_skin14_high_add.unity3d"},
-                {"Art/android/h/hero_gongjianshou_skin_shadow_high_add.unity3d", "Art/android/h/hero_gongjianshou_skin14_shadow_high_add.unity3d"},
-                {"UI/android/Hero1001_add.unity3d", "UI/android/Hero100114_add.unity3d"}
+        // 5. Miya (Marksman) - Doom Catalyst (Collector / Skin 14)
+        HERO_SKINS.add(new HeroSkinOption("miya", "Miya", "Doom Catalyst (Collector)", "Marksman", new String[][]{
+                {"Art/android/h/hero_gongjianshou_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_gongjianshou_skin01_high_add.unity3d"},
+                {"Art/android/h/hero_gongjianshou_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_gongjianshou_skin01_add.unity3d"},
+                {"UI/android/Hero1001_add.unity3d", PATCHED_SKINS_DIR + "/Hero1001_add.unity3d"}
         }));
 
-        // 6. Claude (Marksman) - Bad Bro (Sanrio Collab)
+        // 6. Claude (Marksman) - Bad Bro (Sanrio Collab / Skin 08)
         HERO_SKINS.add(new HeroSkinOption("claude", "Claude", "Bad Bro (Sanrio)", "Marksman", new String[][]{
-                {"Art/android/h/hero_claude_skin_high_add.unity3d", "Art/android/h/hero_claude_skin08_high_add.unity3d"},
-                {"Art/android/h/hero_claude.unity3d", "Art/android/h/hero_claude_skin08_add.unity3d"},
-                {"Art/android/h/hero_claude_skin_shadow_high_add.unity3d", "Art/android/h/hero_claude_skin08_shadow_high_add.unity3d"},
-                {"UI/android/Hero065_add.unity3d", "UI/android/Hero865_add.unity3d"}
+                {"Art/android/h/hero_claude_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_claude_skin01_high_add.unity3d"},
+                {"Art/android/h/hero_claude_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_claude_skin01_add.unity3d"},
+                {"UI/android/Hero065_add.unity3d", PATCHED_SKINS_DIR + "/Hero065_add.unity3d"}
         }));
 
-        // 7. Karrie (Marksman) - Starstruck (M5 Champion)
+        // 7. Karrie (Marksman) - Starstruck (M5 Champion / Skin 11)
         HERO_SKINS.add(new HeroSkinOption("karrie", "Karrie", "Starstruck (M5 Champion)", "Marksman", new String[][]{
-                {"Art/android/h/hero_feilun_skin_high_add.unity3d", "Art/android/h/hero_feilun_skin11_high_add.unity3d"},
-                {"Art/android/h/hero_feilun.unity3d", "Art/android/h/hero_feilun_skin11_add.unity3d"},
-                {"Art/android/h/hero_feilun_skin_shadow_high_add.unity3d", "Art/android/h/hero_feilun_skin11_shadow_high_add.unity3d"},
-                {"UI/android/Hero401_add.unity3d", "UI/android/Hero104011_add.unity3d"}
+                {"Art/android/h/hero_feilun_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_feilun_skin01_high_add.unity3d"},
+                {"Art/android/h/hero_feilun_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_feilun_skin01_add.unity3d"},
+                {"UI/android/Hero401_add.unity3d", PATCHED_SKINS_DIR + "/Hero401_add.unity3d"}
         }));
     }
 
-    public static void unlockHeroSkin(String heroId, Callback callback) {
+    public static void unlockHeroSkin(Context context, String heroId, Callback callback) {
         EXECUTOR.execute(() -> {
             if (!ShizukuShell.hasPermission()) {
                 postComplete(callback, false, "Shizuku permission not granted.");
@@ -392,13 +383,17 @@ public final class MlbbModInjector {
 
             try {
                 postProgress(callback, "Unlocking " + target.heroName + " (" + target.skinName + ")...");
-                applyHeroSwapInternal(target);
-                postComplete(callback, true, "Unlocked " + target.heroName + " (" + target.skinName + ")!");
+                applyHeroSwapInternal(context, target);
+                postComplete(callback, true, "Unlocked " + target.heroName + " (" + target.skinName + ")!\nCustom model, VFX, and audio active.");
             } catch (Throwable t) {
                 Log.e(TAG, "Error unlocking " + heroId, t);
                 postComplete(callback, false, "Unlock error: " + t.getMessage());
             }
         });
+    }
+
+    public static void unlockHeroSkin(String heroId, Callback callback) {
+        unlockHeroSkin(null, heroId, callback);
     }
 
     public static void restoreHeroSkin(String heroId, Callback callback) {
@@ -432,7 +427,7 @@ public final class MlbbModInjector {
         });
     }
 
-    public static void unlockAll7Heroes(Callback callback) {
+    public static void unlockAll7Heroes(Context context, Callback callback) {
         EXECUTOR.execute(() -> {
             if (!ShizukuShell.hasPermission()) {
                 postComplete(callback, false, "Shizuku permission not granted.");
@@ -440,9 +435,10 @@ public final class MlbbModInjector {
             }
 
             try {
+                injectGameResAlternative(context);
                 for (HeroSkinOption h : HERO_SKINS) {
                     postProgress(callback, "Injecting " + h.heroName + " (" + h.skinName + ")...");
-                    applyHeroSwapInternal(h);
+                    applyHeroSwapInternal(context, h);
                 }
                 postComplete(callback, true, "All 7 Skins unlocked successfully!\n(Fanny, Gusion, Ling, Nolan, Miya, Claude, Karrie)");
             } catch (Throwable t) {
@@ -450,6 +446,10 @@ public final class MlbbModInjector {
                 postComplete(callback, false, "Unlock error: " + t.getMessage());
             }
         });
+    }
+
+    public static void unlockAll7Heroes(Callback callback) {
+        unlockAll7Heroes(null, callback);
     }
 
     public static void restoreAllHeroSkins(Callback callback) {
@@ -464,7 +464,12 @@ public final class MlbbModInjector {
                 for (HeroSkinOption h : HERO_SKINS) {
                     restoreHeroSwapInternal(h);
                 }
-                // Safety wipe of backup folder
+                // Restore GameResAlternative if backup exists
+                String targetRes = DRAGON_ASSETS + "/Document/android/GameResAlternative.unity3d";
+                String backupRes = BACKUP_SKINS_DIR + "/Document/android/GameResAlternative.unity3d";
+                ShizukuShell.exec("if [ -f \"" + backupRes + "\" ]; then cp -f \"" + backupRes + "\" \"" + targetRes + "\"; fi");
+
+                // Safety restore of all backup files
                 ShizukuShell.exec("if [ -d \"" + BACKUP_SKINS_DIR + "\" ]; then cp -rf \"" + BACKUP_SKINS_DIR + "\"/* \"" + DRAGON_ASSETS + "/\" 2>/dev/null; rm -rf \"" + BACKUP_SKINS_DIR + "\"; fi");
                 postComplete(callback, true, "All hero skins restored to stock genuine assets.");
             } catch (Throwable t) {
@@ -474,13 +479,39 @@ public final class MlbbModInjector {
         });
     }
 
-    private static void applyHeroSwapInternal(HeroSkinOption h) {
+    private static void injectGameResAlternative(Context context) {
+        String target = DRAGON_ASSETS + "/Document/android/GameResAlternative.unity3d";
+        String backup = BACKUP_SKINS_DIR + "/Document/android/GameResAlternative.unity3d";
+
+        ShizukuShell.exec("mkdir -p \"" + DRAGON_ASSETS + "/Document/android\"");
+        ShizukuShell.exec("mkdir -p \"" + BACKUP_SKINS_DIR + "/Document/android\"");
+        ShizukuShell.exec("if [ ! -f \"" + backup + "\" ] && [ -f \"" + target + "\" ]; then cp -f \"" + target + "\" \"" + backup + "\"; fi");
+
+        // 1. Check if bundled in assets
+        if (context != null) {
+            File stage = new File(STAGE_DIR);
+            stage.mkdirs();
+            stageAsset(context, "mlbb_drone/base/Document/android/GameResAlternative.unity3d", stage, "GameResAlternative.unity3d");
+            File stagedRes = new File(stage, "GameResAlternative.unity3d");
+            if (stagedRes.exists() && stagedRes.length() > 0) {
+                ShizukuShell.exec("cp -f \"" + stagedRes.getAbsolutePath() + "\" \"" + target + "\"");
+                stagedRes.delete();
+                return;
+            }
+        }
+
+        // 2. Fallback to /sdcard/Download/WillyLibTool/skins/GameResAlternative.unity3d
+        ShizukuShell.exec("if [ -f \"" + PATCHED_SKINS_DIR + "/GameResAlternative.unity3d\" ]; then cp -f \"" + PATCHED_SKINS_DIR + "/GameResAlternative.unity3d\" \"" + target + "\"; fi");
+    }
+
+    private static void applyHeroSwapInternal(Context context, HeroSkinOption h) {
+        injectGameResAlternative(context);
+
         for (String[] pair : h.swapPairs) {
             String targetRel = pair[0];
-            String sourceRel = pair[1];
+            String sourcePath = pair[1];
 
             String targetPath = DRAGON_ASSETS + "/" + targetRel;
-            String sourcePath = DRAGON_ASSETS + "/" + sourceRel;
             String backupPath = BACKUP_SKINS_DIR + "/" + targetRel;
 
             // 1. Ensure backup directory exists
@@ -491,7 +522,7 @@ public final class MlbbModInjector {
             String backupCmd = "if [ ! -f \"" + backupPath + "\" ] && [ -f \"" + targetPath + "\" ]; then cp -f \"" + targetPath + "\" \"" + backupPath + "\"; fi";
             ShizukuShell.exec(backupCmd);
 
-            // 3. Overwrite target stock asset with source skin asset
+            // 3. Overwrite target stock asset with patched skin asset
             String swapCmd = "if [ -f \"" + sourcePath + "\" ]; then cp -f \"" + sourcePath + "\" \"" + targetPath + "\"; fi";
             ShizukuShell.exec(swapCmd);
         }
