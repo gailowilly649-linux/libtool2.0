@@ -312,16 +312,95 @@ public class OverlayService extends Service {
             MlbbModInjector.unlock120Fps(this, false, modCallback);
         });
 
-        // Section 3: Map & Skins
-        menuView.findViewById(R.id.btnInjectMapSkins).setOnClickListener(v -> {
-            txtStatus.setText("Injecting Map & Skins...");
-            MlbbModInjector.injectMapAndSkins(this, modCallback);
-        });
+        // Section 3: 7 Heroes Skins Unlocker
+        View btnUnlockAllSkins = menuView.findViewById(R.id.btnUnlockAllSkins);
+        if (btnUnlockAllSkins != null) {
+            btnUnlockAllSkins.setOnClickListener(v -> {
+                txtStatus.setText("Unlocking All 7 Hero Skins...");
+                MlbbModInjector.unlockAll7Heroes(modCallback);
+            });
+        }
 
-        menuView.findViewById(R.id.btnRestoreMapSkins).setOnClickListener(v -> {
-            txtStatus.setText("Restoring stock map & skins...");
-            MlbbModInjector.restoreDefaultMapAndSkins(modCallback);
-        });
+        View btnRestoreAllSkins = menuView.findViewById(R.id.btnRestoreAllSkins);
+        if (btnRestoreAllSkins != null) {
+            btnRestoreAllSkins.setOnClickListener(v -> {
+                txtStatus.setText("Restoring all hero skins...");
+                MlbbModInjector.restoreAllHeroSkins(modCallback);
+            });
+        }
+
+        View btnSkinFanny = menuView.findViewById(R.id.btnSkinFanny);
+        if (btnSkinFanny != null) {
+            btnSkinFanny.setOnClickListener(v -> {
+                txtStatus.setText("Unlocking Fanny Mikasa...");
+                MlbbModInjector.unlockHeroSkin("fanny", modCallback);
+            });
+        }
+
+        View btnSkinGusion = menuView.findViewById(R.id.btnSkinGusion);
+        if (btnSkinGusion != null) {
+            btnSkinGusion.setOnClickListener(v -> {
+                txtStatus.setText("Unlocking Gusion KOF...");
+                MlbbModInjector.unlockHeroSkin("gusion", modCallback);
+            });
+        }
+
+        View btnSkinLing = menuView.findViewById(R.id.btnSkinLing);
+        if (btnSkinLing != null) {
+            btnSkinLing.setOnClickListener(v -> {
+                txtStatus.setText("Unlocking Ling Lord Shen...");
+                MlbbModInjector.unlockHeroSkin("ling", modCallback);
+            });
+        }
+
+        View btnSkinNolan = menuView.findViewById(R.id.btnSkinNolan);
+        if (btnSkinNolan != null) {
+            btnSkinNolan.setOnClickListener(v -> {
+                txtStatus.setText("Unlocking Nolan Navigator...");
+                MlbbModInjector.unlockHeroSkin("nolan", modCallback);
+            });
+        }
+
+        View btnSkinMiya = menuView.findViewById(R.id.btnSkinMiya);
+        if (btnSkinMiya != null) {
+            btnSkinMiya.setOnClickListener(v -> {
+                txtStatus.setText("Unlocking Miya Collector...");
+                MlbbModInjector.unlockHeroSkin("miya", modCallback);
+            });
+        }
+
+        View btnSkinClaude = menuView.findViewById(R.id.btnSkinClaude);
+        if (btnSkinClaude != null) {
+            btnSkinClaude.setOnClickListener(v -> {
+                txtStatus.setText("Unlocking Claude Sanrio...");
+                MlbbModInjector.unlockHeroSkin("claude", modCallback);
+            });
+        }
+
+        View btnSkinKarrie = menuView.findViewById(R.id.btnSkinKarrie);
+        if (btnSkinKarrie != null) {
+            btnSkinKarrie.setOnClickListener(v -> {
+                txtStatus.setText("Unlocking Karrie M5...");
+                MlbbModInjector.unlockHeroSkin("karrie", modCallback);
+            });
+        }
+
+        // Section 4: Map & Battlefield Assets
+        View btnInjectMapSkins = menuView.findViewById(R.id.btnInjectMapSkins);
+        if (btnInjectMapSkins != null) {
+            btnInjectMapSkins.setOnClickListener(v -> {
+                txtStatus.setText("Injecting Map & Skins...");
+                MlbbModInjector.injectMapAndSkins(this, modCallback);
+            });
+        }
+
+        View btnRestoreMapSkins = menuView.findViewById(R.id.btnRestoreMapSkins);
+        if (btnRestoreMapSkins != null) {
+            btnRestoreMapSkins.setOnClickListener(v -> {
+                txtStatus.setText("Restoring stock map & skins...");
+                MlbbModInjector.restoreDefaultMapAndSkins(modCallback);
+            });
+        }
 
         menuView.setVisibility(View.GONE);
         try {

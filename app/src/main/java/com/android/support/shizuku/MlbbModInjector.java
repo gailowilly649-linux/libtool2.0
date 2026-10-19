@@ -287,6 +287,229 @@ public final class MlbbModInjector {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
+    // 4. HERO SKINS UNLOCKER (7 HEROES: FANNY, GUSION, LING, NOLAN, MIYA, CLAUDE, KARRIE)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    public static final String BACKUP_SKINS_DIR = FILES + "/dragon2017/backup_skins";
+
+    public static class HeroSkinOption {
+        public final String heroId;
+        public final String heroName;
+        public final String skinName;
+        public final String role;
+        public final String[][] swapPairs;
+
+        public HeroSkinOption(String heroId, String heroName, String skinName, String role, String[][] swapPairs) {
+            this.heroId = heroId;
+            this.heroName = heroName;
+            this.skinName = skinName;
+            this.role = role;
+            this.swapPairs = swapPairs;
+        }
+    }
+
+    public static final List<HeroSkinOption> HERO_SKINS = new ArrayList<>();
+    static {
+        // 1. Fanny (Assassin) - Mikasa Ackerman (Attack on Titan)
+        HERO_SKINS.add(new HeroSkinOption("fanny", "Fanny", "Mikasa Ackerman (AoT)", "Assassin", new String[][]{
+                {"Art/android/h/hero_fanny_skin_high_add.unity3d", "Art/android/h/hero_fanny_skin12_high_add.unity3d"},
+                {"Art/android/h/hero_fanny.unity3d", "Art/android/h/hero_fanny_skin12_add.unity3d"},
+                {"Art/android/h/hero_fanny_skin_shadow_high_add.unity3d", "Art/android/h/hero_fanny_skin12_shadow_high_add.unity3d"},
+                {"UI/android/Hero171_add.unity3d", "UI/android/Hero101712_add.unity3d"},
+                {"UI/android/Hero117_add.unity3d", "UI/android/Hero101712_add.unity3d"}
+        }));
+
+        // 2. Gusion (Assassin) - K' (KOF Collab)
+        HERO_SKINS.add(new HeroSkinOption("gusion", "Gusion", "K' (KOF Collab)", "Assassin", new String[][]{
+                {"Art/android/h/hero_Gusin_skin_high_add.unity3d", "Art/android/h/hero_Gusin_skin06_high_add.unity3d"},
+                {"Art/android/h/hero_Gusin.unity3d", "Art/android/h/hero_Gusin_skin06_add.unity3d"},
+                {"Art/android/h/hero_Gusin_skin_shadow_high_add.unity3d", "Art/android/h/hero_Gusin_skin06_shadow_high_add.unity3d"},
+                {"UI/android/Hero056_add.unity3d", "UI/android/Hero656_add.unity3d"},
+                {"UI/android/Hero1056_add.unity3d", "UI/android/Hero656_add.unity3d"}
+        }));
+
+        // 3. Ling (Assassin) - Lord Shen (Kung Fu Panda Collab)
+        HERO_SKINS.add(new HeroSkinOption("ling", "Ling", "Lord Shen (Kung Fu Panda)", "Assassin", new String[][]{
+                {"Art/android/h/hero_pofa_skin_high_add.unity3d", "Art/android/h/hero_pofa_skin07_high_add.unity3d"},
+                {"Art/android/h/hero_pofa.unity3d", "Art/android/h/hero_pofa_skin07_add.unity3d"},
+                {"Art/android/h/hero_pofa_skin_shadow_high_add.unity3d", "Art/android/h/hero_pofa_skin07_shadow_high_add.unity3d"},
+                {"UI/android/Hero084_add.unity3d", "UI/android/Hero784_add.unity3d"},
+                {"UI/android/Hero1084_add.unity3d", "UI/android/Hero784_add.unity3d"}
+        }));
+
+        // 4. Nolan (Assassin) - The Navigator (Skin 03)
+        HERO_SKINS.add(new HeroSkinOption("nolan", "Nolan", "The Navigator", "Assassin", new String[][]{
+                {"Art/android/h/hero_NolanOsborne_skin_high_add.unity3d", "Art/android/h/hero_NolanOsborne_skin03_high_add.unity3d"},
+                {"Art/android/h/hero_NolanOsborne.unity3d", "Art/android/h/hero_NolanOsborne_skin03_add.unity3d"},
+                {"Art/android/h/hero_NolanOsborne_skin_shadow_high_add.unity3d", "Art/android/h/hero_NolanOsborne_skin03_shadow_high_add.unity3d"},
+                {"UI/android/Hero1221_add.unity3d", "UI/android/Hero1223_add.unity3d"},
+                {"UI/android/Hero1122_add.unity3d", "UI/android/Hero1223_add.unity3d"}
+        }));
+
+        // 5. Miya (Marksman) - Modesty Goddess (Collector)
+        HERO_SKINS.add(new HeroSkinOption("miya", "Miya", "Modesty Goddess (Collector)", "Marksman", new String[][]{
+                {"Art/android/h/hero_gongjianshou_skin_high_add.unity3d", "Art/android/h/hero_gongjianshou_skin14_high_add.unity3d"},
+                {"Art/android/h/hero_gongjianshou_skin_shadow_high_add.unity3d", "Art/android/h/hero_gongjianshou_skin14_shadow_high_add.unity3d"},
+                {"UI/android/Hero1001_add.unity3d", "UI/android/Hero100114_add.unity3d"}
+        }));
+
+        // 6. Claude (Marksman) - Bad Bro (Sanrio Collab)
+        HERO_SKINS.add(new HeroSkinOption("claude", "Claude", "Bad Bro (Sanrio)", "Marksman", new String[][]{
+                {"Art/android/h/hero_claude_skin_high_add.unity3d", "Art/android/h/hero_claude_skin08_high_add.unity3d"},
+                {"Art/android/h/hero_claude.unity3d", "Art/android/h/hero_claude_skin08_add.unity3d"},
+                {"Art/android/h/hero_claude_skin_shadow_high_add.unity3d", "Art/android/h/hero_claude_skin08_shadow_high_add.unity3d"},
+                {"UI/android/Hero065_add.unity3d", "UI/android/Hero865_add.unity3d"}
+        }));
+
+        // 7. Karrie (Marksman) - Starstruck (M5 Champion)
+        HERO_SKINS.add(new HeroSkinOption("karrie", "Karrie", "Starstruck (M5 Champion)", "Marksman", new String[][]{
+                {"Art/android/h/hero_feilun_skin_high_add.unity3d", "Art/android/h/hero_feilun_skin11_high_add.unity3d"},
+                {"Art/android/h/hero_feilun.unity3d", "Art/android/h/hero_feilun_skin11_add.unity3d"},
+                {"Art/android/h/hero_feilun_skin_shadow_high_add.unity3d", "Art/android/h/hero_feilun_skin11_shadow_high_add.unity3d"},
+                {"UI/android/Hero401_add.unity3d", "UI/android/Hero104011_add.unity3d"}
+        }));
+    }
+
+    public static void unlockHeroSkin(String heroId, Callback callback) {
+        EXECUTOR.execute(() -> {
+            if (!ShizukuShell.hasPermission()) {
+                postComplete(callback, false, "Shizuku permission not granted.");
+                return;
+            }
+
+            HeroSkinOption target = null;
+            for (HeroSkinOption h : HERO_SKINS) {
+                if (h.heroId.equalsIgnoreCase(heroId)) {
+                    target = h;
+                    break;
+                }
+            }
+
+            if (target == null) {
+                postComplete(callback, false, "Hero " + heroId + " not found.");
+                return;
+            }
+
+            try {
+                postProgress(callback, "Unlocking " + target.heroName + " (" + target.skinName + ")...");
+                applyHeroSwapInternal(target);
+                postComplete(callback, true, "Unlocked " + target.heroName + " (" + target.skinName + ")!");
+            } catch (Throwable t) {
+                Log.e(TAG, "Error unlocking " + heroId, t);
+                postComplete(callback, false, "Unlock error: " + t.getMessage());
+            }
+        });
+    }
+
+    public static void restoreHeroSkin(String heroId, Callback callback) {
+        EXECUTOR.execute(() -> {
+            if (!ShizukuShell.hasPermission()) {
+                postComplete(callback, false, "Shizuku permission not granted.");
+                return;
+            }
+
+            HeroSkinOption target = null;
+            for (HeroSkinOption h : HERO_SKINS) {
+                if (h.heroId.equalsIgnoreCase(heroId)) {
+                    target = h;
+                    break;
+                }
+            }
+
+            if (target == null) {
+                postComplete(callback, false, "Hero " + heroId + " not found.");
+                return;
+            }
+
+            try {
+                postProgress(callback, "Restoring stock " + target.heroName + " skin...");
+                restoreHeroSwapInternal(target);
+                postComplete(callback, true, "Restored stock " + target.heroName + " skin.");
+            } catch (Throwable t) {
+                Log.e(TAG, "Error restoring " + heroId, t);
+                postComplete(callback, false, "Restore error: " + t.getMessage());
+            }
+        });
+    }
+
+    public static void unlockAll7Heroes(Callback callback) {
+        EXECUTOR.execute(() -> {
+            if (!ShizukuShell.hasPermission()) {
+                postComplete(callback, false, "Shizuku permission not granted.");
+                return;
+            }
+
+            try {
+                for (HeroSkinOption h : HERO_SKINS) {
+                    postProgress(callback, "Injecting " + h.heroName + " (" + h.skinName + ")...");
+                    applyHeroSwapInternal(h);
+                }
+                postComplete(callback, true, "All 7 Skins unlocked successfully!\n(Fanny, Gusion, Ling, Nolan, Miya, Claude, Karrie)");
+            } catch (Throwable t) {
+                Log.e(TAG, "Error unlocking all skins", t);
+                postComplete(callback, false, "Unlock error: " + t.getMessage());
+            }
+        });
+    }
+
+    public static void restoreAllHeroSkins(Callback callback) {
+        EXECUTOR.execute(() -> {
+            if (!ShizukuShell.hasPermission()) {
+                postComplete(callback, false, "Shizuku permission not granted.");
+                return;
+            }
+
+            try {
+                postProgress(callback, "Restoring all stock skins from backup...");
+                for (HeroSkinOption h : HERO_SKINS) {
+                    restoreHeroSwapInternal(h);
+                }
+                // Safety wipe of backup folder
+                ShizukuShell.exec("if [ -d \"" + BACKUP_SKINS_DIR + "\" ]; then cp -rf \"" + BACKUP_SKINS_DIR + "\"/* \"" + DRAGON_ASSETS + "/\" 2>/dev/null; rm -rf \"" + BACKUP_SKINS_DIR + "\"; fi");
+                postComplete(callback, true, "All hero skins restored to stock genuine assets.");
+            } catch (Throwable t) {
+                Log.e(TAG, "Error restoring all skins", t);
+                postComplete(callback, false, "Restore error: " + t.getMessage());
+            }
+        });
+    }
+
+    private static void applyHeroSwapInternal(HeroSkinOption h) {
+        for (String[] pair : h.swapPairs) {
+            String targetRel = pair[0];
+            String sourceRel = pair[1];
+
+            String targetPath = DRAGON_ASSETS + "/" + targetRel;
+            String sourcePath = DRAGON_ASSETS + "/" + sourceRel;
+            String backupPath = BACKUP_SKINS_DIR + "/" + targetRel;
+
+            // 1. Ensure backup directory exists
+            String backupParent = backupPath.substring(0, backupPath.lastIndexOf('/'));
+            ShizukuShell.exec("mkdir -p \"" + backupParent + "\"");
+
+            // 2. If genuine stock file is not yet backed up, back it up now
+            String backupCmd = "if [ ! -f \"" + backupPath + "\" ] && [ -f \"" + targetPath + "\" ]; then cp -f \"" + targetPath + "\" \"" + backupPath + "\"; fi";
+            ShizukuShell.exec(backupCmd);
+
+            // 3. Overwrite target stock asset with source skin asset
+            String swapCmd = "if [ -f \"" + sourcePath + "\" ]; then cp -f \"" + sourcePath + "\" \"" + targetPath + "\"; fi";
+            ShizukuShell.exec(swapCmd);
+        }
+    }
+
+    private static void restoreHeroSwapInternal(HeroSkinOption h) {
+        for (String[] pair : h.swapPairs) {
+            String targetRel = pair[0];
+            String targetPath = DRAGON_ASSETS + "/" + targetRel;
+            String backupPath = BACKUP_SKINS_DIR + "/" + targetRel;
+
+            // If backup exists, copy genuine file back and remove the backup
+            String restoreCmd = "if [ -f \"" + backupPath + "\" ]; then cp -f \"" + backupPath + "\" \"" + targetPath + "\" && rm -f \"" + backupPath + "\"; fi";
+            ShizukuShell.exec(restoreCmd);
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
     // HELPERS
     // ─────────────────────────────────────────────────────────────────────────
 

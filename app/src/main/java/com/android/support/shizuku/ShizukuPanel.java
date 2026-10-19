@@ -67,6 +67,8 @@ public final class ShizukuPanel {
     private final Button btnDrone4x;
     private final Button btnDrone5x;
     private final Button btnDroneReset;
+    private final Button btnUnlockAllSkins;
+    private final Button btnRestoreAllSkins;
     private final Button btnMapSkins;
     private final Button btnRestoreMap;
 
@@ -96,6 +98,8 @@ public final class ShizukuPanel {
         btnDrone4x = activity.findViewById(R.id.btnMainDrone4x);
         btnDrone5x = activity.findViewById(R.id.btnMainDrone5x);
         btnDroneReset = activity.findViewById(R.id.btnMainDroneReset);
+        btnUnlockAllSkins = activity.findViewById(R.id.btnMainUnlockAllSkins);
+        btnRestoreAllSkins = activity.findViewById(R.id.btnMainRestoreAllSkins);
         btnMapSkins = activity.findViewById(R.id.btnMainMapSkins);
         btnRestoreMap = activity.findViewById(R.id.btnMainRestoreMap);
 
@@ -122,6 +126,8 @@ public final class ShizukuPanel {
         if (btnDrone4x != null) btnDrone4x.setOnClickListener(v -> MlbbModInjector.applyDroneView(activity, 4, panelCallback));
         if (btnDrone5x != null) btnDrone5x.setOnClickListener(v -> MlbbModInjector.applyDroneView(activity, 5, panelCallback));
         if (btnDroneReset != null) btnDroneReset.setOnClickListener(v -> MlbbModInjector.restoreDefaultDrone(panelCallback));
+        if (btnUnlockAllSkins != null) btnUnlockAllSkins.setOnClickListener(v -> MlbbModInjector.unlockAll7Heroes(panelCallback));
+        if (btnRestoreAllSkins != null) btnRestoreAllSkins.setOnClickListener(v -> MlbbModInjector.restoreAllHeroSkins(panelCallback));
         if (btnMapSkins != null) btnMapSkins.setOnClickListener(v -> MlbbModInjector.injectMapAndSkins(activity, panelCallback));
         if (btnRestoreMap != null) btnRestoreMap.setOnClickListener(v -> MlbbModInjector.restoreDefaultMapAndSkins(panelCallback));
 
@@ -177,6 +183,8 @@ public final class ShizukuPanel {
         if (btnDrone4x != null) btnDrone4x.setEnabled(granted);
         if (btnDrone5x != null) btnDrone5x.setEnabled(granted);
         if (btnDroneReset != null) btnDroneReset.setEnabled(granted);
+        if (btnUnlockAllSkins != null) btnUnlockAllSkins.setEnabled(granted);
+        if (btnRestoreAllSkins != null) btnRestoreAllSkins.setEnabled(granted);
         if (btnMapSkins != null) btnMapSkins.setEnabled(granted);
         if (btnRestoreMap != null) btnRestoreMap.setEnabled(granted);
 
