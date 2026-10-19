@@ -270,7 +270,7 @@ public class OverlayService extends Service implements View.OnTouchListener, GLS
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null && "STOP".equals(intent.getAction())) {
+        if (intent != null && ("STOP".equals(intent.getAction()) || "com.android.support.STOP_OVERLAY".equals(intent.getAction()))) {
             stopSelf();
             return START_NOT_STICKY;
         }
@@ -293,6 +293,7 @@ public class OverlayService extends Service implements View.OnTouchListener, GLS
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         Log.i(TAG, "GLSurfaceView onSurfaceChanged: " + width + "x" + height);
         try {
+            NativeMethods.onSurfaceCreate();
             NativeMethods.onSurfaceChanged(width, height);
         } catch (Throwable t) {
             Log.e(TAG, "Renderer onSurfaceChanged error", t);

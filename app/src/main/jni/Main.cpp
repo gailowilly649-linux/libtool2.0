@@ -532,9 +532,13 @@ void on_init()
     if (!hasTargetLib)
     {
         LOGI("Target library (%s) not found in process. Running in standalone overlay mode.", (const char *)targetLibName);
+        ConfigManager::Init();
+        ConfigManager::Load();
+        Tool::Init(nullptr, {});
+
         std::thread([]() {
             int retries = 0;
-            while (!isLibraryLoaded(targetLibName) && !isLibraryLoaded("libil2cpp.so") && retries < 20)
+            while (!isLibraryLoaded(targetLibName) && !isLibraryLoaded("libil2cpp.so") && retries < 60)
             {
                 std::this_thread::sleep_for(std::chrono::seconds(1));
                 retries++;

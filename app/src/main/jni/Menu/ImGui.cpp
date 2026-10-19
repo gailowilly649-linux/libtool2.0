@@ -197,7 +197,10 @@ void setupMenu()
 
     // Setup Platform/Renderer backends
     ImGui_ImplAndroid_Init(g_AppWindow);
-    ImGui_ImplOpenGL3_Init("#version 300 es");
+    if (!ImGui_ImplOpenGL3_Init("#version 300 es"))
+    {
+        ImGui_ImplOpenGL3_Init("#version 100");
+    }
 
     // int systemScale = (1.0 / glWidth) * glWidth;
     // ImFontConfig font_cfg;

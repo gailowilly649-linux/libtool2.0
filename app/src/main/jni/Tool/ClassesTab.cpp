@@ -2108,11 +2108,12 @@ void ClassesTab::Draw(int index, bool closeable)
         setOpenedTab = false;
         ImGui::BeginDisabled(includeAllImages);
         ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0), ImVec2(-1, io.DisplaySize.y / 1.5f));
-        if (ImGui::BeginCombo("Image##ImageSelector", selectedImage->getName()))
+        const char *currentImageName = selectedImage ? selectedImage->getName() : "No Images Loaded (Standalone)";
+        if (ImGui::BeginCombo("Image##ImageSelector", currentImageName))
         {
-
             for (int i = 0; i < g_Images.size(); i++)
             {
+                if (!g_Images[i]) continue;
                 bool selected = selectedImageIndex == i;
                 if (ImGui::Selectable(g_Images[i]->getName(), selected))
                 {
@@ -2808,11 +2809,14 @@ void ClassesTab::FilterClasses(const std::string &filter)
     {
         for (auto image : g_Images)
         {
-            auto imageClasses = image->getClasses();
-            classes.insert(classes.end(), imageClasses.begin(), imageClasses.end());
+            if (image)
+            {
+                auto imageClasses = image->getClasses();
+                classes.insert(classes.end(), imageClasses.begin(), imageClasses.end());
+            }
         }
     }
-    else
+    else if (selectedImage)
     {
         classes = selectedImage->getClasses();
     }

@@ -66,7 +66,7 @@ public class MainActivity extends Activity {
 
         btnLaunchMLBB.setOnClickListener(v -> launchGame());
 
-        checkAndRequestStoragePermission();
+        txtStorageStatus.setOnClickListener(v -> checkAndRequestStoragePermission());
     }
 
     @Override
@@ -122,6 +122,8 @@ public class MainActivity extends Activity {
                         Manifest.permission.WRITE_EXTERNAL_STORAGE
                 }, REQ_STORAGE_PERMISSION);
             }
+        } else {
+            Toast.makeText(this, "Storage permission already granted", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -148,7 +150,7 @@ public class MainActivity extends Activity {
     private void stopOverlayService() {
         try {
             Intent intent = new Intent(this, OverlayService.class);
-            intent.setAction("STOP");
+            intent.setAction("com.android.support.STOP_OVERLAY");
             startService(intent);
             Toast.makeText(this, "Willy LibTool Stopped", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
@@ -158,6 +160,11 @@ public class MainActivity extends Activity {
     }
 
     private void launchGame() {
+        // Auto-start Willy LibTool overlay if permitted and not yet running
+        if (!OverlayService.isRunning && hasOverlayPermission()) {
+            startOverlayService();
+        }
+
         PackageManager pm = getPackageManager();
         Intent launchIntent = null;
         String foundPackage = null;
@@ -173,6 +180,22 @@ public class MainActivity extends Activity {
             }
         }
 
+        if (launchIntent == null) {
+            // Direct component fallback for Android 11-16
+            for (String pkg : MLBB_PACKAGES) {
+                try {
+                    Intent fallback = new Intent(Intent.ACTION_MAIN);
+                    fallback.addCategory(Intent.CATEGORY_LAUNCHER);
+                    fallback.setComponent(new android.content.ComponentName(pkg, pkg + ".SplashActivity"));
+                    fallback.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                    startActivity(fallback);
+                    Toast.makeText(this, "Launching Mobile Legends (" + pkg + ")...", Toast.LENGTH_SHORT).show();
+                    return;
+                } catch (Exception ignored) {
+                }
+            }
+        }
+
         if (launchIntent != null) {
             try {
                 launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
@@ -183,7 +206,7 @@ public class MainActivity extends Activity {
                 e.printStackTrace();
             }
         } else {
-            Toast.makeText(this, "Mobile Legends not installed on this device!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Mobile Legends not found! Please check installation.", Toast.LENGTH_LONG).show();
         }
     }
 

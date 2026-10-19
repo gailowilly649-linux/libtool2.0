@@ -526,8 +526,15 @@ namespace Il2cpp
         g_initialized = true;
     }
 
+    bool IsInitialized()
+    {
+        return g_initialized;
+    }
+
     bool EnsureAttached()
     {
+        if (!g_initialized || !il2cpp_thread_current || !il2cpp_thread_attach)
+            return false;
         auto curr = il2cpp_thread_current();
         if (!curr)
         {
@@ -538,13 +545,11 @@ namespace Il2cpp
             LOGI("Already Attached -> %p", curr);
             return true;
         }
+        auto domain = GetDomain();
+        if (!domain)
+            return false;
         LOGI("Attaching Thread");
-        auto *thread = il2cpp_thread_attach(il2cpp_domain_get());
-        while (!il2cpp_is_vm_thread(thread))
-        {
-            LOGI("Waiting...");
-            sleep(1);
-        }
+        auto *thread = il2cpp_thread_attach(domain);
         if (!thread)
         {
             LOGE("Attaching Failed");
@@ -556,6 +561,8 @@ namespace Il2cpp
 
     void Detach()
     {
+        if (!g_initialized || !il2cpp_thread_current || !il2cpp_thread_detach)
+            return;
         auto curr = il2cpp_thread_current();
         if (!curr)
         {
@@ -569,12 +576,19 @@ namespace Il2cpp
 
     Il2CppDomain *GetDomain()
     {
+        if (!g_initialized || !il2cpp_domain_get)
+            return nullptr;
         return il2cpp_domain_get();
     }
 
     Il2CppAssembly *GetAssembly(const char *name)
     {
-        auto result = il2cpp_domain_assembly_open(il2cpp_domain_get(), name);
+        if (!g_initialized || !name || !il2cpp_domain_assembly_open)
+            return nullptr;
+        auto domain = GetDomain();
+        if (!domain)
+            return nullptr;
+        auto result = il2cpp_domain_assembly_open(domain, name);
         if (!result && g_DoLog)
             LOGE("There's no assembly : %s", name);
         return result;
@@ -582,6 +596,8 @@ namespace Il2cpp
 
     Il2CppImage *GetImage(Il2CppAssembly *assembly)
     {
+        if (!g_initialized || !assembly || !il2cpp_assembly_get_image)
+            return nullptr;
         auto result = il2cpp_assembly_get_image(assembly);
         if (!result && g_DoLog)
             LOGE("GetImage return nullptr");
@@ -590,28 +606,36 @@ namespace Il2cpp
 
     Il2CppImage *GetCorlib()
     {
+        if (!g_initialized || !il2cpp_get_corlib)
+            return nullptr;
         return il2cpp_get_corlib();
     }
 
     Il2CppImage *GetImage(const char *assemblyName)
     {
+        if (!g_initialized || !assemblyName)
+            return nullptr;
         return GetImage(GetAssembly(assemblyName));
     }
 
     Il2CppClass *GetClass(Il2CppImage *image, const char *name)
     {
+        if (!g_initialized || !image || !name || !il2cpp_class_from_name)
+            return nullptr;
         std::string nameStr = name;
         size_t dotIndex = nameStr.find_last_of('.');
         std::string classNamespace = (dotIndex == std::string::npos) ? "" : nameStr.substr(0, dotIndex);
         const std::string className = nameStr.substr(dotIndex + 1);
         auto result = il2cpp_class_from_name(image, classNamespace.c_str(), className.c_str());
-        if (!result)
+        if (!result && il2cpp_image_get_class_count && il2cpp_image_get_class && il2cpp_class_get_type && il2cpp_type_get_name)
         {
             auto size = il2cpp_image_get_class_count(image);
             for (size_t i{0}; i < size; i++)
             {
                 auto klass = il2cpp_image_get_class(image, i);
+                if (!klass) continue;
                 auto type = il2cpp_class_get_type(klass);
+                if (!type) continue;
                 const char* typeName = il2cpp_type_get_name(type);
                 if (typeName && std::string(typeName).compare(name) == 0)
                 {
@@ -627,14 +651,18 @@ namespace Il2cpp
 
     MethodInfo *GetClassMethod(Il2CppClass *klass, const char *methodName, int argsCount)
     {
+        if (!g_initialized || !klass || !methodName || !il2cpp_class_get_method_from_name)
+            return nullptr;
         auto result = il2cpp_class_get_method_from_name(klass, methodName, argsCount);
-        if (!result && g_DoLog)
+        if (!result && g_DoLog && il2cpp_class_get_name)
             LOGE("There's no method : %s in %s", methodName, il2cpp_class_get_name(klass));
         return result;
     }
 
     Il2CppImage *GetClassImage(Il2CppClass *klass)
     {
+        if (!g_initialized || !klass || !il2cpp_class_get_image)
+            return nullptr;
         return il2cpp_class_get_image(klass);
     }
 
@@ -815,9 +843,12 @@ namespace Il2cpp
 
     Il2CppClass *FindClass(const char *klassName)
     {
+        if (!g_initialized || !klassName)
+            return nullptr;
         auto &images = GetImages();
         for (auto image : images)
         {
+            if (!image) continue;
             auto klass = GetClass(image, klassName);
             if (klass)
                 return klass;
@@ -1010,8 +1041,17 @@ namespace Il2cpp
         {
             return assembliesCache;
         }
+        if (!g_initialized || !il2cpp_domain_get_assemblies)
+        {
+            return assembliesCache;
+        }
+        auto domain = GetDomain();
+        if (!domain)
+        {
+            return assembliesCache;
+        }
         size_t size = 0;
-        auto asss = il2cpp_domain_get_assemblies(GetDomain(), &size);
+        auto asss = il2cpp_domain_get_assemblies(domain, &size);
         assembliesCache = std::make_tuple(asss, size);
         return assembliesCache;
     }
@@ -1021,29 +1061,46 @@ namespace Il2cpp
     {
         if (!imagesCache.empty())
             return imagesCache;
+        if (!g_initialized)
+            return imagesCache;
         const auto &[ass, size] = GetAssemblies();
+        if (!ass)
+            return imagesCache;
         for (size_t i = 0; i < size; i++)
         {
-            imagesCache.push_back(GetImage(ass[i]));
+            if (ass[i])
+            {
+                auto img = GetImage(ass[i]);
+                if (img)
+                    imagesCache.push_back(img);
+            }
         }
         return imagesCache;
     }
 
     bool RefreshAssemblies()
     {
+        if (!g_initialized || !il2cpp_domain_get_assemblies)
+            return false;
+        auto domain = GetDomain();
+        if (!domain)
+            return false;
         size_t oldSize = std::get<1>(assembliesCache);
         size_t newSize = 0;
-        auto asss = il2cpp_domain_get_assemblies(GetDomain(), &newSize);
+        auto asss = il2cpp_domain_get_assemblies(domain, &newSize);
         if (asss && newSize > 0)
         {
             assembliesCache = std::make_tuple(asss, newSize);
             imagesCache.clear();
             for (size_t i = 0; i < newSize; i++)
             {
-                auto img = GetImage(asss[i]);
-                if (img)
+                if (asss[i])
                 {
-                    imagesCache.push_back(img);
+                    auto img = GetImage(asss[i]);
+                    if (img)
+                    {
+                        imagesCache.push_back(img);
+                    }
                 }
             }
             LOGI("RefreshAssemblies: %zu assemblies found (previously %zu)", newSize, oldSize);
@@ -1065,10 +1122,11 @@ namespace Il2cpp
 
     std::string getUnityVersion()
     {
+        if (!g_initialized) return "N/A (Standalone)";
         static auto Application = FindClass("UnityEngine.Application");
         if (!Application) return "unknown_unity_version";
         static auto get_unityVersion = GetClassMethod(Application, "get_unityVersion", 0);
-        if (!get_unityVersion) return "unknown_unity_version";
+        if (!get_unityVersion || !il2cpp_runtime_invoke) return "unknown_unity_version";
         
         auto unityVersion = (Il2CppString*)il2cpp_runtime_invoke(get_unityVersion, nullptr, nullptr, nullptr);
         if (unityVersion)
@@ -1085,17 +1143,20 @@ namespace Il2cpp
 
     std::string getDataPath()
     {
-        static auto Application = FindClass("UnityEngine.Application");
-        if (Application)
+        if (g_initialized)
         {
-            static auto get_persistentDataPath = GetClassMethod(Application, "get_persistentDataPath", 0);
-            if (get_persistentDataPath)
+            static auto Application = FindClass("UnityEngine.Application");
+            if (Application)
             {
-                auto dataPath = (Il2CppString*)il2cpp_runtime_invoke(get_persistentDataPath, nullptr, nullptr, nullptr);
-                if (dataPath)
+                static auto get_persistentDataPath = GetClassMethod(Application, "get_persistentDataPath", 0);
+                if (get_persistentDataPath && il2cpp_runtime_invoke)
                 {
-                    static auto str = dataPath->to_string();
-                    return str;
+                    auto dataPath = (Il2CppString*)il2cpp_runtime_invoke(get_persistentDataPath, nullptr, nullptr, nullptr);
+                    if (dataPath)
+                    {
+                        static auto str = dataPath->to_string();
+                        return str;
+                    }
                 }
             }
         }
@@ -1113,15 +1174,16 @@ namespace Il2cpp
         {
             return "/sdcard/Download";
         }
-        return "/data/data/com.android.support";
+        return "/data/data/com.android.support/files";
     }
 
     std::string getPackageName()
     {
+        if (!g_initialized) return "com.mobile.legends";
         static auto Application = FindClass("UnityEngine.Application");
         if (!Application) return "unknown_package_name";
         static auto get_identifier = GetClassMethod(Application, "get_identifier", 0);
-        if (!get_identifier) return "unknown_package_name";
+        if (!get_identifier || !il2cpp_runtime_invoke) return "unknown_package_name";
         
         auto identifier = (Il2CppString*)il2cpp_runtime_invoke(get_identifier, nullptr, nullptr, nullptr);
         if (identifier)
@@ -1138,10 +1200,11 @@ namespace Il2cpp
 
     std::string getGameVersion()
     {
+        if (!g_initialized) return "N/A (Standalone)";
         static auto Application = FindClass("UnityEngine.Application");
         if (!Application) return "unknown_game_version";
         static auto get_version = GetClassMethod(Application, "get_version", 0);
-        if (!get_version) return "unknown_game_version";
+        if (!get_version || !il2cpp_runtime_invoke) return "unknown_game_version";
         
         auto version = (Il2CppString*)il2cpp_runtime_invoke(get_version, nullptr, nullptr, nullptr);
         if (version)

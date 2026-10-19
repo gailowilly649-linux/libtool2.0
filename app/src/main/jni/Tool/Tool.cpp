@@ -317,17 +317,27 @@ namespace Tool
     {
         ConfigInit();
         InitScreenSize();
-        InitDumpPaths();
-        g_Images = images;
-        std::sort(g_Images.begin(), g_Images.end(),
-                  [](Il2CppImage *img1, Il2CppImage *img2)
-                  { return std::strcmp(img1->getName(), img2->getName()) < 0; });
+        g_Images.clear();
+        for (auto img : images)
+        {
+            if (img) g_Images.push_back(img);
+        }
+        if (!g_Images.empty())
+        {
+            std::sort(g_Images.begin(), g_Images.end(),
+                      [](Il2CppImage *img1, Il2CppImage *img2)
+                      { return std::strcmp(img1->getName(), img2->getName()) < 0; });
+        }
         classesTabs.reserve(32);
         if (classesTabs.empty())
             OpenNewTab();
 
         for (ClassesTab &tab : classesTabs)
         {
+            if (!g_Images.empty() && !tab.selectedImage)
+            {
+                tab.selectedImage = g_Images.front();
+            }
             tab.FilterClasses(tab.filter);
         }
 #ifdef USE_FRIDA
@@ -339,15 +349,21 @@ namespace Tool
     {
         Il2cpp::RefreshAssemblies();
         auto newImages = Il2cpp::GetImages();
-        if (!newImages.empty())
+        g_Images.clear();
+        for (auto img : newImages)
         {
-            g_Images = newImages;
+            if (img) g_Images.push_back(img);
+        }
+        if (!g_Images.empty())
+        {
             std::sort(g_Images.begin(), g_Images.end(),
                       [](Il2CppImage *img1, Il2CppImage *img2)
                       { return std::strcmp(img1->getName(), img2->getName()) < 0; });
 
             for (ClassesTab &tab : classesTabs)
             {
+                if (!tab.selectedImage)
+                    tab.selectedImage = g_Images.front();
                 tab.FilterClasses(tab.filter);
             }
 

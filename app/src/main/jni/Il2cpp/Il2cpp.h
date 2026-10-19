@@ -11,6 +11,7 @@ namespace Il2cpp
 {
 
     void Init();
+    bool IsInitialized();
     bool EnsureAttached();
     void Detach();
 
