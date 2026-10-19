@@ -244,7 +244,7 @@ namespace ModFeatures
 
         if (ImGui::Begin("##HUDOverlayWindow", nullptr, flags))
         {
-            ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.7f, 1.0f), "MLBB LibTool HUD");
+            ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.7f, 1.0f), "Willy LibTool HUD");
             ImGui::Separator();
             ImGui::Text("FPS: %.1f", io.Framerate);
             ImGui::Text("Patches: %zu active", LivePatcher::GetPatches().size());

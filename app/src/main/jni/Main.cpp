@@ -70,7 +70,7 @@ constexpr std::array<const char *, 3> possibleThemes = {
 
 ImGuiStyle initialStyle;
 
-const char *title = OBFUSCATE("IL2CPP Tool - Mobile Legends");
+const char *title = OBFUSCATE("Willy LibTool - Mobile Legends");
 
 
 void draw_thread()
@@ -81,13 +81,13 @@ void draw_thread()
 
     if (isFloatingBubble)
     {
-        ImGui::SetNextWindowSize(ImVec2(140, 48), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(150, 48), ImGuiCond_FirstUseEver);
         ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.12f, 0.15f, 0.22f, 0.88f));
         ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.2f, 0.85f, 1.0f, 0.95f));
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 24.0f);
         if (ImGui::Begin("##FloatingBubble", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize))
         {
-            if (ImGui::Button(" ⚙️ MLBB Tool ", ImVec2(120, 36)))
+            if (ImGui::Button(" ⚙️ Willy LibTool ", ImVec2(130, 36)))
             {
                 isFloatingBubble = false;
             }
