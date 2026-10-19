@@ -86,6 +86,7 @@ public class OverlayService extends Service {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private Notification buildNotification() {
         Intent notificationIntent = new Intent(this, MainActivity.class);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -117,6 +118,7 @@ public class OverlayService extends Service {
         return Math.round(dp * (metrics.densityDpi / 160f));
     }
 
+    @SuppressWarnings("deprecation")
     private int getOverlayType() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             return WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;

@@ -354,13 +354,21 @@ public final class ShizukuPanel {
         return "settings put system " + key + " " + ShizukuShell.q(old);
     }
 
+    @SuppressWarnings("deprecation")
+    private Display getDisplayCompat() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            return activity.getDisplay();
+        }
+        return activity.getWindowManager().getDefaultDisplay();
+    }
+
     private float currentRefreshRate() {
-        Display d = activity.getWindowManager().getDefaultDisplay();
+        Display d = getDisplayCompat();
         return d != null ? d.getRefreshRate() : 60f;
     }
 
     private float maxRefreshRate() {
-        Display d = activity.getWindowManager().getDefaultDisplay();
+        Display d = getDisplayCompat();
         if (d == null) return 60f;
         float max = d.getRefreshRate();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

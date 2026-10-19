@@ -37,11 +37,15 @@ android {
             pickFirsts += ['**/libTool.so']
         }
     }
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xlint:deprecation"
+    }
 }
 
 //dependencies must be placed below 'android' brackets to get it work on AIDE
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    compileOnly 'androidx.annotation:annotation:1.3.0'
     def shizuku_version = '13.1.5'
     implementation "dev.rikka.shizuku:api:${shizuku_version}"
     implementation "dev.rikka.shizuku:provider:${shizuku_version}"
