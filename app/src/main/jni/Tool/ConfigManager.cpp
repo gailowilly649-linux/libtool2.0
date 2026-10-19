@@ -17,14 +17,19 @@ namespace ConfigManager
 
     void Init()
     {
-        // Try /sdcard/Download/ first
+        // Check writable paths suitable for non-rooted and rooted devices
         if (access("/sdcard/Download", W_OK) == 0)
         {
             s_ConfigPath = "/sdcard/Download/libtool_config.txt";
         }
+        else if (access("/sdcard/Android/data/com.android.support/files", W_OK) == 0)
+        {
+            s_ConfigPath = "/sdcard/Android/data/com.android.support/files/libtool_config.txt";
+        }
         else
         {
-            s_ConfigPath = "/data/data/com.mobile.legends/files/libtool_config.txt";
+            // App-private internal storage, always writable on non-rooted devices
+            s_ConfigPath = "/data/data/com.android.support/files/libtool_config.txt";
         }
     }
 

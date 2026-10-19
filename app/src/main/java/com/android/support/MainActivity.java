@@ -24,6 +24,7 @@ public class MainActivity extends Activity {
     private TextView txtOverlayStatus;
     private TextView txtStorageStatus;
     private TextView txtServiceStatus;
+    private TextView txtDeviceMode;
     private Button btnGrantOverlay;
     private Button btnToggleService;
     private Button btnLaunchMLBB;
@@ -33,9 +34,16 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Ensure internal storage directory is always created for non-rooted compatibility
+        java.io.File filesDir = getFilesDir();
+        if (filesDir != null && !filesDir.exists()) {
+            filesDir.mkdirs();
+        }
+
         txtOverlayStatus = findViewById(R.id.txtOverlayStatus);
         txtStorageStatus = findViewById(R.id.txtStorageStatus);
         txtServiceStatus = findViewById(R.id.txtServiceStatus);
+        txtDeviceMode = findViewById(R.id.txtDeviceMode);
         btnGrantOverlay = findViewById(R.id.btnGrantOverlay);
         btnToggleService = findViewById(R.id.btnToggleService);
         btnLaunchMLBB = findViewById(R.id.btnLaunchMLBB);
@@ -198,6 +206,11 @@ public class MainActivity extends Activity {
         } else {
             txtStorageStatus.setText("DENIED");
             txtStorageStatus.setTextColor(Color.parseColor("#FFAB00"));
+        }
+
+        if (txtDeviceMode != null) {
+            txtDeviceMode.setText("NON-ROOTED (FULL)");
+            txtDeviceMode.setTextColor(Color.parseColor("#00E676"));
         }
 
         if (OverlayService.isRunning) {

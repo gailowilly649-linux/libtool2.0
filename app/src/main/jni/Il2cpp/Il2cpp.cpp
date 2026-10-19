@@ -1086,21 +1086,34 @@ namespace Il2cpp
     std::string getDataPath()
     {
         static auto Application = FindClass("UnityEngine.Application");
-        if (!Application) return "unknown_data_path";
-        static auto get_persistentDataPath = GetClassMethod(Application, "get_persistentDataPath", 0);
-        if (!get_persistentDataPath) return "unknown_data_path";
+        if (Application)
+        {
+            static auto get_persistentDataPath = GetClassMethod(Application, "get_persistentDataPath", 0);
+            if (get_persistentDataPath)
+            {
+                auto dataPath = (Il2CppString*)il2cpp_runtime_invoke(get_persistentDataPath, nullptr, nullptr, nullptr);
+                if (dataPath)
+                {
+                    static auto str = dataPath->to_string();
+                    return str;
+                }
+            }
+        }
         
-        auto dataPath = (Il2CppString*)il2cpp_runtime_invoke(get_persistentDataPath, nullptr, nullptr, nullptr);
-        if (dataPath)
+        // Non-rooted standalone fallback: use accessible internal app storage
+        if (access("/data/data/com.android.support/files", W_OK) == 0)
         {
-            static auto str = dataPath->to_string();
-            return str;
+            return "/data/data/com.android.support/files";
         }
-        else
+        if (access("/sdcard/Android/data/com.android.support/files", W_OK) == 0)
         {
-            LOGE("Failed to get dataPath");
-            return "unknown_data_path";
+            return "/sdcard/Android/data/com.android.support/files";
         }
+        if (access("/sdcard/Download", W_OK) == 0)
+        {
+            return "/sdcard/Download";
+        }
+        return "/data/data/com.android.support";
     }
 
     std::string getPackageName()

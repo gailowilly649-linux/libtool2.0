@@ -51,6 +51,11 @@ public class OverlayService extends Service implements View.OnTouchListener, GLS
         super.onCreate();
         Log.i(TAG, "OverlayService onCreate");
 
+        java.io.File filesDir = getFilesDir();
+        if (filesDir != null && !filesDir.exists()) {
+            filesDir.mkdirs();
+        }
+
         createNotificationChannel();
         startForegroundSafely();
 
