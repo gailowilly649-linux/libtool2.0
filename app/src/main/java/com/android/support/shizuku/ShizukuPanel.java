@@ -62,6 +62,13 @@ public final class ShizukuPanel {
     private final Button btnRestore;
     private final Button btnClean;
     private final Button btnRefreshRate;
+    private final Button btnDrone2x;
+    private final Button btnDrone3x;
+    private final Button btnDrone4x;
+    private final Button btnDrone5x;
+    private final Button btnDroneReset;
+    private final Button btnMapSkins;
+    private final Button btnRestoreMap;
 
     private final Shizuku.OnBinderReceivedListener binderReceived = this::postUpdate;
     private final Shizuku.OnBinderDeadListener binderDead = this::postUpdate;
@@ -84,11 +91,39 @@ public final class ShizukuPanel {
         btnClean = activity.findViewById(R.id.btnCleanCache);
         btnRefreshRate = activity.findViewById(R.id.btnRefreshRate);
 
+        btnDrone2x = activity.findViewById(R.id.btnMainDrone2x);
+        btnDrone3x = activity.findViewById(R.id.btnMainDrone3x);
+        btnDrone4x = activity.findViewById(R.id.btnMainDrone4x);
+        btnDrone5x = activity.findViewById(R.id.btnMainDrone5x);
+        btnDroneReset = activity.findViewById(R.id.btnMainDroneReset);
+        btnMapSkins = activity.findViewById(R.id.btnMainMapSkins);
+        btnRestoreMap = activity.findViewById(R.id.btnMainRestoreMap);
+
         btnGrant.setOnClickListener(v -> onGrant());
         btnBackup.setOnClickListener(v -> onBackup());
         btnRestore.setOnClickListener(v -> onRestore());
         btnClean.setOnClickListener(v -> onClean());
         btnRefreshRate.setOnClickListener(v -> onRefreshRate());
+
+        MlbbModInjector.Callback panelCallback = new MlbbModInjector.Callback() {
+            @Override
+            public void onProgress(String message) {
+                log(message);
+            }
+
+            @Override
+            public void onComplete(boolean success, String message) {
+                log((success ? "✅ " : "❌ ") + message);
+            }
+        };
+
+        if (btnDrone2x != null) btnDrone2x.setOnClickListener(v -> MlbbModInjector.applyDroneView(activity, 2, panelCallback));
+        if (btnDrone3x != null) btnDrone3x.setOnClickListener(v -> MlbbModInjector.applyDroneView(activity, 3, panelCallback));
+        if (btnDrone4x != null) btnDrone4x.setOnClickListener(v -> MlbbModInjector.applyDroneView(activity, 4, panelCallback));
+        if (btnDrone5x != null) btnDrone5x.setOnClickListener(v -> MlbbModInjector.applyDroneView(activity, 5, panelCallback));
+        if (btnDroneReset != null) btnDroneReset.setOnClickListener(v -> MlbbModInjector.restoreDefaultDrone(panelCallback));
+        if (btnMapSkins != null) btnMapSkins.setOnClickListener(v -> MlbbModInjector.injectMapAndSkins(activity, panelCallback));
+        if (btnRestoreMap != null) btnRestoreMap.setOnClickListener(v -> MlbbModInjector.restoreDefaultMapAndSkins(panelCallback));
 
         try {
             Shizuku.addBinderReceivedListenerSticky(binderReceived);
@@ -136,6 +171,14 @@ public final class ShizukuPanel {
         btnRestore.setEnabled(granted);
         btnClean.setEnabled(granted);
         btnRefreshRate.setEnabled(granted);
+
+        if (btnDrone2x != null) btnDrone2x.setEnabled(granted);
+        if (btnDrone3x != null) btnDrone3x.setEnabled(granted);
+        if (btnDrone4x != null) btnDrone4x.setEnabled(granted);
+        if (btnDrone5x != null) btnDrone5x.setEnabled(granted);
+        if (btnDroneReset != null) btnDroneReset.setEnabled(granted);
+        if (btnMapSkins != null) btnMapSkins.setEnabled(granted);
+        if (btnRestoreMap != null) btnRestoreMap.setEnabled(granted);
 
         float current = currentRefreshRate();
         float max = maxRefreshRate();

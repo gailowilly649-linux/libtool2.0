@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/floatingRoot"
+    android:layout_width="320dp"
+    android:layout_height="wrap_content"
+    android:background="#F012151C"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <!-- Header / Drag Bar -->
+    <LinearLayout
+        android:id="@+id/floatingHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp">
+
+        <View
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:background="#00E5FF" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:text="WILLY LIBTOOL (NO ROOT)"
+            android:textColor="#ECEFF4"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnFloatingMinimize"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="#2E3440"
+            android:text="—"
+            android:textColor="#D8DEE9"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnFloatingClose"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="6dp"
+            android:background="#D5011D"
+            android:text="✕"
+            android:textColor="#FFFFFF"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#2E3440" />
+
+    <!-- 1. DRONE VIEW SECTION -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="DRONE VIEW (CAMERA ZOOM)"
+        android:textColor="#00E5FF"
+        android:textSize="11sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnDrone2x"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:background="#1E232E"
+            android:text="2X"
+            android:textColor="#ECEFF4"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnDrone3x"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="4dp"
+            android:layout_weight="1"
+            android:background="#1E232E"
+            android:text="3X"
+            android:textColor="#ECEFF4"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnDrone4x"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="4dp"
+            android:layout_weight="1"
+            android:background="#1E232E"
+            android:text="4X"
+            android:textColor="#ECEFF4"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnDrone5x"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="4dp"
+            android:layout_weight="1"
+            android:background="#1E232E"
+            android:text="5X"
+            android:textColor="#ECEFF4"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnDroneReset"
+        android:layout_width="match_parent"
+        android:layout_height="34dp"
+        android:layout_marginTop="4dp"
+        android:background="#2E3440"
+        android:text="RESTORE STOCK CAMERA"
+        android:textColor="#D8DEE9"
+        android:textSize="10sp" />
+
+    <!-- 2. FPS & REFRESH RATE SECTION -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="120 FPS / ULTRA GRAPHICS"
+        android:textColor="#00E5FF"
+        android:textSize="11sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnUnlock120Fps"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:background="#1E232E"
+            android:text="UNLOCK 120 FPS"
+            android:textColor="#00E676"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnResetFps"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="4dp"
+            android:layout_weight="1"
+            android:background="#1E232E"
+            android:text="RESET 60 FPS"
+            android:textColor="#D8DEE9"
+            android:textSize="10sp" />
+    </LinearLayout>
+
+    <!-- 3. MAP & SKINS SECTION -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="MAP ASSETS &amp; SKINS"
+        android:textColor="#00E5FF"
+        android:textSize="11sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnInjectMapSkins"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:background="#1E232E"
+            android:text="INJECT MAP + SKINS"
+            android:textColor="#FFD54F"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnRestoreMapSkins"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="4dp"
+            android:layout_weight="1"
+            android:background="#1E232E"
+            android:text="RESTORE STOCK"
+            android:textColor="#D8DEE9"
+            android:textSize="10sp" />
+    </LinearLayout>
+
+    <!-- Status message -->
+    <TextView
+        android:id="@+id/txtFloatingStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="#0B0D10"
+        android:fontFamily="monospace"
+        android:padding="6dp"
+        android:text="Ready."
+        android:textColor="#8FBCBB"
+        android:textSize="10sp" />
+
+</LinearLayout>

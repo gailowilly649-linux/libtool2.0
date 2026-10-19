@@ -11,25 +11,23 @@ import android.content.pm.ServiceInfo;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.GradientDrawable;
-import android.opengl.GLSurfaceView;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
+import com.android.support.shizuku.MlbbModInjector;
 
-import imgui.il2cpp.tool.NativeMethods;
-
-public class OverlayService extends Service implements View.OnTouchListener, GLSurfaceView.Renderer {
+public class OverlayService extends Service {
 
     private static final String TAG = "OverlayService";
     private static final String CHANNEL_ID = "willy_libtool_channel";
@@ -38,36 +36,32 @@ public class OverlayService extends Service implements View.OnTouchListener, GLS
     public static boolean isRunning = false;
 
     private WindowManager windowManager;
-    private GLSurfaceView glSurfaceView;
-    private WindowManager.LayoutParams glParams;
     private View bubbleView;
     private WindowManager.LayoutParams bubbleParams;
+    private View menuView;
+    private WindowManager.LayoutParams menuParams;
 
-    private boolean isMenuOpen = true;
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private TextView txtStatus;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i(TAG, "OverlayService onCreate");
-
-        java.io.File filesDir = getFilesDir();
-        if (filesDir != null && !filesDir.exists()) {
-            filesDir.mkdirs();
-        }
+        Log.i(TAG, "OverlayService starting native floating overlay");
 
         createNotificationChannel();
         startForegroundSafely();
 
         windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-        setupViews();
+        setupBubble();
+        setupMenu();
+
         isRunning = true;
     }
 
     private void startForegroundSafely() {
         try {
             Notification notification = buildNotification();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 14+ (API 34)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
             } else {
                 startForeground(NOTIFICATION_ID, notification);
@@ -109,7 +103,6 @@ public class OverlayService extends Service implements View.OnTouchListener, GLS
             builder = new Notification.Builder(this);
         }
 
-        // Use standard raster PNG drawable (R.drawable.app_icon), NEVER an adaptive-icon XML
         return builder
                 .setContentTitle("Willy LibTool")
                 .setContentText("Floating Menu Overlay is Active")
@@ -124,53 +117,23 @@ public class OverlayService extends Service implements View.OnTouchListener, GLS
         return Math.round(dp * (metrics.densityDpi / 160f));
     }
 
-    private void setupViews() {
-        int layoutType;
+    private int getOverlayType() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            layoutType = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-        } else {
-            layoutType = WindowManager.LayoutParams.TYPE_PHONE;
+            return WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
         }
+        return WindowManager.LayoutParams.TYPE_PHONE;
+    }
 
-        // 1. Setup GLSurfaceView for ImGui Menu
-        glParams = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.MATCH_PARENT,
-                layoutType,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                        | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
-                        | WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
-                PixelFormat.TRANSLUCENT
-        );
-        glParams.gravity = Gravity.TOP | Gravity.START;
-        glParams.x = 0;
-        glParams.y = 0;
+    // ─────────────────────────────────────────────────────────────────────────
+    // 1. DRAGGABLE FLOATING BUBBLE
+    // ─────────────────────────────────────────────────────────────────────────
 
-        glSurfaceView = new GLSurfaceView(this);
-        try {
-            glSurfaceView.setEGLContextClientVersion(3);
-        } catch (Exception e) {
-            glSurfaceView.setEGLContextClientVersion(2);
-        }
-        glSurfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
-        glSurfaceView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
-        glSurfaceView.setZOrderOnTop(true);
-        glSurfaceView.setRenderer(this);
-        glSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
-        glSurfaceView.setOnTouchListener(this);
-
-        try {
-            windowManager.addView(glSurfaceView, glParams);
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to add glSurfaceView", e);
-        }
-
-        // 2. Setup Floating Bubble (Icon button for easy toggling / dragging)
+    private void setupBubble() {
         int bubbleSize = dpToPx(56);
         bubbleParams = new WindowManager.LayoutParams(
                 bubbleSize,
                 bubbleSize,
-                layoutType,
+                getOverlayType(),
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                         | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
                 PixelFormat.TRANSLUCENT
@@ -184,25 +147,14 @@ public class OverlayService extends Service implements View.OnTouchListener, GLS
         int padding = dpToPx(6);
         iconView.setPadding(padding, padding, padding, padding);
 
-        // Circular background with red border
+        // Circular styled bubble with accent border
         GradientDrawable bg = new GradientDrawable();
         bg.setShape(GradientDrawable.OVAL);
-        bg.setColor(Color.parseColor("#E61E293B"));
-        bg.setStroke(dpToPx(2), Color.parseColor("#D5011D"));
+        bg.setColor(Color.parseColor("#EE12151C"));
+        bg.setStroke(dpToPx(2), Color.parseColor("#00E5FF"));
         iconView.setBackground(bg);
 
-        setupBubbleTouch(iconView);
-        bubbleView = iconView;
-
-        try {
-            windowManager.addView(bubbleView, bubbleParams);
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to add bubbleView", e);
-        }
-    }
-
-    private void setupBubbleTouch(View bubble) {
-        bubble.setOnTouchListener(new View.OnTouchListener() {
+        iconView.setOnTouchListener(new View.OnTouchListener() {
             private int initialX, initialY;
             private float initialTouchX, initialTouchY;
             private long touchStartTime;
@@ -232,39 +184,168 @@ public class OverlayService extends Service implements View.OnTouchListener, GLS
                         float diffY = Math.abs(event.getRawY() - initialTouchY);
                         long duration = System.currentTimeMillis() - touchStartTime;
 
-                        // Click detected if moved less than 15px and tapped quickly
-                        if (diffX < 15 && diffY < 15 && duration < 300) {
-                            toggleMenu();
+                        // Tap opens floating menu
+                        if (diffX < 15 && diffY < 15 && duration < 350) {
+                            showMenu();
                         }
                         return true;
                 }
                 return false;
             }
         });
+
+        bubbleView = iconView;
+        try {
+            windowManager.addView(bubbleView, bubbleParams);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to add bubbleView", e);
+        }
     }
 
-    public void toggleMenu() {
-        setMenuVisible(!isMenuOpen);
+    // ─────────────────────────────────────────────────────────────────────────
+    // 2. COMPACT FLOATING MOD MENU
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private void setupMenu() {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        menuView = inflater.inflate(R.layout.floating_menu, null);
+
+        menuParams = new WindowManager.LayoutParams(
+                dpToPx(320),
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                getOverlayType(),
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                        | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+                PixelFormat.TRANSLUCENT
+        );
+        menuParams.gravity = Gravity.TOP | Gravity.START;
+        menuParams.x = dpToPx(30);
+        menuParams.y = dpToPx(120);
+
+        txtStatus = menuView.findViewById(R.id.txtFloatingStatus);
+
+        // Make floating menu draggable via header
+        View header = menuView.findViewById(R.id.floatingHeader);
+        header.setOnTouchListener(new View.OnTouchListener() {
+            private int initialX, initialY;
+            private float initialTouchX, initialTouchY;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        initialX = menuParams.x;
+                        initialY = menuParams.y;
+                        initialTouchX = event.getRawX();
+                        initialTouchY = event.getRawY();
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        menuParams.x = initialX + (int) (event.getRawX() - initialTouchX);
+                        menuParams.y = initialY + (int) (event.getRawY() - initialTouchY);
+                        try {
+                            windowManager.updateViewLayout(menuView, menuParams);
+                        } catch (Exception ignored) {
+                        }
+                        return true;
+                }
+                return false;
+            }
+        });
+
+        // Window controls
+        Button btnMin = menuView.findViewById(R.id.btnFloatingMinimize);
+        btnMin.setOnClickListener(v -> hideMenu());
+
+        Button btnClose = menuView.findViewById(R.id.btnFloatingClose);
+        btnClose.setOnClickListener(v -> stopSelf());
+
+        // Mod injection listener callbacks
+        MlbbModInjector.Callback modCallback = new MlbbModInjector.Callback() {
+            @Override
+            public void onProgress(String message) {
+                if (txtStatus != null) txtStatus.setText(message);
+            }
+
+            @Override
+            public void onComplete(boolean success, String message) {
+                if (txtStatus != null) {
+                    txtStatus.setText((success ? "✅ " : "❌ ") + message);
+                }
+                Toast.makeText(OverlayService.this, message, Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        // Section 1: Drone View
+        menuView.findViewById(R.id.btnDrone2x).setOnClickListener(v -> {
+            txtStatus.setText("Injecting 2X Drone View...");
+            MlbbModInjector.applyDroneView(this, 2, modCallback);
+        });
+
+        menuView.findViewById(R.id.btnDrone3x).setOnClickListener(v -> {
+            txtStatus.setText("Injecting 3X Drone View...");
+            MlbbModInjector.applyDroneView(this, 3, modCallback);
+        });
+
+        menuView.findViewById(R.id.btnDrone4x).setOnClickListener(v -> {
+            txtStatus.setText("Injecting 4X Drone View...");
+            MlbbModInjector.applyDroneView(this, 4, modCallback);
+        });
+
+        menuView.findViewById(R.id.btnDrone5x).setOnClickListener(v -> {
+            txtStatus.setText("Injecting 5X Drone View...");
+            MlbbModInjector.applyDroneView(this, 5, modCallback);
+        });
+
+        menuView.findViewById(R.id.btnDroneReset).setOnClickListener(v -> {
+            txtStatus.setText("Restoring stock camera...");
+            MlbbModInjector.restoreDefaultDrone(modCallback);
+        });
+
+        // Section 2: 120 FPS
+        menuView.findViewById(R.id.btnUnlock120Fps).setOnClickListener(v -> {
+            txtStatus.setText("Unlocking 120 FPS...");
+            MlbbModInjector.unlock120Fps(this, true, modCallback);
+        });
+
+        menuView.findViewById(R.id.btnResetFps).setOnClickListener(v -> {
+            txtStatus.setText("Resetting FPS...");
+            MlbbModInjector.unlock120Fps(this, false, modCallback);
+        });
+
+        // Section 3: Map & Skins
+        menuView.findViewById(R.id.btnInjectMapSkins).setOnClickListener(v -> {
+            txtStatus.setText("Injecting Map & Skins...");
+            MlbbModInjector.injectMapAndSkins(this, modCallback);
+        });
+
+        menuView.findViewById(R.id.btnRestoreMapSkins).setOnClickListener(v -> {
+            txtStatus.setText("Restoring stock map & skins...");
+            MlbbModInjector.restoreDefaultMapAndSkins(modCallback);
+        });
+
+        menuView.setVisibility(View.GONE);
+        try {
+            windowManager.addView(menuView, menuParams);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to add menuView", e);
+        }
     }
 
-    public void setMenuVisible(boolean visible) {
-        isMenuOpen = visible;
-        NativeMethods.setMenuMinimized(!visible);
+    private void showMenu() {
+        if (menuView != null) {
+            menuView.setVisibility(View.VISIBLE);
+        }
+        if (bubbleView != null) {
+            bubbleView.setAlpha(0.4f);
+        }
+    }
 
-        if (glSurfaceView != null && windowManager != null) {
-            if (visible) {
-                glSurfaceView.setVisibility(View.VISIBLE);
-                glParams.flags &= ~WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
-                bubbleView.setAlpha(0.6f);
-            } else {
-                glSurfaceView.setVisibility(View.GONE);
-                glParams.flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
-                bubbleView.setAlpha(1.0f);
-            }
-            try {
-                windowManager.updateViewLayout(glSurfaceView, glParams);
-            } catch (Exception ignored) {
-            }
+    private void hideMenu() {
+        if (menuView != null) {
+            menuView.setVisibility(View.GONE);
+        }
+        if (bubbleView != null) {
+            bubbleView.setAlpha(1.0f);
         }
     }
 
@@ -277,76 +358,14 @@ public class OverlayService extends Service implements View.OnTouchListener, GLS
         return START_STICKY;
     }
 
-    // GLSurfaceView.Renderer callbacks
-    @Override
-    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        Log.i(TAG, "GLSurfaceView onSurfaceCreated");
-        try {
-            NativeMethods.onSurfaceCreated(glSurfaceView.getHolder().getSurface());
-            NativeMethods.onSurfaceCreate();
-        } catch (Throwable t) {
-            Log.e(TAG, "Renderer onSurfaceCreated error", t);
-        }
-    }
-
-    @Override
-    public void onSurfaceChanged(GL10 gl, int width, int height) {
-        Log.i(TAG, "GLSurfaceView onSurfaceChanged: " + width + "x" + height);
-        try {
-            NativeMethods.onSurfaceCreate();
-            NativeMethods.onSurfaceChanged(width, height);
-        } catch (Throwable t) {
-            Log.e(TAG, "Renderer onSurfaceChanged error", t);
-        }
-    }
-
-    @Override
-    public void onDrawFrame(GL10 gl) {
-        try {
-            NativeMethods.onDrawFrame();
-        } catch (Throwable t) {
-            Log.e(TAG, "Renderer onDrawFrame error", t);
-        }
-    }
-
-    // Touch events for ImGui overlay
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        try {
-            NativeMethods.onTouchEvent(
-                    event.getActionMasked(),
-                    event.getX(),
-                    0,
-                    event.getY(),
-                    0
-            );
-
-            // If user clicked "Minimize [-]" inside the ImGui menu, collapse automatically
-            if (event.getActionMasked() == MotionEvent.ACTION_UP) {
-                mainHandler.post(() -> {
-                    if (NativeMethods.isMenuMinimized() && isMenuOpen) {
-                        setMenuVisible(false);
-                    }
-                });
-            }
-        } catch (Throwable t) {
-            Log.e(TAG, "onTouch error", t);
-        }
-        return true;
-    }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
         isRunning = false;
-        isMenuOpen = false;
 
-        if (glSurfaceView != null) {
+        if (menuView != null && windowManager != null) {
             try {
-                glSurfaceView.onPause();
-                if (windowManager != null) {
-                    windowManager.removeView(glSurfaceView);
-                }
+                windowManager.removeView(menuView);
             } catch (Exception ignored) {
             }
         }
