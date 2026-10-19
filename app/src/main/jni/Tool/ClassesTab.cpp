@@ -118,8 +118,11 @@ ClassesTab::ClassesTab()
             break;
         }
     }
-    classes = selectedImage->getClasses();
-    filteredClasses = classes;
+    if (selectedImage)
+    {
+        classes = selectedImage->getClasses();
+        filteredClasses = classes;
+    }
 }
 
 ClassesTab::Paths &ClassesTab::getJsonPaths(Il2CppObject *object)
@@ -2106,6 +2109,21 @@ void ClassesTab::Draw(int index, bool closeable)
                                                setOpenedTab ? ImGuiTabItemFlags_SetSelected : 0)))
     {
         setOpenedTab = false;
+        if (!Il2cpp::IsInitialized())
+        {
+            ImGui::Spacing();
+            ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.2f, 1.0f), "IL2CPP Not Loaded (Standalone Mode)");
+            ImGui::TextWrapped("Willy LibTool is running in floating overlay mode.");
+            ImGui::TextWrapped("Launch Mobile Legends to inspect live game classes, methods, and memory.");
+            ImGui::Spacing();
+            if (ImGui::Button("Refresh Assemblies (SOSplit)"))
+            {
+                Tool::ReloadImages();
+            }
+            ImGui::EndTabItem();
+            return;
+        }
+
         ImGui::BeginDisabled(includeAllImages);
         ImGui::SetNextWindowSizeConstraints(ImVec2(0, 0), ImVec2(-1, io.DisplaySize.y / 1.5f));
         const char *currentImageName = selectedImage ? selectedImage->getName() : "No Images Loaded (Standalone)";
@@ -2805,6 +2823,10 @@ void ClassesTab::FilterClasses(const std::string &filter)
     filteredClasses.clear();
     classes.clear();
     methodMap.clear(); // is this necessary?
+    if (!Il2cpp::IsInitialized())
+    {
+        return;
+    }
     if (includeAllImages)
     {
         for (auto image : g_Images)
@@ -2905,29 +2927,35 @@ void to_json(nlohmann::ordered_json &j, const ClassesTab &p)
     j["showAllClasses"] = p.showAllClasses;
     j["includeAllImages"] = p.includeAllImages;
     j["caseSensitive"] = p.caseSensitive;
-    j["selectedImage"] = p.selectedImage->getName();
+    j["selectedImage"] = (p.selectedImage != nullptr) ? p.selectedImage->getName() : "";
 }
 
 void from_json(const nlohmann::ordered_json &j, ClassesTab &p)
 {
-    j.at("filter").get_to(p.filter);
-    j.at("filterByClass").get_to(p.filterByClass);
-    j.at("filterByField").get_to(p.filterByField);
-    j.at("filterByMethod").get_to(p.filterByMethod);
-    j.at("showAllClasses").get_to(p.showAllClasses);
-    j.at("includeAllImages").get_to(p.includeAllImages);
-    j.at("caseSensitive").get_to(p.caseSensitive);
-    std::string selectedImage = j.at("selectedImage").get<std::string>();
-    if (selectedImage.size() >= 4 && selectedImage.compare(selectedImage.size() - 4, 4, ".dll") == 0) {
-        selectedImage.erase(selectedImage.size() - 4);
-    }
-    auto assembly = Il2cpp::GetAssembly(selectedImage.c_str());
-    if (assembly)
+    if (j.contains("filter")) j.at("filter").get_to(p.filter);
+    if (j.contains("filterByClass")) j.at("filterByClass").get_to(p.filterByClass);
+    if (j.contains("filterByField")) j.at("filterByField").get_to(p.filterByField);
+    if (j.contains("filterByMethod")) j.at("filterByMethod").get_to(p.filterByMethod);
+    if (j.contains("showAllClasses")) j.at("showAllClasses").get_to(p.showAllClasses);
+    if (j.contains("includeAllImages")) j.at("includeAllImages").get_to(p.includeAllImages);
+    if (j.contains("caseSensitive")) j.at("caseSensitive").get_to(p.caseSensitive);
+    if (j.contains("selectedImage"))
     {
-        auto image = assembly->getImage();
-        if (image)
+        std::string selectedImage = j.at("selectedImage").get<std::string>();
+        if (!selectedImage.empty() && Il2cpp::IsInitialized())
         {
-            p.selectedImage = image;
+            if (selectedImage.size() >= 4 && selectedImage.compare(selectedImage.size() - 4, 4, ".dll") == 0) {
+                selectedImage.erase(selectedImage.size() - 4);
+            }
+            auto assembly = Il2cpp::GetAssembly(selectedImage.c_str());
+            if (assembly)
+            {
+                auto image = assembly->getImage();
+                if (image)
+                {
+                    p.selectedImage = image;
+                }
+            }
         }
     }
 }

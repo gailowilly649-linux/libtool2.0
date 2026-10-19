@@ -61,6 +61,7 @@ public class MainActivity extends Activity {
             } else {
                 startOverlayService();
             }
+            btnToggleService.postDelayed(this::updateUiState, 350);
             updateUiState();
         });
 

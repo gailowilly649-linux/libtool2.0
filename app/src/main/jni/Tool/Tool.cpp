@@ -165,6 +165,11 @@ namespace Tool
     void ConfigLoad()
     {
         LOGD(__FUNCTION__);
+        if (!Il2cpp::IsInitialized())
+        {
+            LOGD("IL2CPP not initialized, skipping ConfigLoad");
+            return;
+        }
         try
         {
             Util::FileReader configFile("class_tabs.json");
@@ -180,6 +185,11 @@ namespace Tool
     void ConfigSave()
     {
         LOGD(__FUNCTION__);
+        if (!Il2cpp::IsInitialized())
+        {
+            LOGD("IL2CPP not initialized, skipping ConfigSave");
+            return;
+        }
         Util::FileWriter configFile("class_tabs.json");
         nlohmann::ordered_json j = classesTabs;
         configFile.write(j.dump(2, ' ').c_str());
@@ -187,6 +197,11 @@ namespace Tool
     void ConfigInit()
     {
         LOGD(__FUNCTION__);
+        if (!Il2cpp::IsInitialized())
+        {
+            LOGD("IL2CPP not initialized, skipping ConfigInit");
+            return;
+        }
         // check if class_tabs.json exists
         Util::FileReader config("class_tabs.json");
         if (config.exists())
@@ -220,6 +235,10 @@ namespace Tool
 
     void InitScreenSize()
     {
+        if (!Il2cpp::IsInitialized())
+        {
+            return;
+        }
         auto Display = Il2cpp::FindClass("UnityEngine.Display");
         if (!Display)
         {
@@ -303,7 +322,7 @@ namespace Tool
     {
         if (!dumpPaths.empty())
             return;
-        std::string pkg = Il2cpp::getPackageName();
+        std::string pkg = Il2cpp::IsInitialized() ? Il2cpp::getPackageName() : "com.mobile.legends";
         dumpPaths.push_back("/sdcard/Android/data/" + pkg + "/files");
         dumpPaths.push_back("/storage/emulated/0/Download");
         dumpPaths.push_back("/storage/emulated/0/Documents");
@@ -315,8 +334,11 @@ namespace Tool
 
     void Init(Il2CppImage *image, std::vector<Il2CppImage *> images)
     {
-        ConfigInit();
-        InitScreenSize();
+        if (Il2cpp::IsInitialized())
+        {
+            ConfigInit();
+            InitScreenSize();
+        }
         g_Images.clear();
         for (auto img : images)
         {
@@ -338,7 +360,10 @@ namespace Tool
             {
                 tab.selectedImage = g_Images.front();
             }
-            tab.FilterClasses(tab.filter);
+            if (Il2cpp::IsInitialized())
+            {
+                tab.FilterClasses(tab.filter);
+            }
         }
 #ifdef USE_FRIDA
         Frida::Init();
@@ -436,6 +461,14 @@ namespace Tool
 
     void Strings()
     {
+        if (!Il2cpp::IsInitialized())
+        {
+            ImGui::Spacing();
+            ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.2f, 1.0f), "IL2CPP Not Loaded (Standalone Mode)");
+            ImGui::TextWrapped("System.String heap search requires Mobile Legends runtime.");
+            return;
+        }
+
         static char filter[128] = "";
         static std::vector<std::string> strings;
         static bool externalChanged = false;
@@ -1021,6 +1054,14 @@ namespace Tool
 
     void GameObjects()
     {
+        if (!Il2cpp::IsInitialized())
+        {
+            ImGui::Spacing();
+            ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.2f, 1.0f), "IL2CPP Not Loaded (Standalone Mode)");
+            ImGui::TextWrapped("GameObjects inspector requires Mobile Legends runtime.");
+            return;
+        }
+
         static std::vector<Il2CppObject *> GameObjects = []()
         {
             auto GO = Il2cpp::FindClass("UnityEngine.GameObject");
