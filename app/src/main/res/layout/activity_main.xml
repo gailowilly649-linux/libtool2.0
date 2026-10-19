@@ -201,6 +201,138 @@
             android:textColor="#ECEFF4"
             android:textSize="14sp" />
 
+        <!-- Shizuku Tools Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="#1A1D24"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SHIZUKU TOOLS (NO ROOT)"
+                android:textColor="#00E5FF"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="12dp"
+                android:background="#2E3440" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Shizuku Status:"
+                    android:textColor="#D8DEE9"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/txtShizukuStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Checking..."
+                    android:textColor="#FFAB00"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Display Refresh Rate:"
+                    android:textColor="#D8DEE9"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/txtRefreshInfo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:textColor="#A0A5B5"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnShizukuGrant"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="12dp"
+                android:background="#2E3440"
+                android:text="GRANT SHIZUKU PERMISSION"
+                android:textColor="#00E5FF"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnBackup"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:background="#1E232E"
+                android:text="BACKUP MLBB SETTINGS"
+                android:textColor="#ECEFF4" />
+
+            <Button
+                android:id="@+id/btnRestore"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:background="#1E232E"
+                android:text="RESTORE FROM BACKUP"
+                android:textColor="#ECEFF4" />
+
+            <Button
+                android:id="@+id/btnCleanCache"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:background="#1E232E"
+                android:text="CLEAN MLBB CACHE"
+                android:textColor="#ECEFF4" />
+
+            <Button
+                android:id="@+id/btnRefreshRate"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:background="#1E232E"
+                android:text="DISPLAY: FORCE MAX REFRESH RATE"
+                android:textColor="#ECEFF4" />
+
+            <TextView
+                android:id="@+id/txtShizukuLog"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="#0B0D10"
+                android:fontFamily="monospace"
+                android:padding="8dp"
+                android:text="Ready."
+                android:textColor="#8FBCBB"
+                android:textIsSelectable="true"
+                android:textSize="11sp" />
+        </LinearLayout>
+
         <!-- Footer Info -->
         <TextView
             android:layout_width="wrap_content"

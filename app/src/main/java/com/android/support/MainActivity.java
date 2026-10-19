@@ -15,6 +15,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.support.shizuku.ShizukuPanel;
+
 public class MainActivity extends Activity {
 
     private static final int REQ_OVERLAY_PERMISSION = 1001;
@@ -28,6 +30,7 @@ public class MainActivity extends Activity {
     private Button btnGrantOverlay;
     private Button btnToggleService;
     private Button btnLaunchMLBB;
+    private ShizukuPanel shizukuPanel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,12 +71,17 @@ public class MainActivity extends Activity {
         btnLaunchMLBB.setOnClickListener(v -> launchGame());
 
         txtStorageStatus.setOnClickListener(v -> checkAndRequestStoragePermission());
+
+        shizukuPanel = new ShizukuPanel(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         updateUiState();
+        if (shizukuPanel != null) {
+            shizukuPanel.updateUi();
+        }
     }
 
     private boolean hasOverlayPermission() {
@@ -247,6 +255,14 @@ public class MainActivity extends Activity {
             txtServiceStatus.setTextColor(Color.parseColor("#FF5252"));
             btnToggleService.setText("START WILLY LIBTOOL");
             btnToggleService.setBackgroundColor(Color.parseColor("#D5011D"));
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (shizukuPanel != null) {
+            shizukuPanel.onDestroy();
         }
     }
 }

@@ -6,7 +6,7 @@ android {
     ndkVersion "27.0.12077973"
     defaultConfig {
         applicationId "com.android.support"
-        minSdkVersion 21
+        minSdkVersion 24
         targetSdkVersion 34
         versionCode 1
         versionName "3.2"
@@ -42,6 +42,9 @@ android {
 //dependencies must be placed below 'android' brackets to get it work on AIDE
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    def shizuku_version = '13.1.5'
+    implementation "dev.rikka.shizuku:api:${shizuku_version}"
+    implementation "dev.rikka.shizuku:provider:${shizuku_version}"
 }
 
 afterEvaluate {
