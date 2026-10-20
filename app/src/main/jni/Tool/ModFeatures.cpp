@@ -17,7 +17,7 @@ namespace ModFeatures
     static bool s_OverlayHUDEnabled = false;
 
     static bool s_FPSUnlockerEnabled = false;
-    static int s_TargetFPS = 120;
+    static int s_TargetFPS = 165;
     static int s_AppliedFPS = 0;
 
     void Init()
@@ -286,6 +286,8 @@ namespace ModFeatures
             if (ImGui::Button("120 FPS")) { SetTargetFPS(120); }
             ImGui::SameLine();
             if (ImGui::Button("144 FPS")) { SetTargetFPS(144); }
+            ImGui::SameLine();
+            if (ImGui::Button("165 FPS")) { SetTargetFPS(165); }
             ImGui::SameLine();
             if (ImGui::Button("240 FPS (Max)")) { SetTargetFPS(240); }
 

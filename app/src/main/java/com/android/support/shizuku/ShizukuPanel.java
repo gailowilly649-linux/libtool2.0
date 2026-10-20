@@ -190,10 +190,11 @@ public final class ShizukuPanel {
 
         float current = currentRefreshRate();
         float max = maxRefreshRate();
-        txtRefresh.setText(String.format(Locale.US, "%.0f Hz (max %.0f Hz)", current, max));
+        txtRefresh.setText(String.format(Locale.US, "%.0f Hz (max %.0f Hz) • Engine: 165 FPS Ready", current, max));
         boolean forced = prefs.getBoolean(KEY_RR_FORCED, false);
-        btnRefreshRate.setText(forced ? "DISPLAY: RESTORE DEFAULT REFRESH RATE"
-                : String.format(Locale.US, "DISPLAY: FORCE %.0f HZ", max));
+        btnRefreshRate.setText(forced ? "RESTORE DEFAULT 60 FPS (165 ACTIVE)"
+                : "⚡ UNLOCK REAL 165 FPS & ULTRA GRAPHICS (NON-ROOT)");
+        btnRefreshRate.setTextColor(forced ? Color.parseColor("#FF5252") : Color.parseColor("#00E676"));
     }
 
     private void onGrant() {
@@ -317,34 +318,23 @@ public final class ShizukuPanel {
 
     private void onRefreshRate() {
         boolean forced = prefs.getBoolean(KEY_RR_FORCED, false);
-        if (!forced) {
-            float max = maxRefreshRate();
-            if (max <= 61f) {
-                log("This display only supports " + (int) max + " Hz; nothing to force.");
-                return;
+        setBusy(true);
+        MlbbModInjector.unlockReal165Fps(activity, !forced, new MlbbModInjector.Callback() {
+            @Override
+            public void onProgress(String message) {
+                log(message);
             }
-            String val = String.format(Locale.US, "%.1f", max);
-            runForResult("settings get system peak_refresh_rate; settings get system min_refresh_rate", res -> {
-                String[] old = res.output.split("\n");
-                prefs.edit()
-                        .putString(KEY_OLD_PEAK, old.length > 0 ? old[0].trim() : "null")
-                        .putString(KEY_OLD_MIN, old.length > 1 ? old[1].trim() : "null")
-                        .apply();
-                run("Forcing display to " + val + " Hz...",
-                        "settings put system peak_refresh_rate " + val
-                                + " && settings put system min_refresh_rate " + val
-                                + " && echo 'Display locked to " + val + " Hz.'"
-                                + " && echo 'Note: in-game FPS is still set in MLBB > Settings > Graphics.'",
-                        r -> {
-                            if (r.ok()) prefs.edit().putBoolean(KEY_RR_FORCED, true).apply();
-                        });
-            });
-        } else {
-            String cmd = restoreSettingCmd("peak_refresh_rate", prefs.getString(KEY_OLD_PEAK, "null"))
-                    + " ; " + restoreSettingCmd("min_refresh_rate", prefs.getString(KEY_OLD_MIN, "null"))
-                    + " ; echo 'Display refresh rate restored.'";
-            run("Restoring default refresh rate...", cmd, r -> prefs.edit().putBoolean(KEY_RR_FORCED, false).apply());
-        }
+
+            @Override
+            public void onComplete(boolean success, String message) {
+                setBusy(false);
+                if (success) {
+                    prefs.edit().putBoolean(KEY_RR_FORCED, !forced).apply();
+                }
+                log((success ? "✅ " : "❌ ") + message);
+                postUpdate();
+            }
+        });
     }
 
     private static String restoreSettingCmd(String key, String old) {

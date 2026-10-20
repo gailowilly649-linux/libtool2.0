@@ -172,31 +172,38 @@ public final class MlbbModInjector {
 
             try {
                 if (unlock) {
-                    postProgress(callback, "1/4: Locking display panel to 144 Hz (hardware ceiling)...");
-                    // 1. Force SurfaceFlinger & Transsion display controller to 144Hz
+                    postProgress(callback, "1/4: Locking display panel to 165 Hz (hardware ceiling)...");
+                    // 1. Force SurfaceFlinger & all vendor display controllers to 165Hz
                     String displayCmd = 
-                            "settings put system peak_refresh_rate 144.0; " +
-                            "settings put system min_refresh_rate 144.0; " +
-                            "settings put system user_refresh_rate 144; " +
-                            "settings put system tran_refresh_mode 144; " +
-                            "settings put system tran_refresh_rate 144; " +
-                            "settings put system tran_screen_refresh_rate_mode 144; " +
-                            "settings put system refresh_rate_setting 144; " +
-                            "settings put system tecno_refresh_rate 144; " +
-                            "settings put system infinix_refresh_rate 144; " +
+                            "settings put system peak_refresh_rate 165.0; " +
+                            "settings put system min_refresh_rate 165.0; " +
+                            "settings put system user_refresh_rate 165; " +
+                            "settings put system tran_refresh_mode 165; " +
+                            "settings put system tran_refresh_rate 165; " +
+                            "settings put system tran_screen_refresh_rate_mode 165; " +
+                            "settings put system refresh_rate_setting 165; " +
+                            "settings put system tecno_refresh_rate 165; " +
+                            "settings put system infinix_refresh_rate 165; " +
                             "settings put system max_refresh_rate 165; " +
                             "settings put system game_fps_override 165; " +
                             "settings put system display_refresh_rate 165; " +
-                            "settings put global peak_refresh_rate 144.0; " +
-                            "settings put global min_refresh_rate 144.0; " +
-                            "settings put global user_refresh_rate 144; " +
+                            "settings put system asus_fps 165; " +
+                            "settings put system asus_refresh_rate 165; " +
+                            "settings put system nubia_refresh_rate 165; " +
+                            "settings put system ro.surface_flinger.set_idle_timer_ms 0; " +
+                            "settings put system ro.surface_flinger.set_touch_timer_ms 0; " +
+                            "settings put global peak_refresh_rate 165.0; " +
+                            "settings put global min_refresh_rate 165.0; " +
+                            "settings put global user_refresh_rate 165; " +
                             "settings put global game_overlay_refresh_rate 165; " +
                             "settings put global preferred_refresh_rate 165; " +
                             "settings put global force_refresh_rate 165; " +
                             "settings put global refresh_rate_force_high 1; " +
                             "settings put global tran_high_temperature_limit_refresh_rate 0; " +
                             "settings put global game_refresh_rate_pkgs com.mobile.legends; " +
-                            "settings put global game_refresh_rate_values 165";
+                            "settings put global game_refresh_rate_values 165; " +
+                            "settings put secure refresh_rate_mode 165; " +
+                            "settings put secure user_refresh_rate 165";
                     ShizukuShell.exec(displayCmd);
 
                     postProgress(callback, "2/4: Injecting Unity boot.config (165 FPS & VSync disabled)...");
@@ -279,11 +286,11 @@ public final class MlbbModInjector {
 
                     postComplete(callback, true, 
                             "⚡ Real 165 FPS & Ultra Unlocked!\n" +
-                            "• Spoofed Device: ASUS ROG Phone 8 Pro\n" +
-                            "• Screen Display: Locked to 144 Hz\n" +
+                            "• Spoofed Device: ASUS ROG Phone 8 Pro (165Hz)\n" +
+                            "• Screen Display: Locked to 165 Hz\n" +
                             "• Engine Target: 165 FPS (VSync Off)\n" +
                             "• Game Table: Ultra Tier 5 Active\n" +
-                            "Launch MLBB to enjoy ultra-smooth gameplay!");
+                            "Launch MLBB to enjoy 165 FPS ultra-smooth gameplay!");
                 } else {
                     postProgress(callback, "Restoring stock 60 Hz display & settings...");
                     // 1. Revert display refresh rate
