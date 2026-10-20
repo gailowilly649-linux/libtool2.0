@@ -247,27 +247,47 @@ public final class MlbbModInjector {
                     }
 
                     postProgress(callback, "4/4: Spoofing ASUS ROG 8 Pro & Ultra Extreme PlayerPrefs (Level 6)...");
-                    // Write high FPS Level 6 (Ultra Extreme) and ASUS spoof parameters to prefs_int and prefs_string
+                    // 4/4: Full Device Spoof (ASUS ROG Phone 8 Pro Snapdragon 8 Gen 3 + Adreno 750 + 16GB RAM)
+                    // Write high FPS Level 6 (Ultra Extreme 165 FPS) and comprehensive ASUS spoof parameters
                     String prefsIntScript = 
                             "INT_FILE=\"" + DRAGON_ASSETS + "/prefs_int\"; " +
+                            "chmod 666 \"$INT_FILE\" 2>/dev/null; " +
                             "touch \"$INT_FILE\"; " +
-                            "for k in high_fps_mode:6 fps_level:6 __FrameRateLevel__:6 __MaxFrameRateLevel__:6 __FrameRateLevel__\\$AI:6 resolution_high:1 hd_mode:1 shadow:1 outline:1 render_scale:165; do " +
+                            "for k in high_fps_mode:6 fps_level:6 __FrameRateLevel__:6 __MaxFrameRateLevel__:6 __FrameRateLevel__\\$AI:6 " +
+                            "         high_fps_mode_ultra:1 resolution_high:1 hd_mode:1 shadow:1 outline:1 render_scale:165 " +
+                            "         system_memory:16384 cpu_cores:8 performance_level:6; do " +
                             "  key=$(echo \"$k\" | cut -d: -f1); " +
                             "  val=$(echo \"$k\" | cut -d: -f2); " +
                             "  sed -i \"/^$key:/d\" \"$INT_FILE\"; " +
                             "  echo \"$key:$val\" >> \"$INT_FILE\"; " +
-                            "done";
+                            "done; ";
                     ShizukuShell.exec(prefsIntScript);
 
                     String prefsStringScript = 
                             "STR_FILE=\"" + DRAGON_ASSETS + "/prefs_string\"; " +
+                            "chmod 666 \"$STR_FILE\" 2>/dev/null; " +
                             "touch \"$STR_FILE\"; " +
-                            "for k in ro.product.model:" + FAKE_SPOOF_MODEL + " ro.product.manufacturer:" + FAKE_SPOOF_MANUFACTURER + " deviceModel:\"" + FAKE_SPOOF_NAME + "\"; do " +
+                            "for k in ro.product.model:" + FAKE_SPOOF_MODEL + " " +
+                            "         ro.product.manufacturer:" + FAKE_SPOOF_MANUFACTURER + " " +
+                            "         ro.product.brand:" + FAKE_SPOOF_MANUFACTURER + " " +
+                            "         ro.product.name:" + FAKE_SPOOF_MODEL + " " +
+                            "         ro.product.device:" + FAKE_SPOOF_MODEL + " " +
+                            "         ro.build.product:" + FAKE_SPOOF_MODEL + " " +
+                            "         ro.board.platform:pineapple " +
+                            "         ro.hardware:qcom " +
+                            "         ro.soc.model:SM8650 " +
+                            "         deviceModel:\"" + FAKE_SPOOF_NAME + "\" " +
+                            "         gpu_name:\"Adreno (TM) 750\" " +
+                            "         gl_renderer:\"Adreno (TM) 750\" " +
+                            "         gl_vendor:\"Qualcomm\" " +
+                            "         gl_version:\"OpenGL ES 3.2 V@0615.0\" " +
+                            "         device_brand:\"asus\"; do " +
                             "  key=$(echo \"$k\" | cut -d: -f1); " +
                             "  val=$(echo \"$k\" | cut -d: -f2); " +
                             "  sed -i \"/^$key:/d\" \"$STR_FILE\"; " +
                             "  echo \"$key:$val\" >> \"$STR_FILE\"; " +
-                            "done";
+                            "done; " +
+                            "chmod 444 \"$INT_FILE\" \"$STR_FILE\" 2>/dev/null; "; // Lock files read-only so MLBB cannot revert on startup!
                     ShizukuShell.exec(prefsStringScript);
 
                     // Also generate shared_prefs XML for extra persistence
@@ -278,13 +298,19 @@ public final class MlbbModInjector {
                             + "    <int name=\"__FrameRateLevel__\" value=\"6\" />\n"
                             + "    <int name=\"__MaxFrameRateLevel__\" value=\"6\" />\n"
                             + "    <int name=\"__FrameRateLevel__$AI\" value=\"6\" />\n"
+                            + "    <int name=\"performance_level\" value=\"6\" />\n"
+                            + "    <int name=\"high_fps_mode_ultra\" value=\"1\" />\n"
                             + "    <int name=\"resolution_high\" value=\"1\" />\n"
                             + "    <int name=\"outline\" value=\"1\" />\n"
                             + "    <int name=\"shadow\" value=\"1\" />\n"
                             + "    <int name=\"hd_mode\" value=\"1\" />\n"
                             + "    <int name=\"render_scale\" value=\"165\" />\n"
+                            + "    <int name=\"system_memory\" value=\"16384\" />\n"
                             + "    <string name=\"device_model\">" + FAKE_SPOOF_MODEL + "</string>\n"
                             + "    <string name=\"device_manufacturer\">" + FAKE_SPOOF_MANUFACTURER + "</string>\n"
+                            + "    <string name=\"device_brand\">" + FAKE_SPOOF_MANUFACTURER + "</string>\n"
+                            + "    <string name=\"gpu_name\">Adreno (TM) 750</string>\n"
+                            + "    <string name=\"gl_renderer\">Adreno (TM) 750</string>\n"
                             + "</map>";
                     File prefsFile = new File(stage, "165fps_prefs.xml");
                     writeFile(prefsFile, prefsXml.getBytes("UTF-8"));
@@ -370,9 +396,10 @@ public final class MlbbModInjector {
                         }
                     }
 
-                    // 4. Remove spoof lines from prefs_int and prefs_string
-                    ShizukuShell.exec("sed -i '/__FrameRateLevel__/d; /__MaxFrameRateLevel__/d; /high_fps_mode/d; /fps_level/d; /render_scale/d' \"" + DRAGON_ASSETS + "/prefs_int\" 2>/dev/null");
-                    ShizukuShell.exec("sed -i '/ASUS/d; /asus/d' \"" + DRAGON_ASSETS + "/prefs_string\" 2>/dev/null");
+                    // 4. Unlock and remove spoof lines from prefs_int and prefs_string
+                    ShizukuShell.exec("chmod 666 \"" + DRAGON_ASSETS + "/prefs_int\" \"" + DRAGON_ASSETS + "/prefs_string\" 2>/dev/null; " +
+                            "sed -i '/__FrameRateLevel__/d; /__MaxFrameRateLevel__/d; /high_fps_mode/d; /fps_level/d; /render_scale/d; /performance_level/d; /system_memory/d' \"" + DRAGON_ASSETS + "/prefs_int\" 2>/dev/null; " +
+                            "sed -i '/ASUS/d; /asus/d; /pineapple/d; /SM8650/d; /Adreno/d; /Qualcomm/d' \"" + DRAGON_ASSETS + "/prefs_string\" 2>/dev/null");
 
                     ShizukuShell.exec("rm -rf \"" + STAGE_DIR + "\"");
 

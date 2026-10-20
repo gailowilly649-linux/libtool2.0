@@ -13,6 +13,7 @@
 #include <sys/stat.h>
 #include <signal.h>
 #include <dlfcn.h>
+#include <sys/system_properties.h>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -36,6 +37,43 @@ namespace Stealth
     static FILE *(*orig_fopen64)(const char *path, const char *mode) = nullptr;
     static int (*orig_open)(const char *path, int flags, ...) = nullptr;
     static int (*orig_openat)(int dirfd, const char *path, int flags, ...) = nullptr;
+    static int (*orig_system_property_get)(const char *name, char *value) = nullptr;
+
+    static int my_system_property_get(const char *name, char *value)
+    {
+        if (s_CloakEnabled && name && value)
+        {
+            if (strcmp(name, "ro.product.model") == 0 || strcmp(name, "ro.product.name") == 0 ||
+                strcmp(name, "ro.product.device") == 0 || strcmp(name, "ro.build.product") == 0)
+            {
+                strcpy(value, "ASUS_AI2401_A");
+                return (int)strlen(value);
+            }
+            if (strcmp(name, "ro.product.manufacturer") == 0 || strcmp(name, "ro.product.brand") == 0)
+            {
+                strcpy(value, "asus");
+                return (int)strlen(value);
+            }
+            if (strcmp(name, "ro.board.platform") == 0)
+            {
+                strcpy(value, "pineapple");
+                return (int)strlen(value);
+            }
+            if (strcmp(name, "ro.hardware") == 0)
+            {
+                strcpy(value, "qcom");
+                return (int)strlen(value);
+            }
+            if (strcmp(name, "ro.soc.model") == 0)
+            {
+                strcpy(value, "SM8650");
+                return (int)strlen(value);
+            }
+        }
+        if (orig_system_property_get)
+            return orig_system_property_get(name, value);
+        return 0;
+    }
 
     static bool IsMapsPath(const char *path)
     {
@@ -214,10 +252,17 @@ namespace Stealth
             DobbyHook(openat_addr, (void *)my_openat, (void **)&orig_openat);
         }
 
+        // Hook __system_property_get for Full Device Spoofing
+        void *prop_get_addr = dlsym(RTLD_DEFAULT, "__system_property_get");
+        if (prop_get_addr)
+        {
+            DobbyHook(prop_get_addr, (void *)my_system_property_get, (void **)&orig_system_property_get);
+        }
+
         // Catch SIGTRAP
         signal(SIGTRAP, SigTrapHandler);
 
-        LOGI("Stealth: Cloaking hooks installed successfully.");
+        LOGI("Stealth: Cloaking & Device Spoofing hooks installed successfully.");
     }
 
     void SetCloakEnabled(bool enabled)
