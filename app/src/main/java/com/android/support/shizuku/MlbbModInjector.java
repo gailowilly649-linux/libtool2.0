@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -173,6 +174,14 @@ public final class MlbbModInjector {
             try {
                 if (unlock) {
                     postProgress(callback, "1/4: Locking display panel to 165 Hz (hardware ceiling)...");
+                    // Backup original display settings before overriding
+                    ShizukuShell.exec("mkdir -p \"" + BACKUP_FPS_DIR + "\"; " +
+                            "if [ ! -f \"" + BACKUP_FPS_DIR + "/old_peak.txt\" ]; then " +
+                            "  settings get system peak_refresh_rate > \"" + BACKUP_FPS_DIR + "/old_peak.txt\"; " +
+                            "  settings get system min_refresh_rate > \"" + BACKUP_FPS_DIR + "/old_min.txt\"; " +
+                            "  settings get system user_refresh_rate > \"" + BACKUP_FPS_DIR + "/old_user.txt\"; " +
+                            "fi");
+
                     // 1. Force SurfaceFlinger & all vendor display controllers to 165Hz
                     String displayCmd = 
                             "settings put system peak_refresh_rate 165.0; " +
@@ -298,19 +307,45 @@ public final class MlbbModInjector {
                             "• Engine Target: 165 FPS (VSync Off)\n" +
                             "Launch MLBB to enjoy 165 FPS Ultra Extreme gameplay!");
                 } else {
-                    postProgress(callback, "Restoring stock 60 Hz display & settings...");
-                    // 1. Revert display refresh rate
+                    float deviceMax = getDeviceDefaultRefreshRate(context);
+                    float targetRestoreHz = (deviceMax > 60f) ? deviceMax : 120.0f;
+                    int targetRestoreInt = Math.round(targetRestoreHz);
+                    String val = String.format(Locale.US, "%.1f", targetRestoreHz);
+
+                    postProgress(callback, "Restoring native display refresh rate (" + targetRestoreInt + " Hz) & settings...");
+
+                    // 1. Revert display refresh rate dynamically based on device hardware and saved backup
                     String revertDisplayCmd = 
-                            "settings put system peak_refresh_rate 60.0; " +
-                            "settings put system min_refresh_rate 60.0; " +
-                            "settings put system user_refresh_rate 60; " +
-                            "settings put system tran_refresh_mode 60; " +
-                            "settings put system tran_refresh_rate 60; " +
-                            "settings put system tran_screen_refresh_rate_mode 60; " +
-                            "settings put system refresh_rate_setting 60; " +
-                            "settings put global peak_refresh_rate 60.0; " +
-                            "settings put global min_refresh_rate 60.0; " +
-                            "settings put global user_refresh_rate 60";
+                            // Delete vendor spoof properties
+                            "settings delete system game_fps_override; " +
+                            "settings delete system asus_fps; " +
+                            "settings delete system asus_refresh_rate; " +
+                            "settings delete system nubia_refresh_rate; " +
+                            "settings delete system display_refresh_rate; " +
+                            "settings delete global game_overlay_refresh_rate; " +
+                            "settings delete global preferred_refresh_rate; " +
+                            "settings delete global force_refresh_rate; " +
+                            "settings delete global refresh_rate_force_high; " +
+                            "settings delete global game_refresh_rate_pkgs; " +
+                            "settings delete global game_refresh_rate_values; " +
+                            // If backup exists and is valid, restore backup; otherwise set to native targetRestoreHz
+                            "PEAK=$(cat \"" + BACKUP_FPS_DIR + "/old_peak.txt\" 2>/dev/null | tr -d '[:space:]'); " +
+                            "MIN=$(cat \"" + BACKUP_FPS_DIR + "/old_min.txt\" 2>/dev/null | tr -d '[:space:]'); " +
+                            "USER=$(cat \"" + BACKUP_FPS_DIR + "/old_user.txt\" 2>/dev/null | tr -d '[:space:]'); " +
+                            "if [ -z \"$PEAK\" ] || [ \"$PEAK\" = \"null\" ]; then PEAK=\"" + val + "\"; fi; " +
+                            "if [ -z \"$MIN\" ] || [ \"$MIN\" = \"null\" ]; then MIN=\"" + val + "\"; fi; " +
+                            "if [ -z \"$USER\" ] || [ \"$USER\" = \"null\" ]; then USER=\"" + targetRestoreInt + "\"; fi; " +
+                            "settings put system peak_refresh_rate \"$PEAK\"; " +
+                            "settings put system min_refresh_rate \"$MIN\"; " +
+                            "settings put system user_refresh_rate \"$USER\"; " +
+                            "settings put system tran_refresh_mode \"$USER\"; " +
+                            "settings put system tran_refresh_rate \"$USER\"; " +
+                            "settings put system tran_screen_refresh_rate_mode \"$USER\"; " +
+                            "settings put system refresh_rate_setting \"$USER\"; " +
+                            "settings put global peak_refresh_rate \"$PEAK\"; " +
+                            "settings put global min_refresh_rate \"$MIN\"; " +
+                            "settings put global user_refresh_rate \"$USER\"; " +
+                            "rm -f \"" + BACKUP_FPS_DIR + "/old_*.txt\" 2>/dev/null";
                     ShizukuShell.exec(revertDisplayCmd);
 
                     // 2. Remove boot.config
@@ -336,12 +371,12 @@ public final class MlbbModInjector {
                     }
 
                     // 4. Remove spoof lines from prefs_int and prefs_string
-                    ShizukuShell.exec("sed -i '/__FrameRateLevel__/d; /__MaxFrameRateLevel__/d; /high_fps_mode/d; /fps_level/d' \"" + DRAGON_ASSETS + "/prefs_int\" 2>/dev/null");
+                    ShizukuShell.exec("sed -i '/__FrameRateLevel__/d; /__MaxFrameRateLevel__/d; /high_fps_mode/d; /fps_level/d; /render_scale/d' \"" + DRAGON_ASSETS + "/prefs_int\" 2>/dev/null");
                     ShizukuShell.exec("sed -i '/ASUS/d; /asus/d' \"" + DRAGON_ASSETS + "/prefs_string\" 2>/dev/null");
 
                     ShizukuShell.exec("rm -rf \"" + STAGE_DIR + "\"");
 
-                    postComplete(callback, true, "Stock 60 Hz display & default MLBB FPS restored!");
+                    postComplete(callback, true, "Native display refresh rate (" + targetRestoreInt + " Hz) & default MLBB FPS restored!");
                 }
             } catch (Throwable t) {
                 Log.e(TAG, "165 FPS injection error", t);
@@ -835,6 +870,28 @@ public final class MlbbModInjector {
                 writeFile(target, bytes);
             }
         } catch (Throwable ignored) {}
+    }
+
+    @SuppressWarnings("deprecation")
+    public static float getDeviceDefaultRefreshRate(Context context) {
+        try {
+            android.view.WindowManager wm = (android.view.WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+            if (wm != null) {
+                android.view.Display d = wm.getDefaultDisplay();
+                if (d != null) {
+                    float max = d.getRefreshRate();
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                        for (android.view.Display.Mode m : d.getSupportedModes()) {
+                            if (m.getRefreshRate() > max) {
+                                max = m.getRefreshRate();
+                            }
+                        }
+                    }
+                    return max;
+                }
+            }
+        } catch (Throwable ignored) {}
+        return 120.0f; // Safe gaming phone default
     }
 
     private static void writeFile(File file, byte[] data) throws Exception {
