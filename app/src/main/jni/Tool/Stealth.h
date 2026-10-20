@@ -13,4 +13,5 @@ namespace Stealth
     void AddHiddenKeyword(const std::string &keyword);
     const std::vector<std::string>& GetHiddenKeywords();
     void DrawSettings();
+    void SpoofBuildProperties(void *env);
 } // namespace Stealth

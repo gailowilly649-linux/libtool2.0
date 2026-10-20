@@ -189,8 +189,14 @@ public final class MlbbModInjector {
                             "  settings get system user_refresh_rate > \"" + BACKUP_FPS_DIR + "/old_user.txt\"; " +
                             "fi");
 
-                    // 1. Force SurfaceFlinger & all vendor display controllers to 165Hz
+                    // 1. Force Android Game Manager, SurfaceFlinger & all vendor display controllers
                     String displayCmd = 
+                            "cmd game set --mode performance " + PKG + " 2>/dev/null; " +
+                            "cmd game set --fps 120 " + PKG + " 2>/dev/null; " +
+                            "cmd power set-fixed-performance-mode-enabled true 2>/dev/null; " +
+                            "device_config put game_overlay " + PKG + " mode=2,fps=120:mode=3,fps=120 2>/dev/null; " +
+                            "settings put system custom_mode 2; " +
+                            "settings put system screen_refresh_rate 120; " +
                             "settings put system peak_refresh_rate 165.0; " +
                             "settings put system min_refresh_rate 165.0; " +
                             "settings put system user_refresh_rate 165; " +
@@ -216,9 +222,9 @@ public final class MlbbModInjector {
                             "settings put global force_refresh_rate 165; " +
                             "settings put global refresh_rate_force_high 1; " +
                             "settings put global tran_high_temperature_limit_refresh_rate 0; " +
-                            "settings put global game_refresh_rate_pkgs com.mobile.legends; " +
+                            "settings put global game_refresh_rate_pkgs " + PKG + "; " +
                             "settings put global game_refresh_rate_values 165; " +
-                            "settings put secure refresh_rate_mode 165; " +
+                            "settings put secure refresh_rate_mode 2; " +
                             "settings put secure user_refresh_rate 165";
                     ShizukuShell.exec(displayCmd);
 
@@ -249,7 +255,8 @@ public final class MlbbModInjector {
                         List<String> slots = discoverActiveSlots();
                         for (String slot : slots) {
                             String slotDoc = slot + "/Document/android";
-                            ShizukuShell.exec("if [ -d \"" + slotDoc + "\" ]; then cp -f \"" + stageRank.getAbsolutePath() + "\" \"" + slotDoc + "/GameSettings_Rank.bytes\"; fi");
+                            ShizukuShell.exec("mkdir -p \"" + slotDoc + "\"; cp -f \"" + stageRank.getAbsolutePath() + "\" \"" + slotDoc + "/GameSettings_Rank.bytes\"; fi");
+                            ShizukuShell.exec("cp -f \"" + stageBoot + "\" \"" + slot + "/boot.config\" 2>/dev/null");
                         }
                     }
 
@@ -267,7 +274,8 @@ public final class MlbbModInjector {
                             "  val=$(echo \"$k\" | cut -d: -f2); " +
                             "  sed -i \"/^$key:/d\" \"$INT_FILE\"; " +
                             "  echo \"$key:$val\" >> \"$INT_FILE\"; " +
-                            "done; ";
+                            "done; " +
+                            "cp -f \"$INT_FILE\" \"" + FILES + "/prefs_int\" 2>/dev/null; ";
                     ShizukuShell.exec(prefsIntScript);
 
                     String prefsStringScript = 
@@ -294,7 +302,15 @@ public final class MlbbModInjector {
                             "  sed -i \"/^$key:/d\" \"$STR_FILE\"; " +
                             "  echo \"$key:$val\" >> \"$STR_FILE\"; " +
                             "done; " +
-                            "chmod 444 \"$INT_FILE\" \"$STR_FILE\" 2>/dev/null; "; // Lock files read-only so MLBB cannot revert on startup!
+                            "cp -f \"$STR_FILE\" \"" + FILES + "/prefs_string\" 2>/dev/null; " +
+                            "for slot in " + FILES + "/mini_patch/*/*/*/ ; do " +
+                            "  if [ -d \"$slot\" ]; then " +
+                            "    cp -f \"$INT_FILE\" \"$slot/prefs_int\" 2>/dev/null; " +
+                            "    cp -f \"$STR_FILE\" \"$slot/prefs_string\" 2>/dev/null; " +
+                            "    chmod 444 \"$slot/prefs_int\" \"$slot/prefs_string\" 2>/dev/null; " +
+                            "  fi; " +
+                            "done; " +
+                            "chmod 444 \"$INT_FILE\" \"$STR_FILE\" \"" + FILES + "/prefs_int\" \"" + FILES + "/prefs_string\" 2>/dev/null; "; // Lock files read-only so MLBB cannot revert on startup!
                     ShizukuShell.exec(prefsStringScript);
 
                     // Also generate shared_prefs XML for extra persistence
@@ -322,10 +338,14 @@ public final class MlbbModInjector {
                     File prefsFile = new File(stage, "165fps_prefs.xml");
                     writeFile(prefsFile, prefsXml.getBytes("UTF-8"));
                     String targetPrefsData = "/data/data/" + PKG + "/shared_prefs/" + PKG + "_preferences.xml";
+                    String targetPrefsV2Data = "/data/data/" + PKG + "/shared_prefs/" + PKG + ".v2.playerprefs.xml";
                     String targetPrefsSd = "/sdcard/Android/data/" + PKG + "/shared_prefs/" + PKG + "_preferences.xml";
+                    String targetPrefsV2Sd = "/sdcard/Android/data/" + PKG + "/shared_prefs/" + PKG + ".v2.playerprefs.xml";
                     ShizukuShell.exec("mkdir -p /sdcard/Android/data/" + PKG + "/shared_prefs");
                     ShizukuShell.exec("cp -f \"" + prefsFile.getAbsolutePath() + "\" \"" + targetPrefsData + "\" 2>/dev/null");
+                    ShizukuShell.exec("cp -f \"" + prefsFile.getAbsolutePath() + "\" \"" + targetPrefsV2Data + "\" 2>/dev/null");
                     ShizukuShell.exec("cp -f \"" + prefsFile.getAbsolutePath() + "\" \"" + targetPrefsSd + "\" 2>/dev/null");
+                    ShizukuShell.exec("cp -f \"" + prefsFile.getAbsolutePath() + "\" \"" + targetPrefsV2Sd + "\" 2>/dev/null");
 
                     // Cleanup stage
                     ShizukuShell.exec("rm -rf \"" + STAGE_DIR + "\"");

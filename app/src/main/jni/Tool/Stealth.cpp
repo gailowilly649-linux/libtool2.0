@@ -14,6 +14,7 @@
 #include <signal.h>
 #include <dlfcn.h>
 #include <sys/system_properties.h>
+#include <jni.h>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -38,6 +39,71 @@ namespace Stealth
     static int (*orig_open)(const char *path, int flags, ...) = nullptr;
     static int (*orig_openat)(int dirfd, const char *path, int flags, ...) = nullptr;
     static int (*orig_system_property_get)(const char *name, char *value) = nullptr;
+
+    struct prop_info;
+    static void (*orig_system_property_read_callback)(
+        const prop_info *pi,
+        void (*callback)(void *cookie, const char *name, const char *value, uint32_t serial),
+        void *cookie) = nullptr;
+
+    struct PropCbContext {
+        void (*orig_cb)(void *cookie, const char *name, const char *value, uint32_t serial);
+        void *orig_cookie;
+    };
+
+    static void my_prop_callback(void *cookie, const char *name, const char *value, uint32_t serial)
+    {
+        PropCbContext *ctx = (PropCbContext *)cookie;
+        if (!ctx || !ctx->orig_cb)
+            return;
+
+        if (s_CloakEnabled && name)
+        {
+            if (strcmp(name, "ro.product.model") == 0 || strcmp(name, "ro.product.name") == 0 ||
+                strcmp(name, "ro.product.device") == 0 || strcmp(name, "ro.build.product") == 0)
+            {
+                ctx->orig_cb(ctx->orig_cookie, name, "ASUS_AI2401_A", serial);
+                return;
+            }
+            if (strcmp(name, "ro.product.manufacturer") == 0 || strcmp(name, "ro.product.brand") == 0)
+            {
+                ctx->orig_cb(ctx->orig_cookie, name, "asus", serial);
+                return;
+            }
+            if (strcmp(name, "ro.board.platform") == 0)
+            {
+                ctx->orig_cb(ctx->orig_cookie, name, "pineapple", serial);
+                return;
+            }
+            if (strcmp(name, "ro.hardware") == 0)
+            {
+                ctx->orig_cb(ctx->orig_cookie, name, "qcom", serial);
+                return;
+            }
+            if (strcmp(name, "ro.soc.model") == 0)
+            {
+                ctx->orig_cb(ctx->orig_cookie, name, "SM8650", serial);
+                return;
+            }
+        }
+        ctx->orig_cb(ctx->orig_cookie, name, value, serial);
+    }
+
+    static void my_system_property_read_callback(
+        const prop_info *pi,
+        void (*callback)(void *cookie, const char *name, const char *value, uint32_t serial),
+        void *cookie)
+    {
+        if (!callback)
+            return;
+        PropCbContext ctx;
+        ctx.orig_cb = callback;
+        ctx.orig_cookie = cookie;
+        if (orig_system_property_read_callback)
+        {
+            orig_system_property_read_callback(pi, my_prop_callback, &ctx);
+        }
+    }
 
     static int my_system_property_get(const char *name, char *value)
     {
@@ -259,10 +325,49 @@ namespace Stealth
             DobbyHook(prop_get_addr, (void *)my_system_property_get, (void **)&orig_system_property_get);
         }
 
+        // Hook __system_property_read_callback for modern Android 9-16 SystemProperties & Build spoofing
+        void *prop_cb_addr = dlsym(RTLD_DEFAULT, "__system_property_read_callback");
+        if (prop_cb_addr)
+        {
+            DobbyHook(prop_cb_addr, (void *)my_system_property_read_callback, (void **)&orig_system_property_read_callback);
+        }
+
         // Catch SIGTRAP
         signal(SIGTRAP, SigTrapHandler);
 
         LOGI("Stealth: Cloaking & Device Spoofing hooks installed successfully.");
+    }
+
+    void SpoofBuildProperties(void *env_ptr)
+    {
+        if (!env_ptr)
+            return;
+        JNIEnv *env = (JNIEnv *)env_ptr;
+        jclass buildClass = env->FindClass("android/os/Build");
+        if (!buildClass)
+        {
+            env->ExceptionClear();
+            return;
+        }
+
+        auto setField = [&](const char *name, const char *val) {
+            jfieldID fid = env->GetStaticFieldID(buildClass, name, "Ljava/lang/String;");
+            if (fid)
+            {
+                env->SetStaticObjectField(buildClass, fid, env->NewStringUTF(val));
+            }
+            else
+            {
+                env->ExceptionClear();
+            }
+        };
+
+        setField("MODEL", "ASUS_AI2401_A");
+        setField("MANUFACTURER", "asus");
+        setField("BRAND", "asus");
+        setField("PRODUCT", "ASUS_AI2401_A");
+        setField("DEVICE", "ASUS_AI2401_A");
+        LOGI("Stealth: android.os.Build properties spoofed to ASUS ROG Phone 8 Pro (ASUS_AI2401_A).");
     }
 
     void SetCloakEnabled(bool enabled)

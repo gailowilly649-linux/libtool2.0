@@ -752,5 +752,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, [[maybe_unused]] void *reserved)
         useJava = true;
     }
 
+    // Mask device and build properties immediately on load
+    Stealth::Init();
+    Stealth::SpoofBuildProperties(env);
+
     return JNI_VERSION_1_6;
 }
