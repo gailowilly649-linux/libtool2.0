@@ -511,196 +511,87 @@ public final class MlbbModInjector {
         public final String heroName;
         public final String skinName;
         public final String role;
+        public final String heroCodeName;
+        public final String targetSkinId;
         public final String downloadUrl;
-        public final String[][] swapPairs;
 
-        public HeroSkinOption(String heroId, String heroName, String skinName, String role, String downloadUrl, String[][] swapPairs) {
+        public HeroSkinOption(String heroId, String heroName, String skinName, String role, String heroCodeName, String targetSkinId, String downloadUrl) {
             this.heroId = heroId;
             this.heroName = heroName;
             this.skinName = skinName;
             this.role = role;
+            this.heroCodeName = heroCodeName;
+            this.targetSkinId = targetSkinId;
             this.downloadUrl = downloadUrl;
-            this.swapPairs = swapPairs;
         }
 
-        public HeroSkinOption(String heroId, String heroName, String skinName, String role, String[][] swapPairs) {
-            this(heroId, heroName, skinName, role, null, swapPairs);
+        public HeroSkinOption(String heroId, String heroName, String skinName, String role, String heroCodeName, String targetSkinId) {
+            this(heroId, heroName, skinName, role, heroCodeName, targetSkinId, null);
         }
     }
 
     public static final List<HeroSkinOption> HERO_SKINS = new ArrayList<>();
     static {
-        // 1. Chou (Fighter) - Anniversary Edition
-        HERO_SKINS.add(new HeroSkinOption("chou", "Chou", "Anniversary Edition", "Fighter",
-                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-0eufvt8zbgzsttymiec27cChou%20Basic%20to%20Anniversary.zip-t27l9h0e5g/AnehGamingOfficial.zip",
-                new String[][]{
-                        {"Art/android/h/hero_chou_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_chou_skin_high_add.unity3d"},
-                        {"Art/android/h/hero_chou_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_chou_skin01_high_add.unity3d"},
-                        {"Art/android/h/hero_chou_skin.unity3d", PATCHED_SKINS_DIR + "/hero_chou_skin.unity3d"},
-                        {"Art/android/h/hero_chou_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_chou_skin_shadow_high_add.unity3d"},
-                        {"Art/android/h/hero_chou_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_chou_skin01_shadow_high_add.unity3d"},
-                        {"Art/android/h/hero_chou_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_chou_skin01_add.unity3d"},
-                        {"UI/android/Hero026_add.unity3d", PATCHED_SKINS_DIR + "/Hero026_add.unity3d"}
-                }));
+        // 1. Chou (Fighter) - ECHO M4 Champion / STUN
+        HERO_SKINS.add(new HeroSkinOption("chou", "Chou", "ECHO M4 Champion", "Fighter",
+                "hero_kongfu", "13",
+                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-0eufvt8zbgzsttymiec27cChou%20Basic%20to%20Anniversary.zip-t27l9h0e5g/AnehGamingOfficial.zip"));
 
         // 2. Fanny (Assassin) - Blade of Kibou (The Aspirants)
         HERO_SKINS.add(new HeroSkinOption("fanny", "Fanny", "Blade of Kibou (Aspirant)", "Assassin",
-                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-rn6x0w7ybnhcn2qe06aenfanny%20eleite%20aspirant.zip-4mrhpn9x4hs/AnehGamingOfficial.zip",
-                new String[][]{
-                        {"Art/android/h/hero_fanny_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_fanny_skin_high_add.unity3d"},
-                        {"Art/android/h/hero_fanny_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_fanny_skin01_high_add.unity3d"},
-                        {"Art/android/h/hero_fanny_skin.unity3d", PATCHED_SKINS_DIR + "/hero_fanny_skin.unity3d"},
-                        {"Art/android/h/hero_fanny_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_fanny_skin_shadow_high_add.unity3d"},
-                        {"Art/android/h/hero_fanny_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_fanny_skin01_shadow_high_add.unity3d"},
-                        {"Art/android/h/hero_fanny_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_fanny_skin01_add.unity3d"},
-                        {"UI/android/Hero171_add.unity3d", PATCHED_SKINS_DIR + "/Hero171_add.unity3d"}
-                }));
+                "hero_fanny", "13",
+                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-rn6x0w7ybnhcn2qe06aenfanny%20eleite%20aspirant.zip-4mrhpn9x4hs/AnehGamingOfficial.zip"));
 
         // 3. Ling (Assassin) - Seraphic Scourge (Collector)
         HERO_SKINS.add(new HeroSkinOption("ling", "Ling", "Seraphic Scourge (Collector)", "Assassin",
-                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-6dpa50ndtqsa1yekwetpcgLing%20Special%20to%20Collector.zip-iu91pbxyicq/AnehGamingOfficial.zip",
-                new String[][]{
-                        {"Art/android/h/hero_pofa_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_pofa_skin_high_add.unity3d"},
-                        {"Art/android/h/hero_pofa_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_pofa_skin01_high_add.unity3d"},
-                        {"Art/android/h/hero_pofa_skin.unity3d", PATCHED_SKINS_DIR + "/hero_pofa_skin.unity3d"},
-                        {"Art/android/h/hero_pofa_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_pofa_skin_shadow_high_add.unity3d"},
-                        {"Art/android/h/hero_pofa_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_pofa_skin01_shadow_high_add.unity3d"},
-                        {"Art/android/h/hero_pofa_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_pofa_skin01_add.unity3d"},
-                        {"UI/android/Hero084_add.unity3d", PATCHED_SKINS_DIR + "/Hero084_add.unity3d"}
-                }));
+                "hero_zeo", "04",
+                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-6dpa50ndtqsa1yekwetpcgLing%20Special%20to%20Collector.zip-iu91pbxyicq/AnehGamingOfficial.zip"));
 
         // 4. Gusion (Assassin) - Dragon Tamer
         HERO_SKINS.add(new HeroSkinOption("gusion", "Gusion", "Dragon Tamer", "Assassin",
-                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-333htss56yrz4p923bt0nGUSION%20DRAGON.zip-r1y32sgfvum/AnehGamingOfficial.zip",
-                new String[][]{
-                        {"Art/android/h/hero_Gusin_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_Gusin_skin_high_add.unity3d"},
-                        {"Art/android/h/hero_Gusin_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_Gusin_skin01_high_add.unity3d"},
-                        {"Art/android/h/hero_Gusin_skin.unity3d", PATCHED_SKINS_DIR + "/hero_Gusin_skin.unity3d"},
-                        {"Art/android/h/hero_Gusin_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_Gusin_skin_shadow_high_add.unity3d"},
-                        {"Art/android/h/hero_Gusin_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_Gusin_skin01_shadow_high_add.unity3d"},
-                        {"Art/android/h/hero_Gusin_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_Gusin_skin01_add.unity3d"},
-                        {"UI/android/Hero056_add.unity3d", PATCHED_SKINS_DIR + "/Hero056_add.unity3d"}
-                }));
+                "hero_Gusin", "07",
+                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-333htss56yrz4p923bt0nGUSION%20DRAGON.zip-r1y32sgfvum/AnehGamingOfficial.zip"));
 
-        // 5. Hayabusa (Assassin) - Kitsune's Shadow
-        HERO_SKINS.add(new HeroSkinOption("hayabusa", "Hayabusa", "Kitsune's Shadow", "Assassin",
-                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-gydntpmf1rnne5mzd96dzpHAYA%20BASIC%20TO%20KITSUNE%27S%20SHADOW.zip-5yb529ueaex/AnehGamingOfficial.zip",
-                new String[][]{
-                        {"Art/android/h/hero_haya_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_haya_skin_high_add.unity3d"},
-                        {"Art/android/h/hero_haya_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_haya_skin01_high_add.unity3d"},
-                        {"Art/android/h/hero_haya_skin.unity3d", PATCHED_SKINS_DIR + "/hero_haya_skin.unity3d"},
-                        {"Art/android/h/hero_haya_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_haya_skin_shadow_high_add.unity3d"},
-                        {"Art/android/h/hero_haya_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_haya_skin01_shadow_high_add.unity3d"},
-                        {"Art/android/h/hero_haya_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_haya_skin01_add.unity3d"},
-                        {"UI/android/Hero021_add.unity3d", PATCHED_SKINS_DIR + "/Hero021_add.unity3d"}
-                }));
+        // 5. Hayabusa (Assassin) - Shadow of Obscurity (Kitsune)
+        HERO_SKINS.add(new HeroSkinOption("hayabusa", "Hayabusa", "Shadow of Obscurity (Kitsune)", "Assassin",
+                "hero_ninja", "05",
+                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-gydntpmf1rnne5mzd96dzpHAYA%20BASIC%20TO%20KITSUNE%27S%20SHADOW.zip-5yb529ueaex/AnehGamingOfficial.zip"));
 
         // 6. Lancelot (Assassin) - Swordmaster (Hero)
         HERO_SKINS.add(new HeroSkinOption("lancelot", "Lancelot", "Swordmaster (Hero)", "Assassin",
-                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-h76has13vi8vsime6rn7hStarlight%20Lance%20Hero.zip-e5ngqf41tzn/AnehGamingOfficial.zip",
-                new String[][]{
-                        {"Art/android/h/hero_lance_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_lance_skin_high_add.unity3d"},
-                        {"Art/android/h/hero_lance_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_lance_skin01_high_add.unity3d"},
-                        {"Art/android/h/hero_lance_skin.unity3d", PATCHED_SKINS_DIR + "/hero_lance_skin.unity3d"},
-                        {"Art/android/h/hero_lance_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_lance_skin_shadow_high_add.unity3d"},
-                        {"Art/android/h/hero_lance_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_lance_skin01_shadow_high_add.unity3d"},
-                        {"Art/android/h/hero_lance_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_lance_skin01_add.unity3d"},
-                        {"UI/android/Hero047_add.unity3d", PATCHED_SKINS_DIR + "/Hero047_add.unity3d"}
-                }));
+                "hero_lancelot", "04",
+                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-h76has13vi8vsime6rn7hStarlight%20Lance%20Hero.zip-e5ngqf41tzn/AnehGamingOfficial.zip"));
 
         // 7. Granger (Marksman) - Starfall Knight (Legend)
         HERO_SKINS.add(new HeroSkinOption("granger", "Granger", "Starfall Knight (Legend)", "Marksman",
-                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-49b6l109s31bkzcap2mtzagranger%20star%20legend-4poxjybiel9/AnehGamingOfficial.zip",
-                new String[][]{
-                        {"Art/android/h/hero_granger_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_granger_skin_high_add.unity3d"},
-                        {"Art/android/h/hero_granger_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_granger_skin01_high_add.unity3d"},
-                        {"Art/android/h/hero_granger_skin.unity3d", PATCHED_SKINS_DIR + "/hero_granger_skin.unity3d"},
-                        {"Art/android/h/hero_granger_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_granger_skin_shadow_high_add.unity3d"},
-                        {"Art/android/h/hero_granger_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_granger_skin01_shadow_high_add.unity3d"},
-                        {"Art/android/h/hero_granger_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_granger_skin01_add.unity3d"},
-                        {"UI/android/Hero079_add.unity3d", PATCHED_SKINS_DIR + "/Hero079_add.unity3d"}
-                }));
+                "hero_mike", "12",
+                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-49b6l109s31bkzcap2mtzagranger%20star%20legend-4poxjybiel9/AnehGamingOfficial.zip"));
 
-        // 8. Layla (Marksman) - Prismatic Rhythm (Collector)
-        HERO_SKINS.add(new HeroSkinOption("layla", "Layla", "Prismatic Rhythm (Collector)", "Marksman",
-                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-071jtt54kgthcdb67csatijLayla%20Basic%20to%20Prismatic%20Rhythm%20Collector.zip-49pjjdb716v/AnehGamingOfficial.zip",
-                new String[][]{
-                        {"Art/android/h/hero_layla_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_layla_skin_high_add.unity3d"},
-                        {"Art/android/h/hero_layla_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_layla_skin01_high_add.unity3d"},
-                        {"Art/android/h/hero_layla_skin.unity3d", PATCHED_SKINS_DIR + "/hero_layla_skin.unity3d"},
-                        {"Art/android/h/hero_layla_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_layla_skin_shadow_high_add.unity3d"},
-                        {"Art/android/h/hero_layla_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_layla_skin01_shadow_high_add.unity3d"},
-                        {"Art/android/h/hero_layla_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_layla_skin01_add.unity3d"},
-                        {"UI/android/Hero001_add.unity3d", PATCHED_SKINS_DIR + "/Hero001_add.unity3d"}
-                }));
+        // 8. Layla (Marksman) - Miss Hikari (Aspirant)
+        HERO_SKINS.add(new HeroSkinOption("layla", "Layla", "Miss Hikari (Aspirant)", "Marksman",
+                "hero_shooter", "12",
+                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-071jtt54kgthcdb67csatijLayla%20Basic%20to%20Prismatic%20Rhythm%20Collector.zip-49pjjdb716v/AnehGamingOfficial.zip"));
 
         // 9. Moskov (Marksman) - Doom Incarnate (Abyss)
         HERO_SKINS.add(new HeroSkinOption("moskov", "Moskov", "Doom Incarnate (Abyss)", "Marksman",
-                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-1el5oaqcxkd123ovdjb2munmoskov%20abyss.zip-o5owlkhyb7/AnehGamingOfficial.zip",
-                new String[][]{
-                        {"Art/android/h/hero_moskov_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_moskov_skin_high_add.unity3d"},
-                        {"Art/android/h/hero_moskov_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_moskov_skin01_high_add.unity3d"},
-                        {"Art/android/h/hero_moskov_skin.unity3d", PATCHED_SKINS_DIR + "/hero_moskov_skin.unity3d"},
-                        {"Art/android/h/hero_moskov_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_moskov_skin_shadow_high_add.unity3d"},
-                        {"Art/android/h/hero_moskov_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_moskov_skin01_shadow_high_add.unity3d"},
-                        {"Art/android/h/hero_moskov_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_moskov_skin01_add.unity3d"},
-                        {"UI/android/Hero031_add.unity3d", PATCHED_SKINS_DIR + "/Hero031_add.unity3d"}
-                }));
+                "hero_Moskov", "10",
+                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-1el5oaqcxkd123ovdjb2munmoskov%20abyss.zip-o5owlkhyb7/AnehGamingOfficial.zip"));
 
-        // 10. Claude (Marksman) - Bad Bro (Sanrio Collab / Skin 08)
-        HERO_SKINS.add(new HeroSkinOption("claude", "Claude", "Bad Bro (Sanrio)", "Marksman", new String[][]{
-                {"Art/android/h/hero_claude_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_claude_skin_high_add.unity3d"},
-                {"Art/android/h/hero_claude_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_claude_skin01_high_add.unity3d"},
-                {"Art/android/h/hero_claude_skin.unity3d", PATCHED_SKINS_DIR + "/hero_claude_skin.unity3d"},
-                {"Art/android/h/hero_claude_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_claude_skin_shadow_high_add.unity3d"},
-                {"Art/android/h/hero_claude_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_claude_skin01_shadow_high_add.unity3d"},
-                {"Art/android/h/hero_claude_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_claude_skin01_add.unity3d"},
-                {"UI/android/Hero065_add.unity3d", PATCHED_SKINS_DIR + "/Hero065_add.unity3d"}
-        }));
+        // 10. Claude (Marksman) - Bad Bro (Sanrio)
+        HERO_SKINS.add(new HeroSkinOption("claude", "Claude", "Bad Bro (Sanrio)", "Marksman",
+                "hero_claude", "08"));
 
-        // 11. Miya (Marksman) - Doom Catalyst (Collector / Skin 14)
-        HERO_SKINS.add(new HeroSkinOption("miya", "Miya", "Doom Catalyst (Collector)", "Marksman", new String[][]{
-                {"Art/android/h/hero_gongjianshou_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_gongjianshou_skin_high_add.unity3d"},
-                {"Art/android/h/hero_gongjianshou_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_gongjianshou_skin01_high_add.unity3d"},
-                {"Art/android/h/hero_gongjianshou_skin.unity3d", PATCHED_SKINS_DIR + "/hero_gongjianshou_skin.unity3d"},
-                {"Art/android/h/hero_gongjianshou_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_gongjianshou_skin_shadow_high_add.unity3d"},
-                {"Art/android/h/hero_gongjianshou_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_gongjianshou_skin01_shadow_high_add.unity3d"},
-                {"Art/android/h/hero_gongjianshou_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_gongjianshou_skin01_add.unity3d"},
-                {"UI/android/Hero1001_add.unity3d", PATCHED_SKINS_DIR + "/Hero1001_add.unity3d"}
-        }));
+        // 11. Miya (Marksman) - Doom Catalyst (Collector)
+        HERO_SKINS.add(new HeroSkinOption("miya", "Miya", "Doom Catalyst (Collector)", "Marksman",
+                "hero_gongjianshou", "14"));
 
-        // 12. Karrie (Marksman) - Starstruck (M5 Champion / Skin 11)
-        HERO_SKINS.add(new HeroSkinOption("karrie", "Karrie", "Starstruck (M5 Champion)", "Marksman", new String[][]{
-                {"Art/android/h/hero_feilun_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_feilun_skin_high_add.unity3d"},
-                {"Art/android/h/hero_feilun_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_feilun_skin01_high_add.unity3d"},
-                {"Art/android/h/hero_feilun_skin.unity3d", PATCHED_SKINS_DIR + "/hero_feilun_skin.unity3d"},
-                {"Art/android/h/hero_feilun_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_feilun_skin_shadow_high_add.unity3d"},
-                {"Art/android/h/hero_feilun_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_feilun_skin01_shadow_high_add.unity3d"},
-                {"Art/android/h/hero_feilun_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_feilun_skin01_add.unity3d"},
-                {"UI/android/Hero401_add.unity3d", PATCHED_SKINS_DIR + "/Hero401_add.unity3d"}
-        }));
+        // 12. Karrie (Marksman) - Starstruck (M5 Champion)
+        HERO_SKINS.add(new HeroSkinOption("karrie", "Karrie", "Starstruck (M5 Champion)", "Marksman",
+                "hero_feilun", "11"));
 
-        // 13. Nolan (Assassin) - The Navigator (Skin 03)
-        HERO_SKINS.add(new HeroSkinOption("nolan", "Nolan", "The Navigator", "Assassin", new String[][]{
-                {"Art/android/h/hero_NolanOsborne_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_NolanOsborne_skin_high_add.unity3d"},
-                {"Art/android/h/hero_NolanOsborne_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_NolanOsborne_skin01_high_add.unity3d"},
-                {"Art/android/h/hero_NolanOsborne_skin.unity3d", PATCHED_SKINS_DIR + "/hero_NolanOsborne_skin.unity3d"},
-                {"Art/android/h/hero_NolanOsborne_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_NolanOsborne_skin_shadow_high_add.unity3d"},
-                {"Art/android/h/hero_NolanOsborne_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_NolanOsborne_skin01_shadow_high_add.unity3d"},
-                {"Art/android/h/hero_NolanOsborne_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_NolanOsborne_skin01_add.unity3d"},
-                {"UI/android/Hero1221_add.unity3d", PATCHED_SKINS_DIR + "/Hero1221_add.unity3d"}
-        }));
-
-        // 14. Benedetta (Assassin) - Death Oath (Collector / Skin 03)
-        HERO_SKINS.add(new HeroSkinOption("benedetta", "Benedetta", "Death Oath (Collector)", "Assassin", new String[][]{
-                {"Art/android/h/hero_benedetta_skin_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_benedetta_skin_high_add.unity3d"},
-                {"Art/android/h/hero_benedetta_skin01_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_benedetta_skin01_high_add.unity3d"},
-                {"Art/android/h/hero_benedetta_skin.unity3d", PATCHED_SKINS_DIR + "/hero_benedetta_skin.unity3d"},
-                {"Art/android/h/hero_benedetta_skin_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_benedetta_skin_shadow_high_add.unity3d"},
-                {"Art/android/h/hero_benedetta_skin01_shadow_high_add.unity3d", PATCHED_SKINS_DIR + "/hero_benedetta_skin01_shadow_high_add.unity3d"},
-                {"Art/android/h/hero_benedetta_skin01_add.unity3d", PATCHED_SKINS_DIR + "/hero_benedetta_skin01_add.unity3d"},
-                {"UI/android/Hero097_add.unity3d", PATCHED_SKINS_DIR + "/Hero097_add.unity3d"}
-        }));
+        // 13. Nolan (Assassin) - The Navigator
+        HERO_SKINS.add(new HeroSkinOption("nolan", "Nolan", "The Navigator", "Assassin",
+                "hero_NolanOsborne", "03"));
     }
 
     public static void unlockHeroSkin(Context context, String heroId, Callback callback) {
@@ -975,20 +866,95 @@ public final class MlbbModInjector {
         }
     }
 
-    private static void installExtractedSkin(File cacheDir) {
+    private static void installExtractedNonHAssets(File cacheDir) {
         File assetsRoot = findAssetsRoot(cacheDir);
-        String sourcePath = assetsRoot.getAbsolutePath();
+        if (assetsRoot == null || !assetsRoot.exists()) return;
+
+        // CRUCIAL: Remove Art/android/h if present in the downloaded zip to prevent corrupting Unity 3D models with obsolete assets!
+        File hDir = new File(assetsRoot, "Art/android/h");
+        if (hDir.exists()) {
+            deleteRecursive(hDir);
+        }
 
         backupExistingFiles(assetsRoot, assetsRoot, DRAGON_ASSETS);
 
+        String sourcePath = assetsRoot.getAbsolutePath();
         ShizukuShell.exec("cp -rf \"" + sourcePath + "\"/* \"" + DRAGON_ASSETS + "/\"");
         ShizukuShell.exec("chmod -R 777 \"" + DRAGON_ASSETS + "\"");
+    }
+
+    private static void deleteRecursive(File f) {
+        if (f.isDirectory()) {
+            File[] children = f.listFiles();
+            if (children != null) {
+                for (File child : children) {
+                    deleteRecursive(child);
+                }
+            }
+        }
+        f.delete();
+    }
+
+    private static void swapHero3DModel(String heroCodeName, String targetSkinId) {
+        String hDir = DRAGON_ASSETS + "/Art/android/h";
+        String backupHDir = BACKUP_SKINS_DIR + "/Art/android/h";
+        ShizukuShell.exec("mkdir -p \"" + backupHDir + "\"");
+
+        // Remove obsolete 2017 mod bundles that crash Unity animation list and cause invisible models
+        ShizukuShell.exec("rm -f \"" + hDir + "/" + heroCodeName + ".unity3d\"");
+        ShizukuShell.exec("rm -f \"" + hDir + "/" + heroCodeName + "_skin.unity3d\"");
+
+        // Target skin high mesh, smooth mesh, and shadow high mesh
+        String targetHigh = hDir + "/" + heroCodeName + "_skin" + targetSkinId + "_high_add.unity3d";
+        String targetSmooth = hDir + "/" + heroCodeName + "_skin" + targetSkinId + "_add.unity3d";
+        String targetShadowHigh = hDir + "/" + heroCodeName + "_skin" + targetSkinId + "_shadow_high_add.unity3d";
+        String targetShadow = hDir + "/" + heroCodeName + "_skin" + targetSkinId + "_shadow_add.unity3d";
+
+        // Files to replace for default skin & basic skin (skin01)
+        String[] targets = {
+                heroCodeName + "_skin_high_add.unity3d",
+                heroCodeName + "_skin_add.unity3d",
+                heroCodeName + "_skin_shadow_high_add.unity3d",
+                heroCodeName + "_skin_shadow_add.unity3d",
+                heroCodeName + "_skin01_high_add.unity3d",
+                heroCodeName + "_skin01_add.unity3d",
+                heroCodeName + "_skin01_shadow_high_add.unity3d",
+                heroCodeName + "_skin01_shadow_add.unity3d"
+        };
+
+        // 1. Back up originals if not yet backed up
+        for (String file : targets) {
+            String orig = hDir + "/" + file;
+            String bak = backupHDir + "/" + file;
+            ShizukuShell.exec("if [ ! -f \"" + bak + "\" ] && [ -f \"" + orig + "\" ]; then cp -f \"" + orig + "\" \"" + bak + "\"; fi");
+        }
+
+        // 2. Overwrite with authentic target skin 3D models & animations
+        // High mesh -> _skin_high_add and _skin01_high_add
+        ShizukuShell.exec("if [ -f \"" + targetHigh + "\" ]; then " +
+                "cp -f \"" + targetHigh + "\" \"" + hDir + "/" + heroCodeName + "_skin_high_add.unity3d\"; " +
+                "cp -f \"" + targetHigh + "\" \"" + hDir + "/" + heroCodeName + "_skin01_high_add.unity3d\"; fi");
+
+        // Smooth mesh -> _skin_add and _skin01_add
+        ShizukuShell.exec("if [ -f \"" + targetSmooth + "\" ]; then " +
+                "cp -f \"" + targetSmooth + "\" \"" + hDir + "/" + heroCodeName + "_skin_add.unity3d\"; " +
+                "cp -f \"" + targetSmooth + "\" \"" + hDir + "/" + heroCodeName + "_skin01_add.unity3d\"; fi");
+
+        // Shadow high -> _skin_shadow_high_add and _skin01_shadow_high_add
+        ShizukuShell.exec("if [ -f \"" + targetShadowHigh + "\" ]; then " +
+                "cp -f \"" + targetShadowHigh + "\" \"" + hDir + "/" + heroCodeName + "_skin_shadow_high_add.unity3d\"; " +
+                "cp -f \"" + targetShadowHigh + "\" \"" + hDir + "/" + heroCodeName + "_skin01_shadow_high_add.unity3d\"; fi");
+
+        // Shadow smooth -> _skin_shadow_add and _skin01_shadow_add
+        ShizukuShell.exec("if [ -f \"" + targetShadow + "\" ]; then " +
+                "cp -f \"" + targetShadow + "\" \"" + hDir + "/" + heroCodeName + "_skin_shadow_add.unity3d\"; " +
+                "cp -f \"" + targetShadow + "\" \"" + hDir + "/" + heroCodeName + "_skin01_shadow_add.unity3d\"; fi");
     }
 
     private static void applyHeroSwapInternal(Context context, HeroSkinOption h, Callback callback) throws Exception {
         injectGameResAlternative(context);
 
-        // 1. If downloadUrl is present, fetch and extract the skin bundle
+        // 1. If downloadUrl is present, fetch and extract the skin bundle (VFX/Particles, Audio, UI only)
         if (h.downloadUrl != null && !h.downloadUrl.isEmpty()) {
             File cacheDir = new File("/sdcard/Download/WillyLibTool/extracted/" + h.heroId);
             if (!cacheDir.exists() || cacheDir.list() == null || cacheDir.list().length == 0) {
@@ -997,8 +963,8 @@ public final class MlbbModInjector {
             }
 
             if (cacheDir.exists() && cacheDir.list() != null && cacheDir.list().length > 0) {
-                postProgress(callback, "Injecting " + h.heroName + " skin assets into MLBB...");
-                installExtractedSkin(cacheDir);
+                postProgress(callback, "Injecting " + h.heroName + " VFX & audio...");
+                installExtractedNonHAssets(cacheDir);
             }
         }
 
@@ -1027,27 +993,10 @@ public final class MlbbModInjector {
             } catch (Throwable ignored) {}
         }
 
-        // 3. Fallback to individual file swap pairs if present
-        if (h.swapPairs != null) {
-            for (String[] pair : h.swapPairs) {
-                String targetRel = pair[0];
-                String sourcePath = pair[1];
-
-                String targetPath = DRAGON_ASSETS + "/" + targetRel;
-                String backupPath = BACKUP_SKINS_DIR + "/" + targetRel;
-
-                // Ensure backup directory exists
-                String backupParent = backupPath.substring(0, backupPath.lastIndexOf('/'));
-                ShizukuShell.exec("mkdir -p \"" + backupParent + "\"");
-
-                // If genuine stock file is not yet backed up, back it up now
-                String backupCmd = "if [ ! -f \"" + backupPath + "\" ] && [ -f \"" + targetPath + "\" ]; then cp -f \"" + targetPath + "\" \"" + backupPath + "\"; fi";
-                ShizukuShell.exec(backupCmd);
-
-                // Overwrite target stock asset with patched skin asset
-                String swapCmd = "if [ -f \"" + sourcePath + "\" ]; then cp -f \"" + sourcePath + "\" \"" + targetPath + "\"; fi";
-                ShizukuShell.exec(swapCmd);
-            }
+        // 3. High-Definition 3D Model Swap using official local MLBB assets
+        if (h.heroCodeName != null && h.targetSkinId != null) {
+            postProgress(callback, "Applying 3D model for " + h.heroName + " (" + h.skinName + ")...");
+            swapHero3DModel(h.heroCodeName, h.targetSkinId);
         }
     }
 
@@ -1056,15 +1005,23 @@ public final class MlbbModInjector {
     }
 
     private static void restoreHeroSwapInternal(HeroSkinOption h) {
-        if (h.swapPairs != null) {
-            for (String[] pair : h.swapPairs) {
-                String targetRel = pair[0];
-                String targetPath = DRAGON_ASSETS + "/" + targetRel;
-                String backupPath = BACKUP_SKINS_DIR + "/" + targetRel;
-
-                // If backup exists, copy genuine file back and remove the backup
-                String restoreCmd = "if [ -f \"" + backupPath + "\" ]; then cp -f \"" + backupPath + "\" \"" + targetPath + "\" && rm -f \"" + backupPath + "\"; fi";
-                ShizukuShell.exec(restoreCmd);
+        if (h.heroCodeName != null) {
+            String hDir = DRAGON_ASSETS + "/Art/android/h";
+            String backupHDir = BACKUP_SKINS_DIR + "/Art/android/h";
+            String[] targets = {
+                    h.heroCodeName + "_skin_high_add.unity3d",
+                    h.heroCodeName + "_skin_add.unity3d",
+                    h.heroCodeName + "_skin_shadow_high_add.unity3d",
+                    h.heroCodeName + "_skin_shadow_add.unity3d",
+                    h.heroCodeName + "_skin01_high_add.unity3d",
+                    h.heroCodeName + "_skin01_add.unity3d",
+                    h.heroCodeName + "_skin01_shadow_high_add.unity3d",
+                    h.heroCodeName + "_skin01_shadow_add.unity3d"
+            };
+            for (String file : targets) {
+                String orig = hDir + "/" + file;
+                String bak = backupHDir + "/" + file;
+                ShizukuShell.exec("if [ -f \"" + bak + "\" ]; then cp -f \"" + bak + "\" \"" + orig + "\" && rm -f \"" + bak + "\"; fi");
             }
         }
     }
