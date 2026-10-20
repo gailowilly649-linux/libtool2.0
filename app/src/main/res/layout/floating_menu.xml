@@ -33,8 +33,8 @@
 
         <Button
             android:id="@+id/btnFloatingMinimize"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
             android:background="#2E3440"
             android:text="—"
             android:textColor="#D8DEE9"
@@ -42,10 +42,21 @@
             android:textStyle="bold" />
 
         <Button
+            android:id="@+id/btnFloatingStealth"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginStart="4dp"
+            android:background="#2E3440"
+            android:text="👁"
+            android:textColor="#00E5FF"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <Button
             android:id="@+id/btnFloatingClose"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginStart="6dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginStart="4dp"
             android:background="#D5011D"
             android:text="✕"
             android:textColor="#FFFFFF"

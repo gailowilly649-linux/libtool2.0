@@ -33,7 +33,13 @@ public class OverlayService extends Service {
     private static final String CHANNEL_ID = "willy_libtool_channel";
     private static final int NOTIFICATION_ID = 1337;
 
+    public static final String ACTION_TOGGLE_OVERLAY = "com.android.support.ACTION_TOGGLE_OVERLAY";
+    public static final String ACTION_HIDE_OVERLAY = "com.android.support.ACTION_HIDE_OVERLAY";
+    public static final String ACTION_SHOW_OVERLAY = "com.android.support.ACTION_SHOW_OVERLAY";
+    public static final String ACTION_STOP_OVERLAY = "com.android.support.STOP_OVERLAY";
+
     public static boolean isRunning = false;
+    public static boolean isStealthHidden = false;
 
     private WindowManager windowManager;
     private View bubbleView;
@@ -56,6 +62,7 @@ public class OverlayService extends Service {
         setupMenu();
 
         isRunning = true;
+        isStealthHidden = false;
     }
 
     private void startForegroundSafely() {
@@ -97,6 +104,24 @@ public class OverlayService extends Service {
                         : PendingIntent.FLAG_UPDATE_CURRENT
         );
 
+        Intent toggleIntent = new Intent(this, OverlayService.class);
+        toggleIntent.setAction(ACTION_TOGGLE_OVERLAY);
+        PendingIntent togglePendingIntent = PendingIntent.getService(
+                this, 1, toggleIntent,
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                        ? PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
+                        : PendingIntent.FLAG_UPDATE_CURRENT
+        );
+
+        Intent stopIntent = new Intent(this, OverlayService.class);
+        stopIntent.setAction(ACTION_STOP_OVERLAY);
+        PendingIntent stopPendingIntent = PendingIntent.getService(
+                this, 2, stopIntent,
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                        ? PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
+                        : PendingIntent.FLAG_UPDATE_CURRENT
+        );
+
         Notification.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             builder = new Notification.Builder(this, CHANNEL_ID);
@@ -104,13 +129,33 @@ public class OverlayService extends Service {
             builder = new Notification.Builder(this);
         }
 
-        return builder
-                .setContentTitle("Willy LibTool")
-                .setContentText("Floating Menu Overlay is Active")
+        String title = isStealthHidden ? "Willy LibTool (Stealth Mode)" : "Willy LibTool";
+        String contentText = isStealthHidden
+                ? "Overlay is Hidden • Tap below or pull shade to unhide"
+                : "Floating Menu Overlay is Active";
+        String toggleText = isStealthHidden ? "👁️ Show Menu" : "🙈 Hide Menu";
+
+        builder.setContentTitle(title)
+                .setContentText(contentText)
                 .setSmallIcon(R.drawable.app_icon)
                 .setContentIntent(pendingIntent)
-                .setOngoing(true)
-                .build();
+                .setOngoing(true);
+
+        builder.addAction(0, toggleText, togglePendingIntent);
+        builder.addAction(0, "❌ Stop", stopPendingIntent);
+
+        return builder.build();
+    }
+
+    private void updateNotification() {
+        try {
+            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            if (manager != null) {
+                manager.notify(NOTIFICATION_ID, buildNotification());
+            }
+        } catch (Throwable t) {
+            Log.e(TAG, "updateNotification error", t);
+        }
     }
 
     private int dpToPx(int dp) {
@@ -186,9 +231,13 @@ public class OverlayService extends Service {
                         float diffY = Math.abs(event.getRawY() - initialTouchY);
                         long duration = System.currentTimeMillis() - touchStartTime;
 
-                        // Tap opens floating menu
-                        if (diffX < 15 && diffY < 15 && duration < 350) {
-                            showMenu();
+                        // Tap opens floating menu, long hold (>= 700ms) hides into stealth mode
+                        if (diffX < 15 && diffY < 15) {
+                            if (duration >= 700) {
+                                hideAllOverlays();
+                            } else {
+                                showMenu();
+                            }
                         }
                         return true;
                 }
@@ -257,6 +306,11 @@ public class OverlayService extends Service {
         // Window controls
         Button btnMin = menuView.findViewById(R.id.btnFloatingMinimize);
         btnMin.setOnClickListener(v -> hideMenu());
+
+        Button btnStealth = menuView.findViewById(R.id.btnFloatingStealth);
+        if (btnStealth != null) {
+            btnStealth.setOnClickListener(v -> hideAllOverlays());
+        }
 
         Button btnClose = menuView.findViewById(R.id.btnFloatingClose);
         btnClose.setOnClickListener(v -> stopSelf());
@@ -418,29 +472,78 @@ public class OverlayService extends Service {
         }
     }
 
-    private void showMenu() {
+    public void showMenu() {
+        isStealthHidden = false;
+        if (bubbleView != null) {
+            bubbleView.setVisibility(View.VISIBLE);
+            bubbleView.setAlpha(0.4f);
+        }
         if (menuView != null) {
             menuView.setVisibility(View.VISIBLE);
         }
-        if (bubbleView != null) {
-            bubbleView.setAlpha(0.4f);
-        }
+        updateNotification();
     }
 
-    private void hideMenu() {
+    public void hideMenu() {
         if (menuView != null) {
             menuView.setVisibility(View.GONE);
         }
         if (bubbleView != null) {
+            bubbleView.setVisibility(View.VISIBLE);
             bubbleView.setAlpha(1.0f);
+        }
+    }
+
+    public void hideAllOverlays() {
+        isStealthHidden = true;
+        if (menuView != null) {
+            menuView.setVisibility(View.GONE);
+        }
+        if (bubbleView != null) {
+            bubbleView.setVisibility(View.GONE);
+        }
+        updateNotification();
+        Toast.makeText(this, "Floating menu hidden (Stealth). Tap notification to unhide.", Toast.LENGTH_SHORT).show();
+    }
+
+    public void showAllOverlays() {
+        isStealthHidden = false;
+        if (bubbleView != null) {
+            bubbleView.setVisibility(View.VISIBLE);
+            bubbleView.setAlpha(1.0f);
+        }
+        if (menuView != null) {
+            menuView.setVisibility(View.VISIBLE);
+        }
+        updateNotification();
+        Toast.makeText(this, "Floating menu restored!", Toast.LENGTH_SHORT).show();
+    }
+
+    public void toggleStealthMode() {
+        if (isStealthHidden) {
+            showAllOverlays();
+        } else {
+            hideAllOverlays();
         }
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null && ("STOP".equals(intent.getAction()) || "com.android.support.STOP_OVERLAY".equals(intent.getAction()))) {
-            stopSelf();
-            return START_NOT_STICKY;
+        if (intent != null) {
+            String action = intent.getAction();
+            if ("STOP".equals(action) || ACTION_STOP_OVERLAY.equals(action) || "com.android.support.STOP_OVERLAY".equals(action)) {
+                stopSelf();
+                return START_NOT_STICKY;
+            } else if (ACTION_TOGGLE_OVERLAY.equals(action)) {
+                toggleStealthMode();
+                return START_STICKY;
+            } else if (ACTION_HIDE_OVERLAY.equals(action)) {
+                hideAllOverlays();
+                return START_STICKY;
+            } else if (ACTION_SHOW_OVERLAY.equals(action)) {
+                showAllOverlays();
+                return START_STICKY;
+            }
         }
         return START_STICKY;
     }
@@ -449,6 +552,7 @@ public class OverlayService extends Service {
     public void onDestroy() {
         super.onDestroy();
         isRunning = false;
+        isStealthHidden = false;
 
         if (menuView != null && windowManager != null) {
             try {

@@ -246,8 +246,13 @@ public class MainActivity extends Activity {
         }
 
         if (OverlayService.isRunning) {
-            txtServiceStatus.setText("ACTIVE");
-            txtServiceStatus.setTextColor(Color.parseColor("#00E676"));
+            if (OverlayService.isStealthHidden) {
+                txtServiceStatus.setText("ACTIVE (STEALTH HIDDEN)");
+                txtServiceStatus.setTextColor(Color.parseColor("#00E5FF"));
+            } else {
+                txtServiceStatus.setText("ACTIVE (VISIBLE)");
+                txtServiceStatus.setTextColor(Color.parseColor("#00E676"));
+            }
             btnToggleService.setText("STOP WILLY LIBTOOL");
             btnToggleService.setBackgroundColor(Color.parseColor("#37474F"));
         } else {
