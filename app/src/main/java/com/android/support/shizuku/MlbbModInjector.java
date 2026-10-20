@@ -831,4 +831,117 @@ public final class MlbbModInjector {
         }
         file.setReadable(true, false);
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 6. MEMHOOK NATIVE DAEMON DEPLOYMENT & EXECUTION
+    // ─────────────────────────────────────────────────────────────────────────
+
+    public static final String MEMHOOK_BIN = "/data/local/tmp/memhook";
+    public static final String MEMHOOK_SOCK = "/data/local/tmp/memhook.sock";
+    public static final String MEMHOOK_LOG = "/data/local/tmp/memhook.log";
+
+    public static void deployMemHook(Context context, Callback callback) {
+        EXECUTOR.execute(() -> {
+            if (!ShizukuShell.hasPermission()) {
+                postComplete(callback, false, "Shizuku permission not granted.");
+                return;
+            }
+
+            try {
+                postProgress(callback, "Preparing MemHook native binary for arm64-v8a...");
+                byte[] binBytes = readAsset(context, "memhook/arm64-v8a/memhook");
+                if (binBytes == null || binBytes.length == 0) {
+                    postComplete(callback, false, "MemHook asset missing in APK.");
+                    return;
+                }
+
+                File stage = new File(STAGE_DIR);
+                stage.mkdirs();
+                File stageBin = new File(stage, "memhook");
+                writeFile(stageBin, binBytes);
+
+                postProgress(callback, "Deploying MemHook to /data/local/tmp...");
+                ShizukuShell.exec("cp -f \"" + stageBin.getAbsolutePath() + "\" " + MEMHOOK_BIN);
+                ShizukuShell.exec("chmod 755 " + MEMHOOK_BIN);
+
+                ShizukuShell.Result check = ShizukuShell.exec("ls -l " + MEMHOOK_BIN);
+                if (check.ok()) {
+                    postComplete(callback, true, "MemHook deployed successfully: " + check.output);
+                } else {
+                    postComplete(callback, false, "Failed to deploy MemHook: " + check.output);
+                }
+            } catch (Throwable t) {
+                postComplete(callback, false, "Deploy error: " + t.getMessage());
+            }
+        });
+    }
+
+    public static void startMemHookDaemon(Context context, Callback callback) {
+        EXECUTOR.execute(() -> {
+            if (!ShizukuShell.hasPermission()) {
+                postComplete(callback, false, "Shizuku permission not granted.");
+                return;
+            }
+
+            try {
+                postProgress(callback, "Ensuring MemHook is installed...");
+                ShizukuShell.Result check = ShizukuShell.exec("test -f " + MEMHOOK_BIN + " && echo 1 || echo 0");
+                if (!"1".equals(check.output.trim())) {
+                    postProgress(callback, "MemHook not found in /data/local/tmp. Deploying now...");
+                    byte[] binBytes = readAsset(context, "memhook/arm64-v8a/memhook");
+                    if (binBytes != null && binBytes.length > 0) {
+                        File stage = new File(STAGE_DIR);
+                        stage.mkdirs();
+                        File stageBin = new File(stage, "memhook");
+                        writeFile(stageBin, binBytes);
+                        ShizukuShell.exec("cp -f \"" + stageBin.getAbsolutePath() + "\" " + MEMHOOK_BIN);
+                        ShizukuShell.exec("chmod 755 " + MEMHOOK_BIN);
+                    }
+                }
+
+                postProgress(callback, "Stopping previous daemon instance if running...");
+                ShizukuShell.exec("pkill -f memhook 2>/dev/null");
+                ShizukuShell.exec("rm -f " + MEMHOOK_SOCK);
+
+                postProgress(callback, "Launching MemHook daemon...");
+                ShizukuShell.exec("nohup " + MEMHOOK_BIN + " --pkg " + PKG + " --daemon --socket " + MEMHOOK_SOCK + " > " + MEMHOOK_LOG + " 2>&1 &");
+
+                Thread.sleep(600);
+                ShizukuShell.Result logRes = ShizukuShell.exec("cat " + MEMHOOK_LOG + " 2>/dev/null");
+                ShizukuShell.Result psRes = ShizukuShell.exec("pidof memhook || pgrep -f memhook");
+
+                if (psRes.ok() && !psRes.output.trim().isEmpty()) {
+                    postComplete(callback, true, "MemHook daemon active (PID " + psRes.output.trim() + "):\n" + logRes.output);
+                } else {
+                    postComplete(callback, false, "MemHook failed to start. Log:\n" + logRes.output);
+                }
+            } catch (Throwable t) {
+                postComplete(callback, false, "Daemon launch error: " + t.getMessage());
+            }
+        });
+    }
+
+    public static void stopMemHookDaemon(Callback callback) {
+        EXECUTOR.execute(() -> {
+            if (!ShizukuShell.hasPermission()) {
+                postComplete(callback, false, "Shizuku permission not granted.");
+                return;
+            }
+            ShizukuShell.exec("pkill -f memhook 2>/dev/null");
+            ShizukuShell.exec("rm -f " + MEMHOOK_SOCK);
+            postComplete(callback, true, "MemHook daemon stopped.");
+        });
+    }
+
+    public static void runMemHookScan(String targetModule, String pattern, Callback callback) {
+        EXECUTOR.execute(() -> {
+            if (!ShizukuShell.hasPermission()) {
+                postComplete(callback, false, "Shizuku permission not granted.");
+                return;
+            }
+            postProgress(callback, "Scanning " + targetModule + " for signature: " + pattern + "...");
+            ShizukuShell.Result res = ShizukuShell.exec(MEMHOOK_BIN + " --pkg " + PKG);
+            postComplete(callback, res.ok(), res.output);
+        });
+    }
 }

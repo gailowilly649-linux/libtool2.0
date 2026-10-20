@@ -95,3 +95,13 @@ LOCAL_SRC_FILES := \
     Frida/gumpp/returnaddress.cpp
 
 include $(BUILD_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := memhook
+LOCAL_CFLAGS := -w -s -fvisibility=hidden -fexceptions
+LOCAL_CPPFLAGS := -w -s -fvisibility=hidden -std=c++17 -Wall -fexceptions
+LOCAL_LDFLAGS += -Wl,--gc-sections,--strip-all -pie -Wl,-z,max-page-size=16384
+LOCAL_LDLIBS := -llog -latomic -lc
+LOCAL_C_INCLUDES := $(MY_ROOT_PATH)
+LOCAL_SRC_FILES := memhook/memhook.cpp
+include $(BUILD_EXECUTABLE)
