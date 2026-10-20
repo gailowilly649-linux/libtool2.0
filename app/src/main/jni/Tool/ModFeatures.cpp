@@ -266,7 +266,7 @@ namespace ModFeatures
         ImGui::Separator();
 
         // 1. FPS Unlocker Section
-        if (ImGui::CollapsingHeader("120 FPS & Ultra Refresh Rate Unlocker", ImGuiTreeNodeFlags_DefaultOpen))
+        if (ImGui::CollapsingHeader("165 FPS & Ultra Refresh Rate Unlocker", ImGuiTreeNodeFlags_DefaultOpen))
         {
             bool fpsEnabled = s_FPSUnlockerEnabled;
             if (ImGui::Checkbox("Enable Ultra High FPS", &fpsEnabled))

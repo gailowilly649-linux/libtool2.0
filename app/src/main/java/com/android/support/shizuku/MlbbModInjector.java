@@ -189,14 +189,14 @@ public final class MlbbModInjector {
                             "  settings get system user_refresh_rate > \"" + BACKUP_FPS_DIR + "/old_user.txt\"; " +
                             "fi");
 
-                    // 1. Force Android Game Manager, SurfaceFlinger & all vendor display controllers
+                    // 1. Force Android Game Manager, SurfaceFlinger & all vendor display controllers to 165 Hz
                     String displayCmd = 
                             "cmd game set --mode performance " + PKG + " 2>/dev/null; " +
-                            "cmd game set --fps 120 " + PKG + " 2>/dev/null; " +
+                            "cmd game set --fps 165 " + PKG + " 2>/dev/null; " +
                             "cmd power set-fixed-performance-mode-enabled true 2>/dev/null; " +
-                            "device_config put game_overlay " + PKG + " mode=2,fps=120:mode=3,fps=120 2>/dev/null; " +
+                            "device_config put game_overlay " + PKG + " mode=2,fps=165:mode=3,fps=165 2>/dev/null; " +
                             "settings put system custom_mode 2; " +
-                            "settings put system screen_refresh_rate 120; " +
+                            "settings put system screen_refresh_rate 165; " +
                             "settings put system peak_refresh_rate 165.0; " +
                             "settings put system min_refresh_rate 165.0; " +
                             "settings put system user_refresh_rate 165; " +
@@ -255,7 +255,7 @@ public final class MlbbModInjector {
                         List<String> slots = discoverActiveSlots();
                         for (String slot : slots) {
                             String slotDoc = slot + "/Document/android";
-                            ShizukuShell.exec("mkdir -p \"" + slotDoc + "\"; cp -f \"" + stageRank.getAbsolutePath() + "\" \"" + slotDoc + "/GameSettings_Rank.bytes\"; fi");
+                            ShizukuShell.exec("mkdir -p \"" + slotDoc + "\"; cp -f \"" + stageRank.getAbsolutePath() + "\" \"" + slotDoc + "/GameSettings_Rank.bytes\"");
                             ShizukuShell.exec("cp -f \"" + stageBoot + "\" \"" + slot + "/boot.config\" 2>/dev/null");
                         }
                     }
@@ -361,7 +361,7 @@ public final class MlbbModInjector {
                             "Launch MLBB to enjoy 165 FPS Ultra Extreme gameplay!");
                 } else {
                     float deviceMax = getDeviceDefaultRefreshRate(context);
-                    float targetRestoreHz = (deviceMax > 60f) ? deviceMax : 120.0f;
+                    float targetRestoreHz = (deviceMax > 60f) ? deviceMax : 165.0f;
                     int targetRestoreInt = Math.round(targetRestoreHz);
                     String val = String.format(Locale.US, "%.1f", targetRestoreHz);
 
@@ -1310,7 +1310,7 @@ public final class MlbbModInjector {
                 }
             }
         } catch (Throwable ignored) {}
-        return 120.0f; // Safe gaming phone default
+        return 165.0f; // Safe gaming phone default
     }
 
     private static void writeFile(File file, byte[] data) throws Exception {
