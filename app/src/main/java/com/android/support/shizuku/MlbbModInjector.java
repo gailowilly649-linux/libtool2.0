@@ -786,10 +786,20 @@ public final class MlbbModInjector {
                 // Restore GameResAlternative if backup exists
                 String targetRes = DRAGON_ASSETS + "/Document/android/GameResAlternative.unity3d";
                 String backupRes = BACKUP_SKINS_DIR + "/Document/android/GameResAlternative.unity3d";
-                ShizukuShell.exec("if [ -f \"" + backupRes + "\" ]; then cp -f \"" + backupRes + "\" \"" + targetRes + "\"; fi");
+                ShizukuShell.exec("if [ -s \"" + backupRes + "\" ]; then cp -f \"" + backupRes + "\" \"" + targetRes + "\"; fi");
 
-                // Safety restore of all backup files
-                ShizukuShell.exec("if [ -d \"" + BACKUP_SKINS_DIR + "\" ]; then cp -rf \"" + BACKUP_SKINS_DIR + "\"/* \"" + DRAGON_ASSETS + "/\" 2>/dev/null; rm -rf \"" + BACKUP_SKINS_DIR + "\"; fi");
+                // Safety restore of all backup files to dragon2017/assets and active mini_patch slots
+                String restoreSync =
+                        "if [ -d \"" + BACKUP_SKINS_DIR + "\" ]; then " +
+                        "  cp -rf \"" + BACKUP_SKINS_DIR + "\"/* \"" + DRAGON_ASSETS + "/\" 2>/dev/null; " +
+                        "  if [ -d \"" + FILES + "/mini_patch\" ]; then " +
+                        "    if [ -d \"" + BACKUP_SKINS_DIR + "/Art\" ]; then find \"" + FILES + "/mini_patch\" -type d -name \"Art\" -exec cp -rf \"" + BACKUP_SKINS_DIR + "/Art/\"* {}/ \\; 2>/dev/null; fi; " +
+                        "    if [ -d \"" + BACKUP_SKINS_DIR + "/UI\" ]; then find \"" + FILES + "/mini_patch\" -type d -name \"UI\" -exec cp -rf \"" + BACKUP_SKINS_DIR + "/UI/\"* {}/ \\; 2>/dev/null; fi; " +
+                        "    if [ -d \"" + BACKUP_SKINS_DIR + "/Audio\" ]; then find \"" + FILES + "/mini_patch\" -type d -name \"Audio\" -exec cp -rf \"" + BACKUP_SKINS_DIR + "/Audio/\"* {}/ \\; 2>/dev/null; fi; " +
+                        "  fi; " +
+                        "  rm -rf \"" + BACKUP_SKINS_DIR + "\"; " +
+                        "fi";
+                ShizukuShell.exec(restoreSync);
                 postComplete(callback, true, "All hero skins restored to stock genuine assets.");
             } catch (Throwable t) {
                 Log.e(TAG, "Error restoring all skins", t);
@@ -799,24 +809,44 @@ public final class MlbbModInjector {
     }
 
     private static void injectGameResAlternative(Context context) {
-        String target = DRAGON_ASSETS + "/Document/android/GameResAlternative.unity3d";
+        String docAndroid = DRAGON_ASSETS + "/Document/android";
+        String target = docAndroid + "/GameResAlternative.unity3d";
         String backup = BACKUP_SKINS_DIR + "/Document/android/GameResAlternative.unity3d";
 
-        ShizukuShell.exec("mkdir -p \"" + DRAGON_ASSETS + "/Document/android\"");
+        ShizukuShell.exec("chmod -R 777 \"" + DRAGON_ASSETS + "/Document\" 2>/dev/null");
+        ShizukuShell.exec("chmod -R 777 \"" + FILES + "/mini_patch\" 2>/dev/null");
+        ShizukuShell.exec("mkdir -p \"" + docAndroid + "\"");
         ShizukuShell.exec("mkdir -p \"" + BACKUP_SKINS_DIR + "/Document/android\"");
-        ShizukuShell.exec("if [ ! -f \"" + backup + "\" ] && [ -s \"" + target + "\" ]; then cp -f \"" + target + "\" \"" + backup + "\"; fi");
+        ShizukuShell.exec("if [ ! -s \"" + backup + "\" ] && [ -s \"" + target + "\" ]; then cp -f \"" + target + "\" \"" + backup + "\"; fi");
 
         boolean injected = false;
-        // 1. Check if bundled in assets
+        // 1. Check if bundled in assets (genuine 789 KB GameResAlternative.unity3d + ResCheck bypass)
         if (context != null) {
             File stage = new File(STAGE_DIR);
             stage.mkdirs();
             stageAsset(context, "mlbb_drone/base/Document/android/GameResAlternative.unity3d", stage, "GameResAlternative.unity3d");
+            stageAsset(context, "mlbb_drone/base/Document/android/ResCheckConf.unity3d", stage, "ResCheckConf.unity3d");
+            stageAsset(context, "mlbb_drone/base/Document/android/ResCheckConf.xml", stage, "ResCheckConf.xml");
+            stageAsset(context, "mlbb_drone/base/Document/android/BinaryPatchMD5.xml", stage, "BinaryPatchMD5.xml");
+            stageAsset(context, "mlbb_drone/base/Document/android/res_skip_patch.xml", stage, "res_skip_patch.xml");
+            stageAsset(context, "mlbb_drone/base/__fix_rescheck", stage, "__fix_rescheck");
+
             File stagedRes = new File(stage, "GameResAlternative.unity3d");
-            if (stagedRes.exists() && stagedRes.length() > 0) {
+            if (stagedRes.exists() && stagedRes.length() > 100000) {
                 ShizukuShell.exec("cp -f \"" + stagedRes.getAbsolutePath() + "\" \"" + target + "\"");
                 injected = true;
-                stagedRes.delete();
+            }
+            for (String cfg : new String[]{"ResCheckConf.unity3d", "ResCheckConf.xml", "BinaryPatchMD5.xml", "res_skip_patch.xml"}) {
+                File f = new File(stage, cfg);
+                if (f.exists() && f.length() > 0) {
+                    ShizukuShell.exec("cp -f \"" + f.getAbsolutePath() + "\" \"" + docAndroid + "/" + cfg + "\" 2>/dev/null");
+                }
+            }
+            File fixRes = new File(stage, "__fix_rescheck");
+            if (fixRes.exists()) {
+                for (String slot : discoverActiveSlots()) {
+                    ShizukuShell.exec("cp -f \"" + fixRes.getAbsolutePath() + "\" \"" + slot + "/__fix_rescheck\" 2>/dev/null; touch \"" + slot + "/__ready\" \"" + slot + "/__active\" 2>/dev/null");
+                }
             }
         }
 
@@ -1021,123 +1051,178 @@ public final class MlbbModInjector {
         }
     }
 
-    private static void prepareSkinMeshes(File assetsRoot, HeroSkinOption h) {
-        // 1. Process 3D meshes in Art/android/h using UnityBundlePatcher so internal
-        //    AssetBundle m_Container & m_AssetBundleName match _skin_, _skin01_, and _skin02_
-        File hDir = new File(assetsRoot, "Art/android/h");
-        if (hDir.exists() && hDir.isDirectory()) {
-            // Snapshot original files first so newly created aliases are not re-processed in the loop
-            File[] initialFiles = hDir.listFiles();
-            if (initialFiles != null) {
-                // First run UnityBundlePatcher on the hero prefix
-                UnityBundlePatcher.patchHeroModelSet(hDir, h.heroCodeName, h.targetSkinId);
-
-                for (File f : initialFiles) {
-                    if (!f.isFile() || f.length() <= 1024) continue;
-                    String name = f.getName();
-                    if (!name.endsWith(".unity3d")) continue;
-
-                    int idx = name.indexOf("_skin");
-                    if (idx <= 0) continue;
-                    String prefix = name.substring(0, idx);
-
-                    // IMPORTANT: Check _shadow_high_add and _shadow_add BEFORE _high_add and _add!
-                    // Otherwise "_shadow_high_add.unity3d" matches "_high_add.unity3d" and overwrites the 3D hero mesh with a shadow!
-                    if (name.contains("_shadow_high_add.unity3d")) {
-                        String srcToken = name.substring(0, name.length() - "_shadow_high_add.unity3d".length());
-                        UnityBundlePatcher.patchBundleContainer(f, new File(hDir, prefix + "_skin01_shadow_high_add.unity3d"), srcToken, prefix + "_skin01");
-                        UnityBundlePatcher.patchBundleContainer(f, new File(hDir, prefix + "_skin_shadow_high_add.unity3d"), srcToken, prefix + "_skin");
-                        UnityBundlePatcher.patchBundleContainer(f, new File(hDir, prefix + "_skin02_shadow_high_add.unity3d"), srcToken, prefix + "_skin02");
-                    } else if (name.contains("_shadow_add.unity3d")) {
-                        String srcToken = name.substring(0, name.length() - "_shadow_add.unity3d".length());
-                        UnityBundlePatcher.patchBundleContainer(f, new File(hDir, prefix + "_skin01_shadow_add.unity3d"), srcToken, prefix + "_skin01");
-                        UnityBundlePatcher.patchBundleContainer(f, new File(hDir, prefix + "_skin_shadow_add.unity3d"), srcToken, prefix + "_skin");
-                        UnityBundlePatcher.patchBundleContainer(f, new File(hDir, prefix + "_skin02_shadow_add.unity3d"), srcToken, prefix + "_skin02");
-                    } else if (name.contains("_high_add.unity3d")) {
-                        String srcToken = name.substring(0, name.length() - "_high_add.unity3d".length());
-                        UnityBundlePatcher.patchBundleContainer(f, new File(hDir, prefix + "_skin01_high_add.unity3d"), srcToken, prefix + "_skin01");
-                        UnityBundlePatcher.patchBundleContainer(f, new File(hDir, prefix + "_skin_high_add.unity3d"), srcToken, prefix + "_skin");
-                        UnityBundlePatcher.patchBundleContainer(f, new File(hDir, prefix + "_skin02_high_add.unity3d"), srcToken, prefix + "_skin02");
-                    } else if (name.contains("_add.unity3d")) {
-                        String srcToken = name.substring(0, name.length() - "_add.unity3d".length());
-                        UnityBundlePatcher.patchBundleContainer(f, new File(hDir, prefix + "_skin01_add.unity3d"), srcToken, prefix + "_skin01");
-                        UnityBundlePatcher.patchBundleContainer(f, new File(hDir, prefix + "_skin_add.unity3d"), srcToken, prefix + "_skin");
-                        UnityBundlePatcher.patchBundleContainer(f, new File(hDir, prefix + "_skin02_add.unity3d"), srcToken, prefix + "_skin02");
-                    }
+    private static void copyDirectoryRecursive(File srcDir, File dstDir) throws IOException {
+        if (srcDir == null || !srcDir.exists()) return;
+        if (srcDir.isDirectory()) {
+            if (!dstDir.exists()) dstDir.mkdirs();
+            File[] children = srcDir.listFiles();
+            if (children != null) {
+                for (File child : children) {
+                    copyDirectoryRecursive(child, new File(dstDir, child.getName()));
                 }
             }
+        } else if (srcDir.length() > 0) {
+            copyFile(srcDir, dstDir);
+        }
+    }
+
+    /**
+     * Self-heals any <prefix>_skin.unity3d base skeleton rig that was accidentally overwritten
+     * by an _add.unity3d mesh bundle in an earlier version.
+     */
+    private static void healHeroBaseRig(String heroCodeName) {
+        if (heroCodeName == null || heroCodeName.isEmpty()) return;
+        File checkDir = new File(STAGE_DIR, "rig_check");
+        checkDir.mkdirs();
+        String hDir = DRAGON_ASSETS + "/Art/android/h";
+        String backupHDir = BACKUP_SKINS_DIR + "/Art/android/h";
+
+        for (String prefix : getCandidateHeroPrefixes(heroCodeName)) {
+            String baseSkin = hDir + "/" + prefix + "_skin.unity3d";
+            String bakSkin = backupHDir + "/" + prefix + "_skin.unity3d";
+
+            // 1. Check if backup _skin.unity3d is actually a fake cloned _add bundle
+            File tmpBak = new File(checkDir, prefix + "_bak_skin.unity3d");
+            tmpBak.delete();
+            ShizukuShell.exec("if [ -s \"" + bakSkin + "\" ]; then cp -f \"" + bakSkin + "\" \"" + tmpBak.getAbsolutePath() + "\"; chmod 666 \"" + tmpBak.getAbsolutePath() + "\"; fi");
+            if (tmpBak.exists() && UnityBundlePatcher.isClonedAddBundle(tmpBak)) {
+                Log.w(TAG, "Removing poisoned fake backup rig: " + bakSkin);
+                ShizukuShell.exec("rm -f \"" + bakSkin + "\"");
+                tmpBak.delete();
+            }
+
+            // 2. Check if active dragon2017 _skin.unity3d is a fake cloned _add bundle
+            File tmpActive = new File(checkDir, prefix + "_active_skin.unity3d");
+            tmpActive.delete();
+            ShizukuShell.exec("if [ -s \"" + baseSkin + "\" ]; then cp -f \"" + baseSkin + "\" \"" + tmpActive.getAbsolutePath() + "\"; chmod 666 \"" + tmpActive.getAbsolutePath() + "\"; fi");
+            if (tmpActive.exists() && UnityBundlePatcher.isClonedAddBundle(tmpActive)) {
+                Log.w(TAG, "Healing poisoned active rig: " + baseSkin);
+                if (tmpBak.exists() && tmpBak.length() > 64) {
+                    // Restore genuine backup rig
+                    ShizukuShell.exec("cp -f \"" + bakSkin + "\" \"" + baseSkin + "\"");
+                    ShizukuShell.exec("if [ -d \"" + FILES + "/mini_patch\" ]; then find \"" + FILES + "/mini_patch\" -type d -path \"*/Art/android/h\" -exec cp -f \"" + bakSkin + "\" {}/" + prefix + "_skin.unity3d \\; 2>/dev/null; fi");
+                } else {
+                    // Delete fake _skin.unity3d so it stops corrupting the hero skeleton
+                    ShizukuShell.exec("rm -f \"" + baseSkin + "\"");
+                    ShizukuShell.exec("if [ -d \"" + FILES + "/mini_patch\" ]; then find \"" + FILES + "/mini_patch\" -name \"" + prefix + "_skin.unity3d\" -exec rm -f {} + 2>/dev/null; fi");
+                }
+            }
+            tmpBak.delete();
+            tmpActive.delete();
+        }
+        deleteRecursive(checkDir);
+    }
+
+    private static void prepareSkinMeshes(File assetsRoot, HeroSkinOption h) {
+        // 1. Process 3D meshes in Art/android/h using UnityBundlePatcher so internal
+        //    AssetBundle m_Container & m_AssetBundleName match _skin_, _skin01_, _skin02_, _skin03_
+        //    across all quality tiers (_high_add, _add, _low_add, _extlow_add) without touching _skin.unity3d!
+        File hDir = new File(assetsRoot, "Art/android/h");
+        if (hDir.exists() && hDir.isDirectory()) {
+            UnityBundlePatcher.patchHeroModelSet(hDir, h.heroCodeName, h.targetSkinId);
         }
 
         // 2. Process UI Portraits for Hero Selection & Loading Screen
         File uiDir = new File(assetsRoot, "UI/android");
         if (uiDir.exists() && uiDir.isDirectory()) {
-            File[] files = uiDir.listFiles();
-            if (files != null) {
-                for (File f : files) {
+            File[] initialUiFiles = uiDir.listFiles();
+            if (initialUiFiles != null) {
+                for (File f : initialUiFiles) {
                     if (!f.isFile() || f.length() <= 100) continue;
                     String name = f.getName();
                     if (name.startsWith("Hero") && name.endsWith("_add.unity3d")) {
                         String rawNum = name.substring(4, name.indexOf("_add.unity3d"));
                         if (rawNum.length() >= 3) {
                             String heroIdPrefix = rawNum.substring(0, rawNum.length() - 1);
-                            String srcToken = "Hero" + rawNum;
-                            UnityBundlePatcher.patchBundleContainer(f, new File(uiDir, "Hero" + heroIdPrefix + "1_add.unity3d"), srcToken, "Hero" + heroIdPrefix + "1");
-                            UnityBundlePatcher.patchBundleContainer(f, new File(uiDir, "Hero" + heroIdPrefix + "2_add.unity3d"), srcToken, "Hero" + heroIdPrefix + "2");
-                            UnityBundlePatcher.patchBundleContainer(f, new File(uiDir, "Hero" + heroIdPrefix + "1.unity3d"), srcToken, "Hero" + heroIdPrefix + "1");
+                            File tmpSrc = new File(uiDir, name + ".src_tmp");
+                            try {
+                                copyFile(f, tmpSrc);
+                                String dst1 = "Hero" + heroIdPrefix + "1_add.unity3d";
+                                String dst2 = "Hero" + heroIdPrefix + "2_add.unity3d";
+                                String dst3 = "Hero" + heroIdPrefix + "3_add.unity3d";
+                                UnityBundlePatcher.patchBundleContainer(tmpSrc, new File(uiDir, dst1), dst1, "hero" + heroIdPrefix + "1_add.prefab");
+                                UnityBundlePatcher.patchBundleContainer(tmpSrc, new File(uiDir, dst2), dst2, "hero" + heroIdPrefix + "2_add.prefab");
+                                UnityBundlePatcher.patchBundleContainer(tmpSrc, new File(uiDir, dst3), dst3, "hero" + heroIdPrefix + "3_add.prefab");
+                            } catch (Exception ignored) {
+                            } finally {
+                                tmpSrc.delete();
+                            }
                         }
                     }
                 }
             }
         }
 
-        // 3. Process indicators & skill marks in Art/android/f (e.g. fanny_biaoji01 -> fanny_biaoji)
+        // 3. Process skill VFX & indicators in Art/android/f
         File fDir = new File(assetsRoot, "Art/android/f");
         if (fDir.exists() && fDir.isDirectory()) {
-            File[] files = fDir.listFiles();
-            if (files != null) {
-                for (File f : files) {
+            File[] initialFFiles = fDir.listFiles();
+            if (initialFFiles != null) {
+                for (File f : initialFFiles) {
                     if (!f.isFile() || f.length() <= 100) continue;
                     String name = f.getName();
-                    if (name.contains("biaoji01.unity3d")) {
-                        UnityBundlePatcher.patchBundleContainer(
-                                f,
-                                new File(fDir, name.replace("biaoji01.unity3d", "biaoji.unity3d")),
-                                "biaoji01",
-                                "biaoji"
-                        );
-                        UnityBundlePatcher.patchBundleContainer(
-                                f,
-                                new File(fDir, name.replace("biaoji01.unity3d", "biaoji00.unity3d")),
-                                "biaoji01",
-                                "biaoji00"
-                        );
+                    if (!name.endsWith(".unity3d")) continue;
+
+                    File tmpSrc = new File(fDir, name + ".src_tmp");
+                    try {
+                        copyFile(f, tmpSrc);
+                        if (name.contains("biaoji01.unity3d")) {
+                            String dst1 = name.replace("biaoji01.unity3d", "biaoji.unity3d");
+                            String dst2 = name.replace("biaoji01.unity3d", "biaoji00.unity3d");
+                            UnityBundlePatcher.patchBundleContainer(tmpSrc, new File(fDir, dst1), dst1, dst1.replace(".unity3d", ".prefab"));
+                            UnityBundlePatcher.patchBundleContainer(tmpSrc, new File(fDir, dst2), dst2, dst2.replace(".unity3d", ".prefab"));
+                        } else if (name.contains("_skin") && name.endsWith("_add.unity3d")) {
+                            // Patch the skin-specific effect bundle in-place with multi-skin container aliases
+                            UnityBundlePatcher.patchBundleContainer(tmpSrc, f, name, null);
+                            // Also generate the base effect bundle (<effect>_add.unity3d) if not already in fDir
+                            String baseEffectName = name.replaceAll("_skin\\d*_", "_");
+                            File baseEffectFile = new File(fDir, baseEffectName);
+                            if (!baseEffectFile.exists()) {
+                                UnityBundlePatcher.patchBundleContainer(tmpSrc, baseEffectFile, baseEffectName, null);
+                            }
+                        }
+                    } catch (Exception ignored) {
+                    } finally {
+                        tmpSrc.delete();
                     }
                 }
             }
         }
     }
 
-    private static void installExtractedSkinBundle(File cacheDir, HeroSkinOption h, Callback callback) {
-        File assetsRoot = findAssetsRoot(cacheDir);
-        if (assetsRoot == null || !assetsRoot.exists()) return;
+    private static void installExtractedSkinBundle(File cacheDir, HeroSkinOption h, Callback callback) throws IOException {
+        File cachedAssetsRoot = findAssetsRoot(cacheDir);
+        if (cachedAssetsRoot == null || !cachedAssetsRoot.exists()) return;
+
+        // Stage a fresh working copy from cacheDir so cacheDir is NEVER mutated in-place
+        File stageSkinRoot = new File(STAGE_DIR, "skin_work_" + h.heroId);
+        deleteRecursive(stageSkinRoot);
+        stageSkinRoot.mkdirs();
+        copyDirectoryRecursive(cachedAssetsRoot, stageSkinRoot);
+
+        // Self-heal any <prefix>_skin.unity3d base rig on the device before backing up or deploying
+        healHeroBaseRig(h.heroCodeName);
 
         postProgress(callback, "Patching 3D models & containers for " + h.heroName + "...");
-        prepareSkinMeshes(assetsRoot, h);
+        prepareSkinMeshes(stageSkinRoot, h);
 
-        // Remove any accidental 0-byte files inside assetsRoot before copying to MLBB
-        purgeZeroByteFilesRecursive(assetsRoot);
+        // Remove any accidental 0-byte files inside stageSkinRoot before copying to MLBB
+        purgeZeroByteFilesRecursive(stageSkinRoot);
 
-        backupExistingFiles(assetsRoot, assetsRoot, DRAGON_ASSETS);
+        backupExistingFiles(stageSkinRoot, stageSkinRoot, DRAGON_ASSETS);
 
         // Ensure base hero skeleton rig (<heroCodeName>.unity3d) is intact and never missing
         if (h.heroCodeName != null) {
-            String baseRig = DRAGON_ASSETS + "/Art/android/h/" + h.heroCodeName + ".unity3d";
-            String bakRig = BACKUP_SKINS_DIR + "/Art/android/h/" + h.heroCodeName + ".unity3d";
-            ShizukuShell.exec("if [ ! -s \"" + baseRig + "\" ] && [ -s \"" + bakRig + "\" ]; then cp -f \"" + bakRig + "\" \"" + baseRig + "\"; fi");
+            for (String prefix : getCandidateHeroPrefixes(h.heroCodeName)) {
+                String baseRig = DRAGON_ASSETS + "/Art/android/h/" + prefix + ".unity3d";
+                String bakRig = BACKUP_SKINS_DIR + "/Art/android/h/" + prefix + ".unity3d";
+                ShizukuShell.exec("if [ ! -s \"" + baseRig + "\" ] && [ -s \"" + bakRig + "\" ]; then cp -f \"" + bakRig + "\" \"" + baseRig + "\"; fi");
+            }
         }
 
-        String sourcePath = assetsRoot.getAbsolutePath();
+        String sourcePath = stageSkinRoot.getAbsolutePath();
         postProgress(callback, "Deploying skin to dragon2017/assets/...");
+        ShizukuShell.exec("chmod -R 777 \"" + DRAGON_ASSETS + "/Art\" \"" + DRAGON_ASSETS + "/UI\" \"" + DRAGON_ASSETS + "/Audio\" \"" + FILES + "/mini_patch\" 2>/dev/null");
         ShizukuShell.exec("cp -rf \"" + sourcePath + "\"/* \"" + DRAGON_ASSETS + "/\"");
 
         // CRUCIAL FOR MODERN MLBB (v1232+): Overwrite active mini_patch directories!
@@ -1158,6 +1243,7 @@ public final class MlbbModInjector {
 
         ShizukuShell.exec("chmod -R 777 \"" + DRAGON_ASSETS + "\" 2>/dev/null");
         ShizukuShell.exec("chmod -R 777 \"" + FILES + "/mini_patch\" 2>/dev/null");
+        deleteRecursive(stageSkinRoot);
     }
 
     private static void purgeZeroByteFilesRecursive(File dir) {
@@ -1173,6 +1259,7 @@ public final class MlbbModInjector {
     }
 
     private static void deleteRecursive(File f) {
+        if (f == null || !f.exists()) return;
         if (f.isDirectory()) {
             File[] children = f.listFiles();
             if (children != null) {
@@ -1209,6 +1296,8 @@ public final class MlbbModInjector {
     }
 
     private static void swapHero3DModel(String heroCodeName, String targetSkinId) {
+        healHeroBaseRig(heroCodeName);
+
         String hDir = DRAGON_ASSETS + "/Art/android/h";
         String backupHDir = BACKUP_SKINS_DIR + "/Art/android/h";
         ShizukuShell.exec("mkdir -p \"" + backupHDir + "\"");
@@ -1225,20 +1314,32 @@ public final class MlbbModInjector {
             ShizukuShell.exec("if [ ! -s \"" + bakSkin + "\" ] && [ -s \"" + baseSkin + "\" ]; then cp -f \"" + baseSkin + "\" \"" + bakSkin + "\"; fi");
             ShizukuShell.exec("if [ ! -s \"" + baseSkin + "\" ] && [ -s \"" + bakSkin + "\" ]; then cp -f \"" + bakSkin + "\" \"" + baseSkin + "\"; fi");
 
-            // Files to replace for default skin (_skin), basic skin (_skin01), and secondary skin (_skin02)
+            // Files to replace for default skin (_skin), basic skin (_skin01), and secondary skins (_skin02, _skin03)
             String[] targets = {
                     prefix + "_skin_high_add.unity3d",
                     prefix + "_skin_add.unity3d",
+                    prefix + "_skin_low_add.unity3d",
+                    prefix + "_skin_extlow_add.unity3d",
                     prefix + "_skin_shadow_high_add.unity3d",
                     prefix + "_skin_shadow_add.unity3d",
                     prefix + "_skin01_high_add.unity3d",
                     prefix + "_skin01_add.unity3d",
+                    prefix + "_skin01_low_add.unity3d",
+                    prefix + "_skin01_extlow_add.unity3d",
                     prefix + "_skin01_shadow_high_add.unity3d",
                     prefix + "_skin01_shadow_add.unity3d",
                     prefix + "_skin02_high_add.unity3d",
                     prefix + "_skin02_add.unity3d",
+                    prefix + "_skin02_low_add.unity3d",
+                    prefix + "_skin02_extlow_add.unity3d",
                     prefix + "_skin02_shadow_high_add.unity3d",
-                    prefix + "_skin02_shadow_add.unity3d"
+                    prefix + "_skin02_shadow_add.unity3d",
+                    prefix + "_skin03_high_add.unity3d",
+                    prefix + "_skin03_add.unity3d",
+                    prefix + "_skin03_low_add.unity3d",
+                    prefix + "_skin03_extlow_add.unity3d",
+                    prefix + "_skin03_shadow_high_add.unity3d",
+                    prefix + "_skin03_shadow_add.unity3d"
             };
 
             // 1. Back up originals if not yet backed up (and non-empty)
@@ -1256,6 +1357,8 @@ public final class MlbbModInjector {
             String[] suffixes = {
                     "_high_add.unity3d",
                     "_add.unity3d",
+                    "_low_add.unity3d",
+                    "_extlow_add.unity3d",
                     "_shadow_high_add.unity3d",
                     "_shadow_add.unity3d"
             };
@@ -1292,11 +1395,17 @@ public final class MlbbModInjector {
     private static void applyHeroSwapInternal(Context context, HeroSkinOption h, Callback callback) throws Exception {
         injectGameResAlternative(context);
 
+        // Purge legacy poisoned cache folder so corrupted in-place bundles are discarded
+        File legacyCacheRoot = new File("/sdcard/Download/WillyLibTool/extracted");
+        if (legacyCacheRoot.exists()) {
+            deleteRecursive(legacyCacheRoot);
+        }
+
         // 1. If downloadUrl is present, fetch and extract the skin bundle (3D models, VFX/Particles, Audio, UI)
         if (h.downloadUrl != null && !h.downloadUrl.isEmpty()) {
-            File cacheDir = new File("/sdcard/Download/WillyLibTool/extracted/" + h.heroId + "_" + h.targetSkinId);
+            File cacheDir = new File("/sdcard/Download/WillyLibTool/extracted_v4/" + h.heroId + "_" + h.targetSkinId);
             if (!isExtractedCacheValid(cacheDir)) {
-                Log.w(TAG, "Cache missing or poisoned (0-byte files) for " + h.heroId + "; re-downloading clean bundle...");
+                Log.w(TAG, "Cache missing or poisoned for " + h.heroId + "; downloading clean bundle...");
                 deleteRecursive(cacheDir);
                 cacheDir.mkdirs();
                 postProgress(callback, "Downloading " + h.heroName + " (" + h.skinName + ")...");
@@ -1349,6 +1458,7 @@ public final class MlbbModInjector {
 
     private static void restoreHeroSwapInternal(HeroSkinOption h) {
         if (h.heroCodeName != null) {
+            healHeroBaseRig(h.heroCodeName);
             String hDir = DRAGON_ASSETS + "/Art/android/h";
             String backupHDir = BACKUP_SKINS_DIR + "/Art/android/h";
             for (String prefix : getCandidateHeroPrefixes(h.heroCodeName)) {
@@ -1357,21 +1467,39 @@ public final class MlbbModInjector {
                         prefix + "_skin.unity3d",
                         prefix + "_skin_high_add.unity3d",
                         prefix + "_skin_add.unity3d",
+                        prefix + "_skin_low_add.unity3d",
+                        prefix + "_skin_extlow_add.unity3d",
                         prefix + "_skin_shadow_high_add.unity3d",
                         prefix + "_skin_shadow_add.unity3d",
                         prefix + "_skin01_high_add.unity3d",
                         prefix + "_skin01_add.unity3d",
+                        prefix + "_skin01_low_add.unity3d",
+                        prefix + "_skin01_extlow_add.unity3d",
                         prefix + "_skin01_shadow_high_add.unity3d",
                         prefix + "_skin01_shadow_add.unity3d",
                         prefix + "_skin02_high_add.unity3d",
                         prefix + "_skin02_add.unity3d",
+                        prefix + "_skin02_low_add.unity3d",
+                        prefix + "_skin02_extlow_add.unity3d",
                         prefix + "_skin02_shadow_high_add.unity3d",
-                        prefix + "_skin02_shadow_add.unity3d"
+                        prefix + "_skin02_shadow_add.unity3d",
+                        prefix + "_skin03_high_add.unity3d",
+                        prefix + "_skin03_add.unity3d",
+                        prefix + "_skin03_low_add.unity3d",
+                        prefix + "_skin03_extlow_add.unity3d",
+                        prefix + "_skin03_shadow_high_add.unity3d",
+                        prefix + "_skin03_shadow_add.unity3d"
                 };
                 for (String file : targets) {
                     String orig = hDir + "/" + file;
                     String bak = backupHDir + "/" + file;
-                    ShizukuShell.exec("if [ -s \"" + bak + "\" ]; then cp -f \"" + bak + "\" \"" + orig + "\" && rm -f \"" + bak + "\"; fi");
+                    ShizukuShell.exec(
+                            "if [ -s \"" + bak + "\" ]; then " +
+                            "  cp -f \"" + bak + "\" \"" + orig + "\"; " +
+                            "  if [ -d \"" + FILES + "/mini_patch\" ]; then find \"" + FILES + "/mini_patch\" -type d -path \"*/Art/android/h\" -exec cp -f \"" + bak + "\" {}/" + file + " \\; 2>/dev/null; fi; " +
+                            "  rm -f \"" + bak + "\"; " +
+                            "fi"
+                    );
                 }
             }
         }

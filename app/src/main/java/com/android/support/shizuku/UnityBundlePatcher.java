@@ -13,9 +13,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -77,55 +80,168 @@ public final class UnityBundlePatcher {
 
     /**
      * Patches all 3D model variants in hDir for a given hero so Default (_skin_), Basic (_skin01_),
-     * and Elite (_skin02_) files contain dual/multi-mapped m_Container entries.
+     * and Elite (_skin02_, _skin03_) files contain multi-mapped m_Container entries across all quality tiers.
+     * NEVER creates or overwrites <prefix>.unity3d or <prefix>_skin.unity3d (which are base skeleton rigs).
      */
     public static void patchHeroModelSet(File hDir, String heroCodeName, String targetSkinId) {
         if (hDir == null || !hDir.exists() || !hDir.isDirectory()) return;
         File[] files = hDir.listFiles();
         if (files == null) return;
 
-        // Snapshot initial valid (> 64 bytes) files first so we never read a file we are writing to
-        List<File> validSources = new ArrayList<>();
+        // 1. Purge any accidental fake <prefix>_skin.unity3d that was cloned from an _add.unity3d bundle
         for (File f : files) {
-            if (f.isFile() && f.getName().endsWith(".unity3d") && f.length() > 64) {
-                validSources.add(f);
+            if (f.isFile() && f.getName().endsWith("_skin.unity3d")) {
+                if (isClonedAddBundle(f)) {
+                    f.delete();
+                }
             }
         }
 
-        for (File src : validSources) {
-            String name = src.getName();
+        // 2. Collect unique hero prefixes present in hDir
+        Set<String> prefixes = new LinkedHashSet<>();
+        for (File f : files) {
+            if (!f.isFile() || !f.getName().endsWith(".unity3d") || f.length() <= 64) continue;
+            String name = f.getName();
             int idx = name.indexOf("_skin");
-            String prefix = (idx > 0) ? name.substring(0, idx) : heroCodeName;
+            if (idx > 0) {
+                prefixes.add(name.substring(0, idx));
+            }
+        }
+        if (prefixes.isEmpty() && heroCodeName != null && !heroCodeName.isEmpty()) {
+            prefixes.add(heroCodeName);
+        }
 
-            if (name.contains("_shadow_high_add.unity3d")) {
-                cloneAndPatch(src, hDir, prefix + "_skin_shadow_high_add.unity3d");
-                cloneAndPatch(src, hDir, prefix + "_skin01_shadow_high_add.unity3d");
-                cloneAndPatch(src, hDir, prefix + "_skin02_shadow_high_add.unity3d");
-            } else if (name.contains("_shadow_add.unity3d")) {
-                cloneAndPatch(src, hDir, prefix + "_skin_shadow_add.unity3d");
-                cloneAndPatch(src, hDir, prefix + "_skin01_shadow_add.unity3d");
-                cloneAndPatch(src, hDir, prefix + "_skin02_shadow_add.unity3d");
-            } else if (name.contains("_high_add.unity3d")) {
-                cloneAndPatch(src, hDir, prefix + "_skin_high_add.unity3d");
-                cloneAndPatch(src, hDir, prefix + "_skin01_high_add.unity3d");
-                cloneAndPatch(src, hDir, prefix + "_skin02_high_add.unity3d");
-            } else if (name.contains("_add.unity3d")) {
-                cloneAndPatch(src, hDir, prefix + "_skin_add.unity3d");
-                cloneAndPatch(src, hDir, prefix + "_skin01_add.unity3d");
-                cloneAndPatch(src, hDir, prefix + "_skin02_add.unity3d");
-                cloneAndPatch(src, hDir, prefix + "_skin.unity3d");
+        // 3. For each prefix, snapshot the primary source bytes for each category BEFORE writing any files
+        for (String prefix : prefixes) {
+            byte[] shadowHighBytes = null;
+            byte[] shadowAddBytes = null;
+            byte[] meshHighBytes = null;
+            byte[] meshAddBytes = null;
+            byte[] meshLowBytes = null;
+            byte[] meshExtLowBytes = null;
+
+            for (File f : files) {
+                if (!f.isFile() || !f.exists() || f.length() <= 64) continue;
+                String name = f.getName();
+                if (!name.startsWith(prefix + "_skin") || !name.endsWith(".unity3d")) continue;
+
+                try {
+                    if (name.contains("_shadow_high_add.unity3d")) {
+                        if (shadowHighBytes == null || f.length() > shadowHighBytes.length) {
+                            shadowHighBytes = readAllBytes(f);
+                        }
+                    } else if (name.contains("_shadow_add.unity3d")) {
+                        if (shadowAddBytes == null || f.length() > shadowAddBytes.length) {
+                            shadowAddBytes = readAllBytes(f);
+                        }
+                    } else if (name.contains("_high_add.unity3d")) {
+                        if (meshHighBytes == null || f.length() > meshHighBytes.length) {
+                            meshHighBytes = readAllBytes(f);
+                        }
+                    } else if (name.contains("_extlow_add.unity3d")) {
+                        if (meshExtLowBytes == null || f.length() > meshExtLowBytes.length) {
+                            meshExtLowBytes = readAllBytes(f);
+                        }
+                    } else if (name.contains("_low_add.unity3d")) {
+                        if (meshLowBytes == null || f.length() > meshLowBytes.length) {
+                            meshLowBytes = readAllBytes(f);
+                        }
+                    } else if (name.contains("_add.unity3d")) {
+                        if (meshAddBytes == null || f.length() > meshAddBytes.length) {
+                            meshAddBytes = readAllBytes(f);
+                        }
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+
+            // Cross-fill missing quality tiers so Smooth/Medium/High/Ultra graphics all work
+            if (meshHighBytes == null && meshAddBytes != null) meshHighBytes = meshAddBytes;
+            if (meshAddBytes == null && meshHighBytes != null) meshAddBytes = meshHighBytes;
+            if (meshLowBytes == null && meshAddBytes != null) meshLowBytes = meshAddBytes;
+            if (meshExtLowBytes == null && meshLowBytes != null) meshExtLowBytes = meshLowBytes;
+            if (shadowAddBytes == null && shadowHighBytes != null) shadowAddBytes = shadowHighBytes;
+            if (shadowHighBytes == null && shadowAddBytes != null) shadowHighBytes = shadowAddBytes;
+
+            String[] skinSlots = new String[]{"_skin", "_skin01", "_skin02", "_skin03"};
+            for (String slot : skinSlots) {
+                if (meshHighBytes != null) {
+                    patchBytesToFile(meshHighBytes, hDir, prefix + slot + "_high_add.unity3d");
+                }
+                if (meshAddBytes != null) {
+                    patchBytesToFile(meshAddBytes, hDir, prefix + slot + "_add.unity3d");
+                }
+                if (meshLowBytes != null) {
+                    patchBytesToFile(meshLowBytes, hDir, prefix + slot + "_low_add.unity3d");
+                }
+                if (meshExtLowBytes != null) {
+                    patchBytesToFile(meshExtLowBytes, hDir, prefix + slot + "_extlow_add.unity3d");
+                }
+                if (shadowHighBytes != null) {
+                    patchBytesToFile(shadowHighBytes, hDir, prefix + slot + "_shadow_high_add.unity3d");
+                }
+                if (shadowAddBytes != null) {
+                    patchBytesToFile(shadowAddBytes, hDir, prefix + slot + "_shadow_add.unity3d");
+                }
             }
         }
     }
 
-    private static void cloneAndPatch(File src, File dir, String targetFileName) {
+    /**
+     * Returns true if the given file (e.g. <prefix>_skin.unity3d) is actually a cloned _add.unity3d
+     * mesh bundle rather than a genuine MLBB base skeleton rig.
+     */
+    public static boolean isClonedAddBundle(File f) {
+        if (f == null || !f.exists() || f.length() < 64) return false;
         try {
-            byte[] srcBytes = readAllBytes(src);
+            byte[] raw = readAllBytes(f);
+            int[] posRef = new int[]{0};
+            String sig = readCString(raw, posRef);
+            if (!"UnityFS".equals(sig)) return false;
+            int formatVersion = readIntBE(raw, posRef);
+            readCString(raw, posRef);
+            readCString(raw, posRef);
+            readLongBE(raw, posRef);
+            int cInfoSize = readIntBE(raw, posRef);
+            int uInfoSize = readIntBE(raw, posRef);
+            int archiveFlags = readIntBE(raw, posRef);
+            if (formatVersion >= 7) {
+                posRef[0] = (posRef[0] + 15) & ~15;
+            }
+            byte[] bInfoRaw = Arrays.copyOfRange(raw, posRef[0], posRef[0] + cInfoSize);
+            int dataPos = posRef[0] + cInfoSize;
+            if ((archiveFlags & 0x200) != 0) {
+                dataPos = (dataPos + 15) & ~15;
+            }
+            byte[] bInfo = ((archiveFlags & 0x3F) == 0) ? bInfoRaw : decompressLz4(bInfoRaw, uInfoSize);
+            int[] bPos = new int[]{16};
+            int numBlocks = readIntBE(bInfo, bPos);
+            if (numBlocks <= 0) return false;
+            int uSz = readIntBE(bInfo, bPos);
+            int cSz = readIntBE(bInfo, bPos);
+            int bFlags = readUShortBE(bInfo, bPos);
+            // If block 0 is LZ4 (0x02) — which our packUnityFs writes — or if its decompressed first block contains "_add.prefab"
+            if ((bFlags & 0x3F) == 2) {
+                return true;
+            }
+            if ((bFlags & 0x3F) == 3 && numBlocks == 1 && uSz <= CHUNK_SIZE) {
+                byte[] dec = decompressLz4(Arrays.copyOfRange(raw, dataPos, dataPos + cSz), uSz);
+                if (indexOf(dec, "_add.prefab".getBytes(StandardCharsets.UTF_8), 0) >= 0) {
+                    return true;
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+        return false;
+    }
+
+    private static void patchBytesToFile(byte[] srcBytes, File dir, String targetFileName) {
+        try {
             File dst = new File(dir, targetFileName);
             byte[] patched = patchUnityFsBytes(srcBytes, targetFileName, null);
             if (patched != null && patched.length > 64) {
                 writeAllBytes(dst, patched);
-            } else if (!src.getCanonicalPath().equals(dst.getCanonicalPath())) {
+            } else {
                 writeAllBytes(dst, srcBytes);
             }
         } catch (Exception ignored) {
@@ -318,8 +434,8 @@ public final class UnityBundlePatcher {
             return null;
         }
 
-        // Append newAbBytes at the end of cab (8-byte aligned) so no other object's byteStart changes!
-        int alignedEnd = (cab.length + 7) & ~7;
+        // Append newAbBytes at the end of cab (16-byte aligned) so no other object's byteStart changes!
+        int alignedEnd = (cab.length + 15) & ~15;
         int newAbStartRel = alignedEnd - dataOffset;
         int newCabSize = alignedEnd + newAbBytes.length;
 
@@ -352,7 +468,7 @@ public final class UnityBundlePatcher {
             pos[0] += 4;
             if (containerCount < 0 || containerCount > 50000) return null;
 
-            Map<String, byte[]> expandedContainer = new LinkedHashMap<>();
+            Map<String, byte[]> expandedContainer = new TreeMap<>();
             for (int i = 0; i < containerCount; i++) {
                 String key = readAlignedStringLE(abBytes, pos);
                 byte[] assetInfo = Arrays.copyOfRange(abBytes, pos[0], pos[0] + 20);
@@ -361,7 +477,7 @@ public final class UnityBundlePatcher {
                 // Keep original key
                 expandedContainer.put(key, assetInfo);
 
-                // Generate Default (_skin_), Basic (_skin01_), and Elite (_skin02_) container aliases
+                // Generate Default (_skin_), Basic (_skin01_), and Elite (_skin02_, _skin03_) container aliases
                 for (String alias : generateContainerAliases(key, uiTargetPrefabLower)) {
                     if (!expandedContainer.containsKey(alias)) {
                         expandedContainer.put(alias, assetInfo);
@@ -378,7 +494,7 @@ public final class UnityBundlePatcher {
             String newAbName = rewriteBundleName(abName, targetBundleFileName);
             String newMName = mName.isEmpty() ? mName : rewriteBundleName(mName, targetBundleFileName);
 
-            ByteArrayOutputStream out = new ByteArrayOutputStream(abBytes.length + 512);
+            ByteArrayOutputStream out = new ByteArrayOutputStream(abBytes.length + 1024);
             writeAlignedStringLE(out, newMName);
             writeIntLE(out, preloadCount);
             out.write(preloadBytes);
@@ -402,24 +518,20 @@ public final class UnityBundlePatcher {
         List<String> aliases = new ArrayList<>();
         String lower = originalKey.toLowerCase(Locale.US);
 
-        // 1. Handle 3D hero mesh & shadow prefab paths (e.g., .../hero_fanny_skin08_high_add.prefab)
+        // 1. Handle 3D hero mesh, shadow, & skill effect prefab paths (e.g., .../hero_fanny_skin08_high_add.prefab)
         Matcher mSkin = SKIN_TAG_PATTERN.matcher(lower);
         if (mSkin.find()) {
-            String[] skinTargets = new String[]{"_skin_", "_skin01_", "_skin02_"};
+            String[] skinTargets = new String[]{"_", "_skin_", "_skin01_", "_skin02_", "_skin03_"};
             for (String target : skinTargets) {
                 String replaced = mSkin.replaceAll(target);
-                aliases.add(replaced);
+                addWithQualityVariants(aliases, replaced);
                 Matcher mDir = SKIN_DIR_PATTERN.matcher(replaced);
                 if (mDir.find()) {
-                    aliases.add(mDir.replaceAll("/skin/"));
-                    aliases.add(mDir.replaceAll("/skin01/"));
-                    aliases.add(mDir.replaceAll("/skin02/"));
+                    addWithQualityVariants(aliases, mDir.replaceAll("/skin/"));
+                    addWithQualityVariants(aliases, mDir.replaceAll("/skin01/"));
+                    addWithQualityVariants(aliases, mDir.replaceAll("/skin02/"));
+                    addWithQualityVariants(aliases, mDir.replaceAll("/skin03/"));
                 }
-            }
-            // Also add base non-_add prefab alias for _skin.unity3d fallback
-            if (lower.endsWith("_add.prefab") && !lower.contains("_high_") && !lower.contains("_shadow_")) {
-                String basePrefab = mSkin.replaceAll("_skin_").replace("_skin_add.prefab", "_skin.prefab");
-                aliases.add(basePrefab);
             }
         }
 
@@ -427,6 +539,7 @@ public final class UnityBundlePatcher {
         Matcher mDirOnly = SKIN_DIR_PATTERN.matcher(lower);
         if (mDirOnly.find()) {
             aliases.add(mDirOnly.replaceAll("/skin01/"));
+            aliases.add(mDirOnly.replaceAll("/skin02/"));
             aliases.add(mDirOnly.replaceAll("/skin/"));
         }
 
@@ -434,7 +547,14 @@ public final class UnityBundlePatcher {
         if (uiTargetPrefabLower != null && !uiTargetPrefabLower.isEmpty()) {
             int slash = lower.lastIndexOf('/');
             if (slash >= 0) {
-                aliases.add(lower.substring(0, slash + 1) + uiTargetPrefabLower.toLowerCase(Locale.US));
+                String prefixPath = lower.substring(0, slash + 1);
+                String targetLower = uiTargetPrefabLower.toLowerCase(Locale.US);
+                if (targetLower.endsWith(".prefab")) {
+                    aliases.add(prefixPath + targetLower);
+                } else {
+                    aliases.add(prefixPath + targetLower + ".prefab");
+                    aliases.add(prefixPath + targetLower + "_add.prefab");
+                }
             }
         }
         Matcher mUi = UI_HERO_PATTERN.matcher(lower);
@@ -442,23 +562,25 @@ public final class UnityBundlePatcher {
             String digits = mUi.group(1);
             String suffix = mUi.group(2);
             if (digits != null && digits.length() >= 3) {
-                // e.g. 101712 -> heroId 17 -> hero171, hero017, hero172; or 656 -> heroId 56 -> hero056, hero561
                 if (digits.length() == 6 && digits.startsWith("10")) {
                     String hId = digits.substring(2, 4);
                     aliases.add(mUi.replaceAll("hero" + hId + "1" + suffix));
                     aliases.add(mUi.replaceAll("hero0" + hId + suffix));
                     aliases.add(mUi.replaceAll("hero" + hId + "2" + suffix));
+                    aliases.add(mUi.replaceAll("hero" + hId + "3" + suffix));
                 } else if (digits.length() == 3) {
-                    String hId2 = digits.substring(1); // e.g. 656 -> 56
-                    String hIdLead = digits.substring(0, 2); // e.g. 178 -> 17
+                    String hId2 = digits.substring(1);
+                    String hIdLead = digits.substring(0, 2);
                     aliases.add(mUi.replaceAll("hero0" + hId2 + suffix));
                     aliases.add(mUi.replaceAll("hero" + hId2 + "1" + suffix));
                     aliases.add(mUi.replaceAll("hero" + hIdLead + "1" + suffix));
                     aliases.add(mUi.replaceAll("hero" + hIdLead + "2" + suffix));
+                    aliases.add(mUi.replaceAll("hero" + hIdLead + "3" + suffix));
                 } else if (digits.length() == 4) {
-                    String hId3 = digits.substring(1); // e.g. 3122 -> 122
+                    String hId3 = digits.substring(1);
                     aliases.add(mUi.replaceAll("hero" + hId3 + "1" + suffix));
                     aliases.add(mUi.replaceAll("hero" + digits.substring(0, 3) + "1" + suffix));
+                    aliases.add(mUi.replaceAll("hero" + digits.substring(0, 3) + "2" + suffix));
                 }
             }
         }
@@ -466,10 +588,36 @@ public final class UnityBundlePatcher {
         return aliases;
     }
 
+    private static void addWithQualityVariants(List<String> aliases, String path) {
+        aliases.add(path);
+        // For 3D hero mesh prefabs (excluding shadow), cross-map quality tiers so Smooth/Medium/High/Ultra all resolve
+        if (!path.contains("_shadow_") && (path.contains("/char/hero/") || path.contains("hero_"))) {
+            String base = null;
+            if (path.endsWith("_high_add.prefab")) {
+                base = path.substring(0, path.length() - "_high_add.prefab".length());
+            } else if (path.endsWith("_extlow_add.prefab")) {
+                base = path.substring(0, path.length() - "_extlow_add.prefab".length());
+            } else if (path.endsWith("_low_add.prefab")) {
+                base = path.substring(0, path.length() - "_low_add.prefab".length());
+            } else if (path.endsWith("_add.prefab")) {
+                base = path.substring(0, path.length() - "_add.prefab".length());
+            }
+            if (base != null && base.contains("_skin")) {
+                aliases.add(base + "_high_add.prefab");
+                aliases.add(base + "_add.prefab");
+                aliases.add(base + "_low_add.prefab");
+                aliases.add(base + "_extlow_add.prefab");
+            }
+        }
+    }
+
     private static String rewriteBundleName(String origAbName, String targetBundleFileName) {
         if (targetBundleFileName == null || targetBundleFileName.isEmpty()) return origAbName;
         int slash = origAbName.lastIndexOf('/');
         String lowerTarget = targetBundleFileName.toLowerCase(Locale.US);
+        if (!lowerTarget.endsWith(".unity3d")) {
+            lowerTarget = lowerTarget + ".unity3d";
+        }
         if (slash >= 0) {
             return origAbName.substring(0, slash + 1) + lowerTarget;
         }
