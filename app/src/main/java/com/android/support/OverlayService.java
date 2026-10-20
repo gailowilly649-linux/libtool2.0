@@ -8,6 +8,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ServiceInfo;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.GradientDrawable;
@@ -450,8 +451,44 @@ public class OverlayService extends Service {
         }
     }
 
+    private void clampOverlaysToScreenBounds() {
+        if (windowManager == null) return;
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        int screenW = Math.max(metrics.widthPixels, dpToPx(200));
+        int screenH = Math.max(metrics.heightPixels, dpToPx(200));
+
+        if (bubbleView != null && bubbleParams != null) {
+            int maxBubbleX = Math.max(0, screenW - dpToPx(56));
+            int maxBubbleY = Math.max(0, screenH - dpToPx(80));
+            bubbleParams.x = Math.max(0, Math.min(bubbleParams.x, maxBubbleX));
+            bubbleParams.y = Math.max(dpToPx(24), Math.min(bubbleParams.y, maxBubbleY));
+            try {
+                windowManager.updateViewLayout(bubbleView, bubbleParams);
+            } catch (Exception ignored) {
+            }
+        }
+
+        if (menuView != null && menuParams != null) {
+            int maxMenuX = Math.max(0, screenW - dpToPx(320));
+            int maxMenuY = Math.max(0, screenH - dpToPx(240));
+            menuParams.x = Math.max(0, Math.min(menuParams.x, maxMenuX));
+            menuParams.y = Math.max(dpToPx(16), Math.min(menuParams.y, maxMenuY));
+            try {
+                windowManager.updateViewLayout(menuView, menuParams);
+            } catch (Exception ignored) {
+            }
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        clampOverlaysToScreenBounds();
+    }
+
     public void showMenu() {
         isStealthHidden = false;
+        clampOverlaysToScreenBounds();
         if (bubbleView != null) {
             bubbleView.setVisibility(View.VISIBLE);
             bubbleView.setAlpha(0.4f);
@@ -486,6 +523,7 @@ public class OverlayService extends Service {
 
     public void showAllOverlays() {
         isStealthHidden = false;
+        clampOverlaysToScreenBounds();
         if (bubbleView != null) {
             bubbleView.setVisibility(View.VISIBLE);
             bubbleView.setAlpha(1.0f);
