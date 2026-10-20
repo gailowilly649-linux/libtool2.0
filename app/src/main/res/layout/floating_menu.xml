@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_weight="1"
-            android:text="WILLY LIBTOOL (NO ROOT)"
+            android:text="WILLY LIBTOOL v3.4 (NO ROOT)"
             android:textColor="#ECEFF4"
             android:textSize="11sp"
             android:textStyle="bold" />
@@ -222,6 +222,53 @@
                     android:layout_weight="0.8"
                     android:background="#2E3440"
                     android:text="RESET 60 HZ"
+                    android:textColor="#D8DEE9"
+                    android:textSize="9sp" />
+            </LinearLayout>
+
+            <!-- 2B. COMBAT DAMAGE & HERO STATS SECTION (SHIZUKU NO-ROOT) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="⚔️ COMBAT DAMAGE &amp; STATS (NO-ROOT)"
+                android:textColor="#FF5252"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:text="BattleConfig.unity3d (984 tables) + HeroStatConfig + ResCheck Bypass"
+                android:textColor="#90A4AE"
+                android:textSize="8sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnInjectCombatDamage"
+                    android:layout_width="0dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1.2"
+                    android:background="#331E1E"
+                    android:text="⚔️ INJECT COMBAT DMG"
+                    android:textColor="#FFD54F"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btnRestoreCombatDamage"
+                    android:layout_width="0dp"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="3dp"
+                    android:layout_weight="0.8"
+                    android:background="#2E3440"
+                    android:text="RESTORE DMG"
                     android:textColor="#D8DEE9"
                     android:textSize="9sp" />
             </LinearLayout>

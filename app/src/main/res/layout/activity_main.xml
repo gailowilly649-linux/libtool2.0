@@ -532,6 +532,53 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
+            <!-- Combat Damage & Stats Row (Shizuku No-Root) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="⚔️ COMBAT DAMAGE &amp; HERO STATS (NO-ROOT)"
+                android:textColor="#FF5252"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="BattleConfig.unity3d (984 tables) • HeroStatConfig • ResCheck Bypass"
+                android:textColor="#81A1C1"
+                android:textSize="10sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnMainCombatDamage"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:background="#331E1E"
+                    android:text="⚔️ INJECT COMBAT DAMAGE"
+                    android:textColor="#FFD54F"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btnMainRestoreCombatDamage"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="RESTORE DAMAGE"
+                    android:textColor="#D8DEE9"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
             <!-- Map & Skins Row -->
             <TextView
                 android:layout_width="wrap_content"
@@ -590,7 +637,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="v3.3 • 16KB Page Aligned • C++17 ImGui Engine"
+            android:text="v3.4 • UnityFS v7 Patcher • 16KB Page Aligned • C++17 ImGui Engine"
             android:textColor="#6C7280"
             android:textSize="11sp" />
 

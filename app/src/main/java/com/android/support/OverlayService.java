@@ -375,6 +375,23 @@ public class OverlayService extends Service {
             });
         }
 
+        // Section 2B: Combat Damage & Hero Stats (Shizuku No-Root)
+        View btnInjectCombatDamage = menuView.findViewById(R.id.btnInjectCombatDamage);
+        if (btnInjectCombatDamage != null) {
+            btnInjectCombatDamage.setOnClickListener(v -> {
+                txtStatus.setText("Injecting Combat Damage & BattleConfig...");
+                MlbbModInjector.injectCombatDamage(OverlayService.this, modCallback);
+            });
+        }
+
+        View btnRestoreCombatDamage = menuView.findViewById(R.id.btnRestoreCombatDamage);
+        if (btnRestoreCombatDamage != null) {
+            btnRestoreCombatDamage.setOnClickListener(v -> {
+                txtStatus.setText("Restoring stock Combat Damage...");
+                MlbbModInjector.restoreCombatDamage(modCallback);
+            });
+        }
+
         // Section 3: 40+ Heroes Skins Unlocker
         View btnUnlockAllSkins = menuView.findViewById(R.id.btnUnlockAllSkins);
         if (btnUnlockAllSkins != null) {
