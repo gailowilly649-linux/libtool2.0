@@ -237,12 +237,12 @@ public final class MlbbModInjector {
                         }
                     }
 
-                    postProgress(callback, "4/4: Spoofing ASUS ROG 8 Pro & Ultra PlayerPrefs...");
-                    // Write high FPS and ASUS spoof parameters to prefs_int and prefs_string
+                    postProgress(callback, "4/4: Spoofing ASUS ROG 8 Pro & Ultra Extreme PlayerPrefs (Level 6)...");
+                    // Write high FPS Level 6 (Ultra Extreme) and ASUS spoof parameters to prefs_int and prefs_string
                     String prefsIntScript = 
                             "INT_FILE=\"" + DRAGON_ASSETS + "/prefs_int\"; " +
                             "touch \"$INT_FILE\"; " +
-                            "for k in high_fps_mode:4 fps_level:4 __FrameRateLevel__:4 __MaxFrameRateLevel__:4 __FrameRateLevel__\\$AI:4 resolution_high:1 hd_mode:1 shadow:1 outline:1; do " +
+                            "for k in high_fps_mode:6 fps_level:6 __FrameRateLevel__:6 __MaxFrameRateLevel__:6 __FrameRateLevel__\\$AI:6 resolution_high:1 hd_mode:1 shadow:1 outline:1 render_scale:165; do " +
                             "  key=$(echo \"$k\" | cut -d: -f1); " +
                             "  val=$(echo \"$k\" | cut -d: -f2); " +
                             "  sed -i \"/^$key:/d\" \"$INT_FILE\"; " +
@@ -264,10 +264,11 @@ public final class MlbbModInjector {
                     // Also generate shared_prefs XML for extra persistence
                     String prefsXml = "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>\n"
                             + "<map>\n"
-                            + "    <int name=\"high_fps_mode\" value=\"4\" />\n"
-                            + "    <int name=\"fps_level\" value=\"4\" />\n"
-                            + "    <int name=\"__FrameRateLevel__\" value=\"4\" />\n"
-                            + "    <int name=\"__MaxFrameRateLevel__\" value=\"4\" />\n"
+                            + "    <int name=\"high_fps_mode\" value=\"6\" />\n"
+                            + "    <int name=\"fps_level\" value=\"6\" />\n"
+                            + "    <int name=\"__FrameRateLevel__\" value=\"6\" />\n"
+                            + "    <int name=\"__MaxFrameRateLevel__\" value=\"6\" />\n"
+                            + "    <int name=\"__FrameRateLevel__$AI\" value=\"6\" />\n"
                             + "    <int name=\"resolution_high\" value=\"1\" />\n"
                             + "    <int name=\"outline\" value=\"1\" />\n"
                             + "    <int name=\"shadow\" value=\"1\" />\n"
@@ -278,19 +279,24 @@ public final class MlbbModInjector {
                             + "</map>";
                     File prefsFile = new File(stage, "165fps_prefs.xml");
                     writeFile(prefsFile, prefsXml.getBytes("UTF-8"));
-                    String targetPrefs = "/data/data/" + PKG + "/shared_prefs/" + PKG + "_preferences.xml";
-                    ShizukuShell.exec("cp -f \"" + prefsFile.getAbsolutePath() + "\" \"" + targetPrefs + "\" 2>/dev/null");
+                    String targetPrefsData = "/data/data/" + PKG + "/shared_prefs/" + PKG + "_preferences.xml";
+                    String targetPrefsSd = "/sdcard/Android/data/" + PKG + "/shared_prefs/" + PKG + "_preferences.xml";
+                    ShizukuShell.exec("mkdir -p /sdcard/Android/data/" + PKG + "/shared_prefs");
+                    ShizukuShell.exec("cp -f \"" + prefsFile.getAbsolutePath() + "\" \"" + targetPrefsData + "\" 2>/dev/null");
+                    ShizukuShell.exec("cp -f \"" + prefsFile.getAbsolutePath() + "\" \"" + targetPrefsSd + "\" 2>/dev/null");
 
                     // Cleanup stage
                     ShizukuShell.exec("rm -rf \"" + STAGE_DIR + "\"");
 
                     postComplete(callback, true, 
-                            "⚡ Real 165 FPS & Ultra Unlocked!\n" +
+                            "⚡ Real 165 FPS & Ultra Extreme Unlocked!\n" +
+                            "• __FrameRateLevel__: 6 (Ultra Extreme)\n" +
+                            "• high_fps_mode: 6\n" +
+                            "• render_scale: 165\n" +
                             "• Spoofed Device: ASUS ROG Phone 8 Pro (165Hz)\n" +
                             "• Screen Display: Locked to 165 Hz\n" +
                             "• Engine Target: 165 FPS (VSync Off)\n" +
-                            "• Game Table: Ultra Tier 5 Active\n" +
-                            "Launch MLBB to enjoy 165 FPS ultra-smooth gameplay!");
+                            "Launch MLBB to enjoy 165 FPS Ultra Extreme gameplay!");
                 } else {
                     postProgress(callback, "Restoring stock 60 Hz display & settings...");
                     // 1. Revert display refresh rate
