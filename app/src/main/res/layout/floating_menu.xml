@@ -157,7 +157,7 @@
                 android:textColor="#D8DEE9"
                 android:textSize="9sp" />
 
-            <!-- 2. REAL 165 FPS & FAKE SPOOF SECTION -->
+            <!-- 2. REAL 165 FPS AND FAKE SPOOF SECTION -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -226,17 +226,17 @@
                     android:textSize="9sp" />
             </LinearLayout>
 
-            <!-- 3. UNLOCK HERO SKINS SECTION (12 HEROES) -->
+            <!-- 3. UNLOCK HERO SKINS SECTION -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="UNLOCK HERO SKINS (12 HEROES)"
+                android:text="UNLOCK HERO SKINS (40+ HEROES)"
                 android:textColor="#FFD54F"
                 android:textSize="10sp"
                 android:textStyle="bold" />
 
-            <!-- Quick Action: All 12 Heroes -->
+            <!-- Master Action: All 40+ Heroes -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -249,9 +249,9 @@
                     android:layout_height="34dp"
                     android:layout_weight="1"
                     android:background="#1E3324"
-                    android:text="★ UNLOCK ALL 12"
+                    android:text="★ UNLOCK ALL 40+ SKINS"
                     android:textColor="#00E676"
-                    android:textSize="10sp"
+                    android:textSize="9sp"
                     android:textStyle="bold" />
 
                 <Button
@@ -259,20 +259,20 @@
                     android:layout_width="0dp"
                     android:layout_height="34dp"
                     android:layout_marginStart="4dp"
-                    android:layout_weight="1"
+                    android:layout_weight="0.8"
                     android:background="#331E1E"
                     android:text="RESTORE ALL"
                     android:textColor="#FF5252"
-                    android:textSize="10sp"
+                    android:textSize="9sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Fighters & Assassins (Chou, Fanny, Ling, Gusion, Hayabusa, Lancelot) -->
+            <!-- Quick Role Batch Unlocks -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Fighters &amp; Assassins (Chou • Fanny • Ling • Gusion • Haya • Lance)"
+                android:text="BATCH UNLOCK BY ROLE"
                 android:textColor="#81A1C1"
                 android:textSize="9sp" />
 
@@ -283,25 +283,39 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/btnSkinChou"
+                    android:id="@+id/btnRoleJungle"
                     android:layout_width="0dp"
-                    android:layout_height="30dp"
+                    android:layout_height="28dp"
                     android:layout_weight="1"
                     android:background="#1E232E"
-                    android:text="CHOU (ANNIV)"
-                    android:textColor="#ECEFF4"
-                    android:textSize="8sp" />
+                    android:text="⚡ JUNGLE"
+                    android:textColor="#A3BE8C"
+                    android:textSize="8sp"
+                    android:textStyle="bold" />
 
                 <Button
-                    android:id="@+id/btnSkinFanny"
+                    android:id="@+id/btnRoleMage"
                     android:layout_width="0dp"
-                    android:layout_height="30dp"
-                    android:layout_marginStart="3dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
                     android:layout_weight="1"
                     android:background="#1E232E"
-                    android:text="FANNY (ASPIRANT)"
-                    android:textColor="#ECEFF4"
-                    android:textSize="8sp" />
+                    android:text="⚡ MAGE"
+                    android:textColor="#B48EAD"
+                    android:textSize="8sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btnRoleTank"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="⚡ TANK"
+                    android:textColor="#EBCB8B"
+                    android:textSize="8sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <LinearLayout
@@ -311,9 +325,72 @@
                 android:orientation="horizontal">
 
                 <Button
+                    android:id="@+id/btnRoleMM"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="⚡ MM"
+                    android:textColor="#D08770"
+                    android:textSize="8sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btnRoleSupport"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="⚡ SUPPORT"
+                    android:textColor="#88C0D0"
+                    android:textSize="8sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btnRoleFighter"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="⚡ FIGHTER"
+                    android:textColor="#BF616A"
+                    android:textSize="8sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- 1. Jungle Heroes -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="JUNGLE (Fanny • Ling • Gusion • Haya • Lance • Nolan • Aamon • Saber • Julian)"
+                android:textColor="#A3BE8C"
+                android:textSize="8sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSkinFanny"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="FANNY (ASPIRANT)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
                     android:id="@+id/btnSkinLing"
                     android:layout_width="0dp"
-                    android:layout_height="30dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
                     android:layout_weight="1"
                     android:background="#1E232E"
                     android:text="LING (COLL)"
@@ -323,8 +400,8 @@
                 <Button
                     android:id="@+id/btnSkinGusion"
                     android:layout_width="0dp"
-                    android:layout_height="30dp"
-                    android:layout_marginStart="3dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
                     android:layout_weight="1"
                     android:background="#1E232E"
                     android:text="GUSION (DRAGON)"
@@ -341,7 +418,7 @@
                 <Button
                     android:id="@+id/btnSkinHayabusa"
                     android:layout_width="0dp"
-                    android:layout_height="30dp"
+                    android:layout_height="28dp"
                     android:layout_weight="1"
                     android:background="#1E232E"
                     android:text="HAYA (KITSUNE)"
@@ -351,23 +428,295 @@
                 <Button
                     android:id="@+id/btnSkinLancelot"
                     android:layout_width="0dp"
-                    android:layout_height="30dp"
-                    android:layout_marginStart="3dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
                     android:layout_weight="1"
                     android:background="#1E232E"
                     android:text="LANCE (HERO)"
                     android:textColor="#ECEFF4"
                     android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinNolan"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="NOLAN (NAV)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
             </LinearLayout>
 
-            <!-- Marksmen: Granger, Layla, Moskov, Claude, Miya, Karrie -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSkinAamon"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="AAMON"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinSaber"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="SABER (ONIMARU)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinJulian"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="JULIAN (JJK)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+            </LinearLayout>
+
+            <!-- 2. Mage Heroes -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Marksmen (Granger • Layla • Moskov • Claude • Miya • Karrie)"
-                android:textColor="#81A1C1"
-                android:textSize="9sp" />
+                android:layout_marginTop="5dp"
+                android:text="MAGE (Kagura • Lunox • Harith • Cecilion • Xavier • Nana • Chang\'e • Vexana)"
+                android:textColor="#B48EAD"
+                android:textSize="8sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSkinKagura"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="KAGURA (LILY)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinLunox"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="LUNOX (DAWN)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinHarith"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="HARITH (EVOS)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSkinCecilion"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="CECILION (COLL)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinXavier"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="XAVIER (GOJO)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinNana"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="NANA (COLL)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSkinChange"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="CHANG\'E (LUNAR)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinVexana"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="VEXANA (COLL)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+            </LinearLayout>
+
+            <!-- 3. Tank Heroes -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="TANK (Tigreal • Franco • Khufra • Atlas • Johnson • Gatot • Akai)"
+                android:textColor="#EBCB8B"
+                android:textSize="8sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSkinTigreal"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="TIGREAL (LIGHT)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinFranco"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="FRANCO (LEGEND)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinKhufra"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="KHUFRA (COLL)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSkinAtlas"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="ATLAS (MECH)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinJohnson"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="JOHNSON (OPTIMUS)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinGatotkaca"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="GATOT (SENTINEL)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSkinAkai"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="AKAI (PO KUNG FU PANDA)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+            </LinearLayout>
+
+            <!-- 4. Marksman Heroes -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="MARKSMAN (Granger • Layla • Moskov • Claude • Miya • Karrie • Beatrix • Brody • Wanwan • Lesley)"
+                android:textColor="#D08770"
+                android:textSize="8sp"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -378,7 +727,7 @@
                 <Button
                     android:id="@+id/btnSkinGranger"
                     android:layout_width="0dp"
-                    android:layout_height="30dp"
+                    android:layout_height="28dp"
                     android:layout_weight="1"
                     android:background="#1E232E"
                     android:text="GRANGER (LEGEND)"
@@ -388,41 +737,24 @@
                 <Button
                     android:id="@+id/btnSkinLayla"
                     android:layout_width="0dp"
-                    android:layout_height="30dp"
-                    android:layout_marginStart="3dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
                     android:layout_weight="1"
                     android:background="#1E232E"
-                    android:text="LAYLA (COLL)"
+                    android:text="LAYLA (ASPIRANT)"
                     android:textColor="#ECEFF4"
                     android:textSize="8sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:orientation="horizontal">
 
                 <Button
                     android:id="@+id/btnSkinMoskov"
                     android:layout_width="0dp"
-                    android:layout_height="30dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
                     android:layout_weight="1"
                     android:background="#1E232E"
                     android:text="MOSKOV (ABYSS)"
                     android:textColor="#ECEFF4"
                     android:textSize="8sp" />
-
-                <Button
-                    android:id="@+id/btnSkinClaude"
-                    android:layout_width="0dp"
-                    android:layout_height="30dp"
-                    android:layout_marginStart="3dp"
-                    android:layout_weight="1"
-                    android:background="#1E232E"
-                    android:text="CLAUDE (SANRIO)"
-                    android:textColor="#ECEFF4"
-                    android:textSize="8sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -432,9 +764,20 @@
                 android:orientation="horizontal">
 
                 <Button
+                    android:id="@+id/btnSkinClaude"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="CLAUDE (SANRIO)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
                     android:id="@+id/btnSkinMiya"
                     android:layout_width="0dp"
-                    android:layout_height="30dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
                     android:layout_weight="1"
                     android:background="#1E232E"
                     android:text="MIYA (COLL)"
@@ -444,11 +787,260 @@
                 <Button
                     android:id="@+id/btnSkinKarrie"
                     android:layout_width="0dp"
-                    android:layout_height="30dp"
-                    android:layout_marginStart="3dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
                     android:layout_weight="1"
                     android:background="#1E232E"
                     android:text="KARRIE (M5)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSkinBeatrix"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="BEATRIX (M4)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinBrody"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="BRODY (COLL)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinWanwan"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="WANWAN (COLL)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSkinLesley"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="LESLEY (LEGEND)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+            </LinearLayout>
+
+            <!-- 5. Support Heroes -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="SUPPORT (Angela • Estes • Diggie • Floryn • Mathilda • Rafaela)"
+                android:textColor="#88C0D0"
+                android:textSize="8sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSkinAngela"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="ANGELA (COLL)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinEstes"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="ESTES (M3)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinDiggie"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="DIGGIE"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSkinFloryn"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="FLORYN (SANRIO)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinMathilda"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="MATHILDA (MPL)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinRafaela"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="RAFAELA (SABER)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+            </LinearLayout>
+
+            <!-- 6. Fighter Heroes -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="FIGHTER (Chou • Yu Zhong • Paquito • Ruby • Dyrroth • Alpha • Alucard)"
+                android:textColor="#BF616A"
+                android:textSize="8sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSkinChou"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="CHOU (M4)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinYuzhong"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="YU ZHONG (M5)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinPaquito"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="PAQUITO (COLL)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSkinRuby"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="RUBY (ASPIRANT)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinDyrroth"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="DYRROTH (COLL)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinAlpha"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="ALPHA (COLL)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSkinAlucard"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="ALUCARD (LEGEND)"
                     android:textColor="#ECEFF4"
                     android:textSize="8sp" />
             </LinearLayout>

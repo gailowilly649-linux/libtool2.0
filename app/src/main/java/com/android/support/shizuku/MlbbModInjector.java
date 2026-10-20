@@ -532,66 +532,73 @@ public final class MlbbModInjector {
 
     public static final List<HeroSkinOption> HERO_SKINS = new ArrayList<>();
     static {
-        // 1. Chou (Fighter) - ECHO M4 Champion / STUN
-        HERO_SKINS.add(new HeroSkinOption("chou", "Chou", "ECHO M4 Champion", "Fighter",
-                "hero_kongfu", "13",
-                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-0eufvt8zbgzsttymiec27cChou%20Basic%20to%20Anniversary.zip-t27l9h0e5g/AnehGamingOfficial.zip"));
-
-        // 2. Fanny (Assassin) - Blade of Kibou (The Aspirants)
-        HERO_SKINS.add(new HeroSkinOption("fanny", "Fanny", "Blade of Kibou (Aspirant)", "Assassin",
-                "hero_fanny", "13",
+        // ── 1. JUNGLE / ASSASSIN ───────────────────────────────────────────
+        HERO_SKINS.add(new HeroSkinOption("fanny", "Fanny", "Blade of Kibou (Aspirant)", "Jungle", "hero_fanny", "13",
                 "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-rn6x0w7ybnhcn2qe06aenfanny%20eleite%20aspirant.zip-4mrhpn9x4hs/AnehGamingOfficial.zip"));
-
-        // 3. Ling (Assassin) - Seraphic Scourge (Collector)
-        HERO_SKINS.add(new HeroSkinOption("ling", "Ling", "Seraphic Scourge (Collector)", "Assassin",
-                "hero_zeo", "04",
+        HERO_SKINS.add(new HeroSkinOption("ling", "Ling", "Seraphic Scourge (Collector)", "Jungle", "hero_zeo", "04",
                 "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-6dpa50ndtqsa1yekwetpcgLing%20Special%20to%20Collector.zip-iu91pbxyicq/AnehGamingOfficial.zip"));
-
-        // 4. Gusion (Assassin) - Dragon Tamer
-        HERO_SKINS.add(new HeroSkinOption("gusion", "Gusion", "Dragon Tamer", "Assassin",
-                "hero_Gusin", "07",
+        HERO_SKINS.add(new HeroSkinOption("gusion", "Gusion", "Dragon Tamer", "Jungle", "hero_Gusin", "07",
                 "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-333htss56yrz4p923bt0nGUSION%20DRAGON.zip-r1y32sgfvum/AnehGamingOfficial.zip"));
-
-        // 5. Hayabusa (Assassin) - Shadow of Obscurity (Kitsune)
-        HERO_SKINS.add(new HeroSkinOption("hayabusa", "Hayabusa", "Shadow of Obscurity (Kitsune)", "Assassin",
-                "hero_ninja", "05",
+        HERO_SKINS.add(new HeroSkinOption("hayabusa", "Hayabusa", "Shadow of Obscurity (Kitsune)", "Jungle", "hero_ninja", "05",
                 "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-gydntpmf1rnne5mzd96dzpHAYA%20BASIC%20TO%20KITSUNE%27S%20SHADOW.zip-5yb529ueaex/AnehGamingOfficial.zip"));
-
-        // 6. Lancelot (Assassin) - Swordmaster (Hero)
-        HERO_SKINS.add(new HeroSkinOption("lancelot", "Lancelot", "Swordmaster (Hero)", "Assassin",
-                "hero_lancelot", "04",
+        HERO_SKINS.add(new HeroSkinOption("lancelot", "Lancelot", "Swordmaster (Hero)", "Jungle", "hero_lancelot", "04",
                 "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-h76has13vi8vsime6rn7hStarlight%20Lance%20Hero.zip-e5ngqf41tzn/AnehGamingOfficial.zip"));
+        HERO_SKINS.add(new HeroSkinOption("nolan", "Nolan", "The Navigator", "Jungle", "hero_NolanOsborne", "03"));
+        HERO_SKINS.add(new HeroSkinOption("aamon", "Aamon", "Noble Crest", "Jungle", "hero_Aamon", "03"));
+        HERO_SKINS.add(new HeroSkinOption("saber", "Saber", "Onimaru", "Jungle", "hero_assassin", "04"));
+        HERO_SKINS.add(new HeroSkinOption("julian", "Julian", "Megumi Fushiguro (JJK)", "Jungle", "hero_julian", "03"));
 
-        // 7. Granger (Marksman) - Starfall Knight (Legend)
-        HERO_SKINS.add(new HeroSkinOption("granger", "Granger", "Starfall Knight (Legend)", "Marksman",
-                "hero_mike", "12",
+        // ── 2. MAGE ────────────────────────────────────────────────────────
+        HERO_SKINS.add(new HeroSkinOption("kagura", "Kagura", "Water Lily (Annual Starlight)", "Mage", "hero_kagura", "06"));
+        HERO_SKINS.add(new HeroSkinOption("lunox", "Lunox", "Dawn Revelation", "Mage", "hero_balancemagic", "06"));
+        HERO_SKINS.add(new HeroSkinOption("harith", "Harith", "EVOS Legends", "Mage", "hero_moshushi", "04"));
+        HERO_SKINS.add(new HeroSkinOption("cecilion", "Cecilion", "Crimson Wings (Collector)", "Mage", "hero_couplemage", "04"));
+        HERO_SKINS.add(new HeroSkinOption("xavier", "Xavier", "Satoru Gojo (JJK)", "Mage", "hero_xavier", "03"));
+        HERO_SKINS.add(new HeroSkinOption("nana", "Nana", "Aqua Pura (Collector)", "Mage", "hero_nana", "08"));
+        HERO_SKINS.add(new HeroSkinOption("change", "Chang'e", "Lunar Magic (Collector)", "Mage", "hero_change", "05"));
+        HERO_SKINS.add(new HeroSkinOption("vexana", "Vexana", "The Sun Empress (Collector)", "Mage", "hero_Vexana", "05"));
+
+        // ── 3. TANK / ROAM ─────────────────────────────────────────────────
+        HERO_SKINS.add(new HeroSkinOption("tigreal", "Tigreal", "Lightborn Defender", "Tank", "hero_warrior", "05"));
+        HERO_SKINS.add(new HeroSkinOption("franco", "Franco", "King of Hell (Legend)", "Tank", "hero_franco", "08"));
+        HERO_SKINS.add(new HeroSkinOption("khufra", "Khufra", "Volcanic Overlord (Collector)", "Tank", "hero_munaiyi", "04"));
+        HERO_SKINS.add(new HeroSkinOption("atlas", "Atlas", "Space Mech", "Tank", "hero_atelasi", "03"));
+        HERO_SKINS.add(new HeroSkinOption("johnson", "Johnson", "Optimus Prime (Transformers)", "Tank", "hero_johnson", "05"));
+        HERO_SKINS.add(new HeroSkinOption("gatotkaca", "Gatotkaca", "Sentinel", "Tank", "hero_gatot", "03"));
+        HERO_SKINS.add(new HeroSkinOption("akai", "Akai", "Kung Fu Panda (Po)", "Tank", "hero_xiongmao", "07"));
+
+        // ── 4. MARKSMAN (MM) ───────────────────────────────────────────────
+        HERO_SKINS.add(new HeroSkinOption("granger", "Granger", "Starfall Knight (Legend)", "Marksman", "hero_mike", "12",
                 "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-49b6l109s31bkzcap2mtzagranger%20star%20legend-4poxjybiel9/AnehGamingOfficial.zip"));
-
-        // 8. Layla (Marksman) - Miss Hikari (Aspirant)
-        HERO_SKINS.add(new HeroSkinOption("layla", "Layla", "Miss Hikari (Aspirant)", "Marksman",
-                "hero_shooter", "12",
+        HERO_SKINS.add(new HeroSkinOption("layla", "Layla", "Miss Hikari (Aspirant)", "Marksman", "hero_shooter", "12",
                 "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-071jtt54kgthcdb67csatijLayla%20Basic%20to%20Prismatic%20Rhythm%20Collector.zip-49pjjdb716v/AnehGamingOfficial.zip"));
-
-        // 9. Moskov (Marksman) - Doom Incarnate (Abyss)
-        HERO_SKINS.add(new HeroSkinOption("moskov", "Moskov", "Doom Incarnate (Abyss)", "Marksman",
-                "hero_Moskov", "10",
+        HERO_SKINS.add(new HeroSkinOption("moskov", "Moskov", "Doom Incarnate (Abyss)", "Marksman", "hero_Moskov", "10",
                 "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-1el5oaqcxkd123ovdjb2munmoskov%20abyss.zip-o5owlkhyb7/AnehGamingOfficial.zip"));
+        HERO_SKINS.add(new HeroSkinOption("claude", "Claude", "Bad Bro (Sanrio)", "Marksman", "hero_claude", "08"));
+        HERO_SKINS.add(new HeroSkinOption("miya", "Miya", "Doom Catalyst (Collector)", "Marksman", "hero_gongjianshou", "14"));
+        HERO_SKINS.add(new HeroSkinOption("karrie", "Karrie", "Starstruck (M5 Champion)", "Marksman", "hero_feilun", "11"));
+        HERO_SKINS.add(new HeroSkinOption("beatrix", "Beatrix", "Stellar Brilliance (M4 Prime)", "Marksman", "hero_chargingshooter", "06"));
+        HERO_SKINS.add(new HeroSkinOption("brody", "Brody", "Ore-chemist (Collector)", "Marksman", "hero_feiden", "04"));
+        HERO_SKINS.add(new HeroSkinOption("wanwan", "Wanwan", "Pixel Blast (Collector)", "Marksman", "hero_wanwan", "04"));
+        HERO_SKINS.add(new HeroSkinOption("lesley", "Lesley", "Angelic Agent (Legend)", "Marksman", "hero_sniper", "05"));
 
-        // 10. Claude (Marksman) - Bad Bro (Sanrio)
-        HERO_SKINS.add(new HeroSkinOption("claude", "Claude", "Bad Bro (Sanrio)", "Marksman",
-                "hero_claude", "08"));
+        // ── 5. SUPPORT ─────────────────────────────────────────────────────
+        HERO_SKINS.add(new HeroSkinOption("angela", "Angela", "Floral Elf (Collector)", "Support", "hero_angela", "05"));
+        HERO_SKINS.add(new HeroSkinOption("estes", "Estes", "Blacklist International (M3)", "Support", "hero_angel", "05"));
+        HERO_SKINS.add(new HeroSkinOption("diggie", "Diggie", "Fairytaler", "Support", "hero_digger", "04"));
+        HERO_SKINS.add(new HeroSkinOption("floryn", "Floryn", "Cinnamoroll (Sanrio)", "Support", "hero_Idun", "02"));
+        HERO_SKINS.add(new HeroSkinOption("mathilda", "Mathilda", "Dream Groove (MPL)", "Support", "hero_madierda", "03"));
+        HERO_SKINS.add(new HeroSkinOption("rafaela", "Rafaela", "S.A.B.E.R. Savior", "Support", "hero_lanbote", "03"));
 
-        // 11. Miya (Marksman) - Doom Catalyst (Collector)
-        HERO_SKINS.add(new HeroSkinOption("miya", "Miya", "Doom Catalyst (Collector)", "Marksman",
-                "hero_gongjianshou", "14"));
-
-        // 12. Karrie (Marksman) - Starstruck (M5 Champion)
-        HERO_SKINS.add(new HeroSkinOption("karrie", "Karrie", "Starstruck (M5 Champion)", "Marksman",
-                "hero_feilun", "11"));
-
-        // 13. Nolan (Assassin) - The Navigator
-        HERO_SKINS.add(new HeroSkinOption("nolan", "Nolan", "The Navigator", "Assassin",
-                "hero_NolanOsborne", "03"));
+        // ── 6. FIGHTER ─────────────────────────────────────────────────────
+        HERO_SKINS.add(new HeroSkinOption("chou", "Chou", "ECHO M4 Champion", "Fighter", "hero_kongfu", "13",
+                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-0eufvt8zbgzsttymiec27cChou%20Basic%20to%20Anniversary.zip-t27l9h0e5g/AnehGamingOfficial.zip"));
+        HERO_SKINS.add(new HeroSkinOption("yuzhong", "Yu Zhong", "Cosmic Dragon (M5 Prime)", "Fighter", "hero_BlackDragon", "05"));
+        HERO_SKINS.add(new HeroSkinOption("paquito", "Paquito", "Fulgent Punch (Collector)", "Fighter", "hero_pakuite", "04"));
+        HERO_SKINS.add(new HeroSkinOption("ruby", "Ruby", "Mecha Maiden (Aspirants)", "Fighter", "hero_xiaohongmao", "07"));
+        HERO_SKINS.add(new HeroSkinOption("dyrroth", "Dyrroth", "Naraka Flame (Collector)", "Fighter", "hero_diyasi", "05"));
+        HERO_SKINS.add(new HeroSkinOption("alpha", "Alpha", "Onofiend (Collector)", "Fighter", "hero_entropy", "05"));
+        HERO_SKINS.add(new HeroSkinOption("alucard", "Alucard", "Obsidian Blade (Legend)", "Fighter", "hero_alucard", "05"));
     }
 
     public static void unlockHeroSkin(Context context, String heroId, Callback callback) {
@@ -662,7 +669,7 @@ public final class MlbbModInjector {
         });
     }
 
-    public static void unlockAll7Heroes(Context context, Callback callback) {
+    public static void unlockHeroesByRole(Context context, String role, Callback callback) {
         EXECUTOR.execute(() -> {
             if (!ShizukuShell.hasPermission()) {
                 postComplete(callback, false, "Shizuku permission not granted.");
@@ -671,30 +678,42 @@ public final class MlbbModInjector {
 
             try {
                 injectGameResAlternative(context);
+                int count = 0;
                 for (HeroSkinOption h : HERO_SKINS) {
-                    postProgress(callback, "Injecting " + h.heroName + " (" + h.skinName + ")...");
-                    applyHeroSwapInternal(context, h, callback);
+                    if (role == null || role.equalsIgnoreCase("ALL") || h.role.equalsIgnoreCase(role)) {
+                        count++;
+                        postProgress(callback, "Injecting " + h.heroName + " (" + h.skinName + ")...");
+                        applyHeroSwapInternal(context, h, callback);
+                    }
                 }
-                postComplete(callback, true, "⚡ All " + HERO_SKINS.size() + " Skins unlocked successfully!\n" +
-                        "💡 In Hero Pick: Select DEFAULT Skin for any unlocked hero!\n" +
+                postComplete(callback, true, "⚡ " + count + " " + (role == null || role.equalsIgnoreCase("ALL") ? "All" : role) + " Skins unlocked!\n" +
+                        "💡 In Hero Pick: Select DEFAULT Skin for any of them!\n" +
                         "Works in Practice, Custom, Classic, and Rank.");
             } catch (Throwable t) {
-                Log.e(TAG, "Error unlocking all skins", t);
+                Log.e(TAG, "Error unlocking " + role + " skins", t);
                 postComplete(callback, false, "Unlock error: " + t.getMessage());
             }
         });
     }
 
+    public static void unlockHeroesByRole(String role, Callback callback) {
+        unlockHeroesByRole(null, role, callback);
+    }
+
     public static void unlockAllHeroSkins(Context context, Callback callback) {
-        unlockAll7Heroes(context, callback);
+        unlockHeroesByRole(context, "ALL", callback);
     }
 
     public static void unlockAllHeroSkins(Callback callback) {
-        unlockAll7Heroes(null, callback);
+        unlockHeroesByRole(null, "ALL", callback);
+    }
+
+    public static void unlockAll7Heroes(Context context, Callback callback) {
+        unlockHeroesByRole(context, "ALL", callback);
     }
 
     public static void unlockAll7Heroes(Callback callback) {
-        unlockAll7Heroes(null, callback);
+        unlockHeroesByRole(null, "ALL", callback);
     }
 
     public static void restoreAllHeroSkins(Callback callback) {

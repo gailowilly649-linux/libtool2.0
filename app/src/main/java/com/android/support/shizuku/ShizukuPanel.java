@@ -126,10 +126,17 @@ public final class ShizukuPanel {
         if (btnDrone4x != null) btnDrone4x.setOnClickListener(v -> MlbbModInjector.applyDroneView(activity, 4, panelCallback));
         if (btnDrone5x != null) btnDrone5x.setOnClickListener(v -> MlbbModInjector.applyDroneView(activity, 5, panelCallback));
         if (btnDroneReset != null) btnDroneReset.setOnClickListener(v -> MlbbModInjector.restoreDefaultDrone(panelCallback));
-        if (btnUnlockAllSkins != null) btnUnlockAllSkins.setOnClickListener(v -> MlbbModInjector.unlockAll7Heroes(panelCallback));
+        if (btnUnlockAllSkins != null) btnUnlockAllSkins.setOnClickListener(v -> MlbbModInjector.unlockAllHeroSkins(activity, panelCallback));
         if (btnRestoreAllSkins != null) btnRestoreAllSkins.setOnClickListener(v -> MlbbModInjector.restoreAllHeroSkins(panelCallback));
         if (btnMapSkins != null) btnMapSkins.setOnClickListener(v -> MlbbModInjector.injectMapAndSkins(activity, panelCallback));
         if (btnRestoreMap != null) btnRestoreMap.setOnClickListener(v -> MlbbModInjector.restoreDefaultMapAndSkins(panelCallback));
+
+        bindRoleButton(activity, R.id.btnMainRoleJungle, "Jungle", panelCallback);
+        bindRoleButton(activity, R.id.btnMainRoleMage, "Mage", panelCallback);
+        bindRoleButton(activity, R.id.btnMainRoleTank, "Tank", panelCallback);
+        bindRoleButton(activity, R.id.btnMainRoleMM, "Marksman", panelCallback);
+        bindRoleButton(activity, R.id.btnMainRoleSupport, "Support", panelCallback);
+        bindRoleButton(activity, R.id.btnMainRoleFighter, "Fighter", panelCallback);
 
         try {
             Shizuku.addBinderReceivedListenerSticky(binderReceived);
@@ -148,6 +155,16 @@ public final class ShizukuPanel {
         } catch (Throwable ignored) {
         }
         worker.shutdownNow();
+    }
+
+    private void bindRoleButton(android.app.Activity activity, int resId, String role, MlbbModInjector.Callback callback) {
+        android.view.View btn = activity.findViewById(resId);
+        if (btn != null) {
+            btn.setOnClickListener(v -> {
+                log("Unlocking " + role + " skins...");
+                MlbbModInjector.unlockHeroesByRole(activity, role, callback);
+            });
+        }
     }
 
     // ---------------------------------------------------------------- status

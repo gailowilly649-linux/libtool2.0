@@ -390,12 +390,12 @@
                 android:textColor="#D8DEE9"
                 android:textSize="11sp" />
 
-            <!-- 7 Hero Skins Row -->
+            <!-- 40+ Hero Skins Section -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="UNLOCK HERO SKINS (7 HEROES)"
+                android:text="UNLOCK HERO SKINS (40+ HEROES)"
                 android:textColor="#FFD54F"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -404,7 +404,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="Fanny (Mikasa) • Gusion (KOF) • Ling (Shen) • Nolan • Miya • Claude • Karrie"
+                android:text="Jungle • Mage • Tank • Marksman • Support • Fighter (Collector / Legend / Collab)"
                 android:textColor="#81A1C1"
                 android:textSize="10sp" />
 
@@ -420,7 +420,7 @@
                     android:layout_height="44dp"
                     android:layout_weight="1"
                     android:background="#1E3324"
-                    android:text="★ UNLOCK ALL 12 SKINS"
+                    android:text="★ UNLOCK ALL 40+ SKINS"
                     android:textColor="#00E676"
                     android:textSize="11sp"
                     android:textStyle="bold" />
@@ -435,6 +435,100 @@
                     android:text="RESTORE ALL SKINS"
                     android:textColor="#FF5252"
                     android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Role Batch Unlock Buttons -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="BATCH UNLOCK BY ROLE"
+                android:textColor="#D8DEE9"
+                android:textSize="9sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnMainRoleJungle"
+                    android:layout_width="0dp"
+                    android:layout_height="34dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="⚡ JUNGLE"
+                    android:textColor="#88C0D0"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btnMainRoleMage"
+                    android:layout_width="0dp"
+                    android:layout_height="34dp"
+                    android:layout_marginStart="3dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="⚡ MAGE"
+                    android:textColor="#B48EAD"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btnMainRoleTank"
+                    android:layout_width="0dp"
+                    android:layout_height="34dp"
+                    android:layout_marginStart="3dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="⚡ TANK"
+                    android:textColor="#EBCB8B"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnMainRoleMM"
+                    android:layout_width="0dp"
+                    android:layout_height="34dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="⚡ MM"
+                    android:textColor="#A3BE8C"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btnMainRoleSupport"
+                    android:layout_width="0dp"
+                    android:layout_height="34dp"
+                    android:layout_marginStart="3dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="⚡ SUPPORT"
+                    android:textColor="#8FBCBB"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btnMainRoleFighter"
+                    android:layout_width="0dp"
+                    android:layout_height="34dp"
+                    android:layout_marginStart="3dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="⚡ FIGHTER"
+                    android:textColor="#D08770"
+                    android:textSize="9sp"
                     android:textStyle="bold" />
             </LinearLayout>
 

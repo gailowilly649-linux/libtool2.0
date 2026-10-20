@@ -374,12 +374,12 @@ public class OverlayService extends Service {
             });
         }
 
-        // Section 3: 7 Heroes Skins Unlocker
+        // Section 3: 40+ Heroes Skins Unlocker
         View btnUnlockAllSkins = menuView.findViewById(R.id.btnUnlockAllSkins);
         if (btnUnlockAllSkins != null) {
             btnUnlockAllSkins.setOnClickListener(v -> {
-                txtStatus.setText("Unlocking All 12 Hero Skins...");
-                MlbbModInjector.unlockAll7Heroes(OverlayService.this, modCallback);
+                txtStatus.setText("Unlocking All 40+ Hero Skins...");
+                MlbbModInjector.unlockAllHeroSkins(OverlayService.this, modCallback);
             });
         }
 
@@ -391,100 +391,38 @@ public class OverlayService extends Service {
             });
         }
 
-        View btnSkinChou = menuView.findViewById(R.id.btnSkinChou);
-        if (btnSkinChou != null) {
-            btnSkinChou.setOnClickListener(v -> {
-                txtStatus.setText("Unlocking Chou Anniversary...");
-                MlbbModInjector.unlockHeroSkin(OverlayService.this, "chou", modCallback);
-            });
+        // Role Batch Unlocks (Jungle, Mage, Tank, MM, Support, Fighter)
+        String[][] roleButtons = {
+                {"btnRoleJungle", "Jungle"},
+                {"btnRoleMage", "Mage"},
+                {"btnRoleTank", "Tank"},
+                {"btnRoleMM", "Marksman"},
+                {"btnRoleSupport", "Support"},
+                {"btnRoleFighter", "Fighter"}
+        };
+        for (String[] rb : roleButtons) {
+            int id = getResources().getIdentifier(rb[0], "id", getPackageName());
+            View btn = menuView.findViewById(id);
+            if (btn != null) {
+                final String roleName = rb[1];
+                btn.setOnClickListener(v -> {
+                    txtStatus.setText("Unlocking " + roleName + " skins...");
+                    MlbbModInjector.unlockHeroesByRole(OverlayService.this, roleName, modCallback);
+                });
+            }
         }
 
-        View btnSkinFanny = menuView.findViewById(R.id.btnSkinFanny);
-        if (btnSkinFanny != null) {
-            btnSkinFanny.setOnClickListener(v -> {
-                txtStatus.setText("Unlocking Fanny Aspirant...");
-                MlbbModInjector.unlockHeroSkin(OverlayService.this, "fanny", modCallback);
-            });
-        }
-
-        View btnSkinLing = menuView.findViewById(R.id.btnSkinLing);
-        if (btnSkinLing != null) {
-            btnSkinLing.setOnClickListener(v -> {
-                txtStatus.setText("Unlocking Ling Collector...");
-                MlbbModInjector.unlockHeroSkin(OverlayService.this, "ling", modCallback);
-            });
-        }
-
-        View btnSkinGusion = menuView.findViewById(R.id.btnSkinGusion);
-        if (btnSkinGusion != null) {
-            btnSkinGusion.setOnClickListener(v -> {
-                txtStatus.setText("Unlocking Gusion Dragon...");
-                MlbbModInjector.unlockHeroSkin(OverlayService.this, "gusion", modCallback);
-            });
-        }
-
-        View btnSkinHayabusa = menuView.findViewById(R.id.btnSkinHayabusa);
-        if (btnSkinHayabusa != null) {
-            btnSkinHayabusa.setOnClickListener(v -> {
-                txtStatus.setText("Unlocking Hayabusa Kitsune...");
-                MlbbModInjector.unlockHeroSkin(OverlayService.this, "hayabusa", modCallback);
-            });
-        }
-
-        View btnSkinLancelot = menuView.findViewById(R.id.btnSkinLancelot);
-        if (btnSkinLancelot != null) {
-            btnSkinLancelot.setOnClickListener(v -> {
-                txtStatus.setText("Unlocking Lancelot Hero...");
-                MlbbModInjector.unlockHeroSkin(OverlayService.this, "lancelot", modCallback);
-            });
-        }
-
-        View btnSkinGranger = menuView.findViewById(R.id.btnSkinGranger);
-        if (btnSkinGranger != null) {
-            btnSkinGranger.setOnClickListener(v -> {
-                txtStatus.setText("Unlocking Granger Legend...");
-                MlbbModInjector.unlockHeroSkin(OverlayService.this, "granger", modCallback);
-            });
-        }
-
-        View btnSkinLayla = menuView.findViewById(R.id.btnSkinLayla);
-        if (btnSkinLayla != null) {
-            btnSkinLayla.setOnClickListener(v -> {
-                txtStatus.setText("Unlocking Layla Collector...");
-                MlbbModInjector.unlockHeroSkin(OverlayService.this, "layla", modCallback);
-            });
-        }
-
-        View btnSkinMoskov = menuView.findViewById(R.id.btnSkinMoskov);
-        if (btnSkinMoskov != null) {
-            btnSkinMoskov.setOnClickListener(v -> {
-                txtStatus.setText("Unlocking Moskov Abyss...");
-                MlbbModInjector.unlockHeroSkin(OverlayService.this, "moskov", modCallback);
-            });
-        }
-
-        View btnSkinClaude = menuView.findViewById(R.id.btnSkinClaude);
-        if (btnSkinClaude != null) {
-            btnSkinClaude.setOnClickListener(v -> {
-                txtStatus.setText("Unlocking Claude Sanrio...");
-                MlbbModInjector.unlockHeroSkin(OverlayService.this, "claude", modCallback);
-            });
-        }
-
-        View btnSkinMiya = menuView.findViewById(R.id.btnSkinMiya);
-        if (btnSkinMiya != null) {
-            btnSkinMiya.setOnClickListener(v -> {
-                txtStatus.setText("Unlocking Miya Collector...");
-                MlbbModInjector.unlockHeroSkin(OverlayService.this, "miya", modCallback);
-            });
-        }
-
-        View btnSkinKarrie = menuView.findViewById(R.id.btnSkinKarrie);
-        if (btnSkinKarrie != null) {
-            btnSkinKarrie.setOnClickListener(v -> {
-                txtStatus.setText("Unlocking Karrie M5...");
-                MlbbModInjector.unlockHeroSkin(OverlayService.this, "karrie", modCallback);
-            });
+        // Individual Hero Buttons (Auto-bound for all 40+ heroes in HERO_SKINS)
+        for (MlbbModInjector.HeroSkinOption h : MlbbModInjector.HERO_SKINS) {
+            String btnName = "btnSkin" + Character.toUpperCase(h.heroId.charAt(0)) + h.heroId.substring(1);
+            int id = getResources().getIdentifier(btnName, "id", getPackageName());
+            View btn = menuView.findViewById(id);
+            if (btn != null) {
+                btn.setOnClickListener(v -> {
+                    txtStatus.setText("Unlocking " + h.heroName + " (" + h.skinName + ")...");
+                    MlbbModInjector.unlockHeroSkin(OverlayService.this, h.heroId, modCallback);
+                });
+            }
         }
 
         // Section 4: Map & Battlefield Assets
