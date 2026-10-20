@@ -267,12 +267,12 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Assassins: Fanny, Gusion, Ling, Nolan -->
+            <!-- Fighters & Assassins (Chou, Fanny, Ling, Gusion, Hayabusa, Lancelot) -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Assassins (Fanny • Gusion • Ling • Nolan)"
+                android:text="Fighters &amp; Assassins (Chou • Fanny • Ling • Gusion • Haya • Lance)"
                 android:textColor="#81A1C1"
                 android:textSize="9sp" />
 
@@ -283,23 +283,23 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/btnSkinFanny"
+                    android:id="@+id/btnSkinChou"
                     android:layout_width="0dp"
                     android:layout_height="30dp"
                     android:layout_weight="1"
                     android:background="#1E232E"
-                    android:text="FANNY (MIKASA)"
+                    android:text="CHOU (ANNIV)"
                     android:textColor="#ECEFF4"
                     android:textSize="8sp" />
 
                 <Button
-                    android:id="@+id/btnSkinGusion"
+                    android:id="@+id/btnSkinFanny"
                     android:layout_width="0dp"
                     android:layout_height="30dp"
                     android:layout_marginStart="3dp"
                     android:layout_weight="1"
                     android:background="#1E232E"
-                    android:text="GUSION (KOF)"
+                    android:text="FANNY (ASPIRANT)"
                     android:textColor="#ECEFF4"
                     android:textSize="8sp" />
             </LinearLayout>
@@ -316,30 +316,114 @@
                     android:layout_height="30dp"
                     android:layout_weight="1"
                     android:background="#1E232E"
-                    android:text="LING (SHEN)"
+                    android:text="LING (COLL)"
                     android:textColor="#ECEFF4"
                     android:textSize="8sp" />
 
                 <Button
-                    android:id="@+id/btnSkinNolan"
+                    android:id="@+id/btnSkinGusion"
                     android:layout_width="0dp"
                     android:layout_height="30dp"
                     android:layout_marginStart="3dp"
                     android:layout_weight="1"
                     android:background="#1E232E"
-                    android:text="NOLAN (NAV)"
+                    android:text="GUSION (DRAGON)"
                     android:textColor="#ECEFF4"
                     android:textSize="8sp" />
             </LinearLayout>
 
-            <!-- Marksmen: Miya, Claude, Karrie -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSkinHayabusa"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="HAYA (KITSUNE)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinLancelot"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="3dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="LANCE (HERO)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+            </LinearLayout>
+
+            <!-- Marksmen: Granger, Layla, Moskov, Claude, Miya, Karrie -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Marksmen (Miya • Claude • Karrie)"
+                android:text="Marksmen (Granger • Layla • Moskov • Claude • Miya • Karrie)"
                 android:textColor="#81A1C1"
                 android:textSize="9sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSkinGranger"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="GRANGER (LEGEND)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinLayla"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="3dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="LAYLA (COLL)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSkinMoskov"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="MOSKOV (ABYSS)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+
+                <Button
+                    android:id="@+id/btnSkinClaude"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="3dp"
+                    android:layout_weight="1"
+                    android:background="#1E232E"
+                    android:text="CLAUDE (SANRIO)"
+                    android:textColor="#ECEFF4"
+                    android:textSize="8sp" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -354,17 +438,6 @@
                     android:layout_weight="1"
                     android:background="#1E232E"
                     android:text="MIYA (COLL)"
-                    android:textColor="#ECEFF4"
-                    android:textSize="8sp" />
-
-                <Button
-                    android:id="@+id/btnSkinClaude"
-                    android:layout_width="0dp"
-                    android:layout_height="30dp"
-                    android:layout_marginStart="3dp"
-                    android:layout_weight="1"
-                    android:background="#1E232E"
-                    android:text="CLAUDE (SANRIO)"
                     android:textColor="#ECEFF4"
                     android:textSize="8sp" />
 
