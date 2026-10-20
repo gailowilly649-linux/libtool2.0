@@ -10,6 +10,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -533,72 +534,106 @@ public final class MlbbModInjector {
     public static final List<HeroSkinOption> HERO_SKINS = new ArrayList<>();
     static {
         // ── 1. JUNGLE / ASSASSIN ───────────────────────────────────────────
-        HERO_SKINS.add(new HeroSkinOption("fanny", "Fanny", "Blade of Kibou (Aspirant)", "Jungle", "hero_fanny", "13",
-                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-rn6x0w7ybnhcn2qe06aenfanny%20eleite%20aspirant.zip-4mrhpn9x4hs/AnehGamingOfficial.zip"));
+        HERO_SKINS.add(new HeroSkinOption("fanny", "Fanny", "Blade of Kibou (Aspirant)", "Jungle", "hero_fanny", "08",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln/main/fanny%20basic%20s%20to%20aspirants.zip"));
         HERO_SKINS.add(new HeroSkinOption("ling", "Ling", "Seraphic Scourge (Collector)", "Jungle", "hero_zeo", "04",
-                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-6dpa50ndtqsa1yekwetpcgLing%20Special%20to%20Collector.zip-iu91pbxyicq/AnehGamingOfficial.zip"));
-        HERO_SKINS.add(new HeroSkinOption("gusion", "Gusion", "Dragon Tamer", "Jungle", "hero_Gusin", "07",
-                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-333htss56yrz4p923bt0nGUSION%20DRAGON.zip-r1y32sgfvum/AnehGamingOfficial.zip"));
-        HERO_SKINS.add(new HeroSkinOption("hayabusa", "Hayabusa", "Shadow of Obscurity (Kitsune)", "Jungle", "hero_ninja", "05",
-                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-gydntpmf1rnne5mzd96dzpHAYA%20BASIC%20TO%20KITSUNE%27S%20SHADOW.zip-5yb529ueaex/AnehGamingOfficial.zip"));
-        HERO_SKINS.add(new HeroSkinOption("lancelot", "Lancelot", "Swordmaster (Hero)", "Jungle", "hero_lancelot", "04",
-                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-h76has13vi8vsime6rn7hStarlight%20Lance%20Hero.zip-e5ngqf41tzn/AnehGamingOfficial.zip"));
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln2/main/ling%20basic%20to%20collector.zip"));
+        HERO_SKINS.add(new HeroSkinOption("gusion", "Gusion", "Dimension Crusher (11.11)", "Jungle", "hero_Gusin", "07",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln2/main/gusion%20basic%20to%2011.11.zip"));
+        HERO_SKINS.add(new HeroSkinOption("hayabusa", "Hayabusa", "Shura (11.11)", "Jungle", "hero_ninja", "05",
+                "https://raw.githubusercontent.com/n3wz1ips/D3f4ultSk1n/main/hayabusa%2011.11.zip"));
+        HERO_SKINS.add(new HeroSkinOption("lancelot", "Lancelot", "Bren Esports (Champion)", "Jungle", "hero_lancelot", "04",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln2/main/lancelot%20basic%20to%20champion.zip"));
         HERO_SKINS.add(new HeroSkinOption("nolan", "Nolan", "The Navigator", "Jungle", "hero_NolanOsborne", "03"));
-        HERO_SKINS.add(new HeroSkinOption("aamon", "Aamon", "Noble Crest", "Jungle", "hero_Aamon", "03"));
-        HERO_SKINS.add(new HeroSkinOption("saber", "Saber", "Onimaru", "Jungle", "hero_assassin", "04"));
-        HERO_SKINS.add(new HeroSkinOption("julian", "Julian", "Megumi Fushiguro (JJK)", "Jungle", "hero_julian", "03"));
+        HERO_SKINS.add(new HeroSkinOption("aamon", "Aamon", "Noble Crest (Elite)", "Jungle", "hero_Aamon", "03",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln/main/aamon%20basic%20to%20elite.zip"));
+        HERO_SKINS.add(new HeroSkinOption("saber", "Saber", "Codename: Storm (Legend)", "Jungle", "hero_assassin", "04",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln3/main/saber%20basic%20to%20legend.zip"));
+        HERO_SKINS.add(new HeroSkinOption("julian", "Julian", "Kurapika (HxH)", "Jungle", "hero_julian", "03",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln2/main/julian%20basic%20to%20hxh.zip"));
 
         // ── 2. MAGE ────────────────────────────────────────────────────────
-        HERO_SKINS.add(new HeroSkinOption("kagura", "Kagura", "Water Lily (Annual Starlight)", "Mage", "hero_kagura", "06"));
-        HERO_SKINS.add(new HeroSkinOption("lunox", "Lunox", "Dawn Revelation", "Mage", "hero_balancemagic", "06"));
-        HERO_SKINS.add(new HeroSkinOption("harith", "Harith", "EVOS Legends", "Mage", "hero_moshushi", "04"));
-        HERO_SKINS.add(new HeroSkinOption("cecilion", "Cecilion", "Crimson Wings (Collector)", "Mage", "hero_couplemage", "04"));
-        HERO_SKINS.add(new HeroSkinOption("xavier", "Xavier", "Satoru Gojo (JJK)", "Mage", "hero_xavier", "03"));
-        HERO_SKINS.add(new HeroSkinOption("nana", "Nana", "Aqua Pura (Collector)", "Mage", "hero_nana", "08"));
-        HERO_SKINS.add(new HeroSkinOption("change", "Chang'e", "Lunar Magic (Collector)", "Mage", "hero_change", "05"));
+        HERO_SKINS.add(new HeroSkinOption("kagura", "Kagura", "Water Lily (Annual Starlight)", "Mage", "hero_kagura", "06",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln2/main/kagura%20basic%20to%20annual%20star.zip"));
+        HERO_SKINS.add(new HeroSkinOption("lunox", "Lunox", "Eyes of Eternity (Epic)", "Mage", "hero_balancemagic", "06",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln3/main/lunox%20basic%20to%20epic.zip"));
+        HERO_SKINS.add(new HeroSkinOption("harith", "Harith", "EVOS Legends (Champion)", "Mage", "hero_moshushi", "04",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln2/main/harith%20basic%20to%20champion.zip"));
+        HERO_SKINS.add(new HeroSkinOption("cecilion", "Cecilion", "Crimson Wings (Collector)", "Mage", "hero_couplemage", "04",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln/main/cecilion%20basic%20to%20collector.zip"));
+        HERO_SKINS.add(new HeroSkinOption("xavier", "Xavier", "Satoru Gojo (JJK)", "Mage", "hero_xavier", "03",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln3/main/xavier%20collector%20to%20jjk.zip"));
+        HERO_SKINS.add(new HeroSkinOption("nana", "Nana", "Aqua Pura (Collector)", "Mage", "hero_nana", "08",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln3/main/nana%20elite%20to%20collector.zip"));
+        HERO_SKINS.add(new HeroSkinOption("change", "Chang'e", "Cyber Cherub (Aspirants)", "Mage", "hero_change", "05",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln/main/change%20basic%20to%20aspirants.zip"));
         HERO_SKINS.add(new HeroSkinOption("vexana", "Vexana", "The Sun Empress (Collector)", "Mage", "hero_Vexana", "05"));
 
         // ── 3. TANK / ROAM ─────────────────────────────────────────────────
         HERO_SKINS.add(new HeroSkinOption("tigreal", "Tigreal", "Lightborn Defender", "Tank", "hero_warrior", "05"));
-        HERO_SKINS.add(new HeroSkinOption("franco", "Franco", "King of Hell (Legend)", "Tank", "hero_franco", "08"));
-        HERO_SKINS.add(new HeroSkinOption("khufra", "Khufra", "Volcanic Overlord (Collector)", "Tank", "hero_munaiyi", "04"));
-        HERO_SKINS.add(new HeroSkinOption("atlas", "Atlas", "Space Mech", "Tank", "hero_atelasi", "03"));
-        HERO_SKINS.add(new HeroSkinOption("johnson", "Johnson", "Optimus Prime (Transformers)", "Tank", "hero_johnson", "05"));
-        HERO_SKINS.add(new HeroSkinOption("gatotkaca", "Gatotkaca", "Sentinel", "Tank", "hero_gatot", "03"));
-        HERO_SKINS.add(new HeroSkinOption("akai", "Akai", "Kung Fu Panda (Po)", "Tank", "hero_xiongmao", "07"));
+        HERO_SKINS.add(new HeroSkinOption("franco", "Franco", "King of Hell (Legend)", "Tank", "hero_franco", "08",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln/main/franco%20basic%20s%20to%20legend.zip"));
+        HERO_SKINS.add(new HeroSkinOption("khufra", "Khufra", "Volcanic Overlord (Collector)", "Tank", "hero_munaiyi", "04",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln2/main/khufra%20basic%20to%20collector.zip"));
+        HERO_SKINS.add(new HeroSkinOption("atlas", "Atlas", "Space Mech (Collector)", "Tank", "hero_atelasi", "03",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln/main/atlas%20basic%20to%20collector.zip"));
+        HERO_SKINS.add(new HeroSkinOption("johnson", "Johnson", "Starblazer (Legend)", "Tank", "hero_johnson", "05",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln2/main/johnson%20basic%20to%20legend.zip"));
+        HERO_SKINS.add(new HeroSkinOption("gatotkaca", "Gatotkaca", "Sentinel (Epic)", "Tank", "hero_gatot", "03",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln/main/gatotkaca%20basic%20to%20epic.zip"));
+        HERO_SKINS.add(new HeroSkinOption("akai", "Akai", "Kung Fu Panda (Po)", "Tank", "hero_xiongmao", "07",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln/main/akai%20elite%20s%20to%20kungfu%20panda.zip"));
 
         // ── 4. MARKSMAN (MM) ───────────────────────────────────────────────
         HERO_SKINS.add(new HeroSkinOption("granger", "Granger", "Starfall Knight (Legend)", "Marksman", "hero_mike", "12",
-                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-49b6l109s31bkzcap2mtzagranger%20star%20legend-4poxjybiel9/AnehGamingOfficial.zip"));
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln2/main/granger%20basic%20to%20legend.zip"));
         HERO_SKINS.add(new HeroSkinOption("layla", "Layla", "Miss Hikari (Aspirant)", "Marksman", "hero_shooter", "12",
-                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-071jtt54kgthcdb67csatijLayla%20Basic%20to%20Prismatic%20Rhythm%20Collector.zip-49pjjdb716v/AnehGamingOfficial.zip"));
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln2/main/layla%20basic%20to%20aspirants.zip"));
         HERO_SKINS.add(new HeroSkinOption("moskov", "Moskov", "Doom Incarnate (Abyss)", "Marksman", "hero_Moskov", "10",
-                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-1el5oaqcxkd123ovdjb2munmoskov%20abyss.zip-o5owlkhyb7/AnehGamingOfficial.zip"));
-        HERO_SKINS.add(new HeroSkinOption("claude", "Claude", "Bad Bro (Sanrio)", "Marksman", "hero_claude", "08"));
-        HERO_SKINS.add(new HeroSkinOption("miya", "Miya", "Doom Catalyst (Collector)", "Marksman", "hero_gongjianshou", "14"));
-        HERO_SKINS.add(new HeroSkinOption("karrie", "Karrie", "Starstruck (M5 Champion)", "Marksman", "hero_feilun", "11"));
-        HERO_SKINS.add(new HeroSkinOption("beatrix", "Beatrix", "Stellar Brilliance (M4 Prime)", "Marksman", "hero_chargingshooter", "06"));
-        HERO_SKINS.add(new HeroSkinOption("brody", "Brody", "Ore-chemist (Collector)", "Marksman", "hero_feiden", "04"));
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln3/main/moskov%20basic%20to%20abyss.zip"));
+        HERO_SKINS.add(new HeroSkinOption("claude", "Claude", "Blazing Trace", "Marksman", "hero_claude", "08",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln/main/claude%20basic%20to%20blazing.zip"));
+        HERO_SKINS.add(new HeroSkinOption("miya", "Miya", "Atomic Pop", "Marksman", "hero_gongjianshou", "14",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln3/main/miya%20elite%20to%20atomic.zip"));
+        HERO_SKINS.add(new HeroSkinOption("karrie", "Karrie", "Gill-Girl (Annual Starlight)", "Marksman", "hero_feilun", "11",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln2/main/karrie%20basic%20to%20annual%20star.zip"));
+        HERO_SKINS.add(new HeroSkinOption("beatrix", "Beatrix", "Stellar Brilliance (M4 Prime)", "Marksman", "hero_chargingshooter", "06",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln/main/beatrix%20basic%20to%20prime.zip"));
+        HERO_SKINS.add(new HeroSkinOption("brody", "Brody", "Apex Hunter (Collector)", "Marksman", "hero_feiden", "04",
+                "https://raw.githubusercontent.com/Opoad55/upluad2/main/brody%20basic%20to%20collector.zip"));
         HERO_SKINS.add(new HeroSkinOption("wanwan", "Wanwan", "Pixel Blast (Collector)", "Marksman", "hero_wanwan", "04"));
-        HERO_SKINS.add(new HeroSkinOption("lesley", "Lesley", "Angelic Agent (Legend)", "Marksman", "hero_sniper", "05"));
+        HERO_SKINS.add(new HeroSkinOption("lesley", "Lesley", "Hawk-eyed Sniper (Annual Star)", "Marksman", "hero_sniper", "05",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln2/main/lesley%20basic%20to%20annual%20star.zip"));
 
         // ── 5. SUPPORT ─────────────────────────────────────────────────────
-        HERO_SKINS.add(new HeroSkinOption("angela", "Angela", "Floral Elf (Collector)", "Support", "hero_angela", "05"));
-        HERO_SKINS.add(new HeroSkinOption("estes", "Estes", "Blacklist International (M3)", "Support", "hero_angel", "05"));
-        HERO_SKINS.add(new HeroSkinOption("diggie", "Diggie", "Fairytaler", "Support", "hero_digger", "04"));
-        HERO_SKINS.add(new HeroSkinOption("floryn", "Floryn", "Cinnamoroll (Sanrio)", "Support", "hero_Idun", "02"));
-        HERO_SKINS.add(new HeroSkinOption("mathilda", "Mathilda", "Dream Groove (MPL)", "Support", "hero_madierda", "03"));
-        HERO_SKINS.add(new HeroSkinOption("rafaela", "Rafaela", "S.A.B.E.R. Savior", "Support", "hero_lanbote", "03"));
+        HERO_SKINS.add(new HeroSkinOption("angela", "Angela", "Avatar of Time (Annual Star)", "Support", "hero_angela", "05",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln/main/angela%20basic%20to%20annual%20star.zip"));
+        HERO_SKINS.add(new HeroSkinOption("estes", "Estes", "Blacklist International (M3)", "Support", "hero_angel", "05",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln/main/estes%20basic%20to%20champion.zip"));
+        HERO_SKINS.add(new HeroSkinOption("diggie", "Diggie", "Fairytaler (Epic)", "Support", "hero_digger", "04",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln/main/diggie%20basic%20to%20epic.zip"));
+        HERO_SKINS.add(new HeroSkinOption("floryn", "Floryn", "Cinnamoroll (Sanrio)", "Support", "hero_Idun", "02",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln/main/floryn%20basic%20to%20sanrio.zip"));
+        HERO_SKINS.add(new HeroSkinOption("mathilda", "Mathilda", "Dream Groove (MPL)", "Support", "hero_madierda", "03",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln3/main/mathilda%20basic%20to%20epic.zip"));
+        HERO_SKINS.add(new HeroSkinOption("rafaela", "Rafaela", "S.A.B.E.R. Savior / Lunar Fest", "Support", "hero_lanbote", "03",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln3/main/rafaela%20elite%20to%20lunar%20fest.zip"));
 
         // ── 6. FIGHTER ─────────────────────────────────────────────────────
-        HERO_SKINS.add(new HeroSkinOption("chou", "Chou", "ECHO M4 Champion", "Fighter", "hero_kongfu", "13",
-                "https://raw.githubusercontent.com/AnehGamingOfficial/temp-ml/main/temp/AnehGamingOfficial-0eufvt8zbgzsttymiec27cChou%20Basic%20to%20Anniversary.zip-t27l9h0e5g/AnehGamingOfficial.zip"));
-        HERO_SKINS.add(new HeroSkinOption("yuzhong", "Yu Zhong", "Cosmic Dragon (M5 Prime)", "Fighter", "hero_BlackDragon", "05"));
-        HERO_SKINS.add(new HeroSkinOption("paquito", "Paquito", "Fulgent Punch (Collector)", "Fighter", "hero_pakuite", "04"));
-        HERO_SKINS.add(new HeroSkinOption("ruby", "Ruby", "Mecha Maiden (Aspirants)", "Fighter", "hero_xiaohongmao", "07"));
-        HERO_SKINS.add(new HeroSkinOption("dyrroth", "Dyrroth", "Naraka Flame (Collector)", "Fighter", "hero_diyasi", "05"));
-        HERO_SKINS.add(new HeroSkinOption("alpha", "Alpha", "Onofiend (Collector)", "Fighter", "hero_entropy", "05"));
-        HERO_SKINS.add(new HeroSkinOption("alucard", "Alucard", "Obsidian Blade (Legend)", "Fighter", "hero_alucard", "05"));
+        HERO_SKINS.add(new HeroSkinOption("chou", "Chou", "Iori Yagami (KOF)", "Fighter", "hero_kongfu", "13",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln/main/chou%20basic%20to%20kof.zip"));
+        HERO_SKINS.add(new HeroSkinOption("yuzhong", "Yu Zhong", "Cosmic Dragon (Dragon/Collector)", "Fighter", "hero_BlackDragon", "05",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln3/main/yu%20zhong%20basic%20to%20dragon.zip"));
+        HERO_SKINS.add(new HeroSkinOption("paquito", "Paquito", "Ryu (Street Fighter)", "Fighter", "hero_pakuite", "04",
+                "https://raw.githubusercontent.com/Opoad55/upluad2/main/paquito%20basic%20to%20sf2.zip"));
+        HERO_SKINS.add(new HeroSkinOption("ruby", "Ruby", "Mecha Maiden (Aspirants)", "Fighter", "hero_xiaohongmao", "07",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln3/main/ruby%20basic%20to%20aspirants.zip"));
+        HERO_SKINS.add(new HeroSkinOption("dyrroth", "Dyrroth", "Street Fighter (SF)", "Fighter", "hero_diyasi", "05",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln/main/dyrroth%20collector%20to%20sf2.zip"));
+        HERO_SKINS.add(new HeroSkinOption("alpha", "Alpha", "General Void (Abyss)", "Fighter", "hero_entropy", "05",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln/main/alpha%20basic%20to%20abyss.zip"));
+        HERO_SKINS.add(new HeroSkinOption("alucard", "Alucard", "Obsidian Blade (Legend)", "Fighter", "hero_alucard", "05",
+                "https://raw.githubusercontent.com/n3wz1ips/0pTS1kln/main/alucard%20basic%20to%20legend.zip"));
     }
 
     public static void unlockHeroSkin(Context context, String heroId, Callback callback) {
@@ -885,21 +920,149 @@ public final class MlbbModInjector {
         }
     }
 
-    private static void installExtractedNonHAssets(File cacheDir) {
+    private static void copyFile(File src, File dst) throws IOException {
+        try (FileInputStream in = new FileInputStream(src);
+             FileOutputStream out = new FileOutputStream(dst)) {
+            byte[] buf = new byte[32768];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+        }
+    }
+
+    private static void prepareSkinMeshes(File assetsRoot, HeroSkinOption h) {
+        // 1. Process 3D meshes in Art/android/h (Preserve genuine high meshes & duplicate to skin01/skin02)
+        File hDir = new File(assetsRoot, "Art/android/h");
+        if (hDir.exists() && hDir.isDirectory()) {
+            File[] files = hDir.listFiles();
+            if (files != null) {
+                for (File f : files) {
+                    String name = f.getName();
+                    if (!name.endsWith(".unity3d")) continue;
+
+                    // e.g. hero_fanny_skin08_high_add.unity3d or hero_Aamon_skin01_high_add.unity3d
+                    if (name.contains("_high_add.unity3d")) {
+                        int idx = name.indexOf("_skin");
+                        String prefix = (idx > 0) ? name.substring(0, idx) : h.heroCodeName;
+                        try {
+                            copyFile(f, new File(hDir, prefix + "_skin01_high_add.unity3d"));
+                            copyFile(f, new File(hDir, prefix + "_skin_high_add.unity3d"));
+                            copyFile(f, new File(hDir, prefix + "_skin02_high_add.unity3d"));
+                        } catch (Exception e) {
+                            Log.w(TAG, "Error cloning high mesh: " + name, e);
+                        }
+                    } else if (name.contains("_add.unity3d") && !name.contains("_shadow_")) {
+                        int idx = name.indexOf("_skin");
+                        String prefix = (idx > 0) ? name.substring(0, idx) : h.heroCodeName;
+                        try {
+                            copyFile(f, new File(hDir, prefix + "_skin01_add.unity3d"));
+                            copyFile(f, new File(hDir, prefix + "_skin_add.unity3d"));
+                            copyFile(f, new File(hDir, prefix + "_skin02_add.unity3d"));
+                            copyFile(f, new File(hDir, prefix + "_skin.unity3d"));
+                        } catch (Exception e) {
+                            Log.w(TAG, "Error cloning smooth mesh: " + name, e);
+                        }
+                    } else if (name.contains("_shadow_high_add.unity3d")) {
+                        int idx = name.indexOf("_skin");
+                        String prefix = (idx > 0) ? name.substring(0, idx) : h.heroCodeName;
+                        try {
+                            copyFile(f, new File(hDir, prefix + "_skin01_shadow_high_add.unity3d"));
+                            copyFile(f, new File(hDir, prefix + "_skin_shadow_high_add.unity3d"));
+                            copyFile(f, new File(hDir, prefix + "_skin02_shadow_high_add.unity3d"));
+                        } catch (Exception e) {
+                            Log.w(TAG, "Error cloning shadow high mesh: " + name, e);
+                        }
+                    } else if (name.contains("_shadow_add.unity3d")) {
+                        int idx = name.indexOf("_skin");
+                        String prefix = (idx > 0) ? name.substring(0, idx) : h.heroCodeName;
+                        try {
+                            copyFile(f, new File(hDir, prefix + "_skin01_shadow_add.unity3d"));
+                            copyFile(f, new File(hDir, prefix + "_skin_shadow_add.unity3d"));
+                            copyFile(f, new File(hDir, prefix + "_skin02_shadow_add.unity3d"));
+                        } catch (Exception e) {
+                            Log.w(TAG, "Error cloning shadow mesh: " + name, e);
+                        }
+                    }
+                }
+            }
+        }
+
+        // 2. Process UI Portraits for Hero Selection & Loading Screen
+        File uiDir = new File(assetsRoot, "UI/android");
+        if (uiDir.exists() && uiDir.isDirectory()) {
+            File[] files = uiDir.listFiles();
+            if (files != null) {
+                for (File f : files) {
+                    String name = f.getName();
+                    if (name.startsWith("Hero") && name.endsWith("_add.unity3d")) {
+                        String rawNum = name.substring(4, name.indexOf("_add.unity3d"));
+                        if (rawNum.length() >= 3) {
+                            String heroIdPrefix = rawNum.substring(0, rawNum.length() - 1);
+                            try {
+                                copyFile(f, new File(uiDir, "Hero" + heroIdPrefix + "1_add.unity3d"));
+                                copyFile(f, new File(uiDir, "Hero" + heroIdPrefix + "2_add.unity3d"));
+                                copyFile(f, new File(uiDir, "Hero" + heroIdPrefix + "1.unity3d"));
+                            } catch (Exception e) {
+                                Log.w(TAG, "Error cloning UI portrait: " + name, e);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // 3. Process indicators & skill marks in Art/android/f (e.g. fanny_biaoji01 -> fanny_biaoji)
+        File fDir = new File(assetsRoot, "Art/android/f");
+        if (fDir.exists() && fDir.isDirectory()) {
+            File[] files = fDir.listFiles();
+            if (files != null) {
+                for (File f : files) {
+                    String name = f.getName();
+                    if (name.contains("biaoji01.unity3d")) {
+                        try {
+                            copyFile(f, new File(fDir, name.replace("biaoji01.unity3d", "biaoji.unity3d")));
+                            copyFile(f, new File(fDir, name.replace("biaoji01.unity3d", "biaoji00.unity3d")));
+                        } catch (Exception e) {
+                            Log.w(TAG, "Error cloning indicator: " + name, e);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static void installExtractedSkinBundle(File cacheDir, HeroSkinOption h, Callback callback) {
         File assetsRoot = findAssetsRoot(cacheDir);
         if (assetsRoot == null || !assetsRoot.exists()) return;
 
-        // CRUCIAL: Remove Art/android/h if present in the downloaded zip to prevent corrupting Unity 3D models with obsolete assets!
-        File hDir = new File(assetsRoot, "Art/android/h");
-        if (hDir.exists()) {
-            deleteRecursive(hDir);
-        }
+        postProgress(callback, "Patching 3D models & indicators for " + h.heroName + "...");
+        prepareSkinMeshes(assetsRoot, h);
 
         backupExistingFiles(assetsRoot, assetsRoot, DRAGON_ASSETS);
 
         String sourcePath = assetsRoot.getAbsolutePath();
+        postProgress(callback, "Deploying skin to dragon2017/assets/...");
         ShizukuShell.exec("cp -rf \"" + sourcePath + "\"/* \"" + DRAGON_ASSETS + "/\"");
-        ShizukuShell.exec("chmod -R 777 \"" + DRAGON_ASSETS + "\"");
+
+        // CRUCIAL FOR MODERN MLBB (v1232+): Overwrite active mini_patch directories!
+        postProgress(callback, "Overwriting active MLBB mini_patch assets...");
+        String miniPatchSync =
+                "if [ -d \"" + FILES + "/mini_patch\" ]; then " +
+                "  find \"" + FILES + "/mini_patch\" -type d -name \"Art\" -exec cp -rf \"" + sourcePath + "/Art/\"* {}/ \\; 2>/dev/null; " +
+                "  find \"" + FILES + "/mini_patch\" -type d -name \"UI\" -exec cp -rf \"" + sourcePath + "/UI/\"* {}/ \\; 2>/dev/null; " +
+                "  find \"" + FILES + "/mini_patch\" -type d -name \"Audio\" -exec cp -rf \"" + sourcePath + "/Audio/\"* {}/ \\; 2>/dev/null; " +
+                "  for d in " + FILES + "/mini_patch/*/*/*/ ; do " +
+                "    if [ -d \"$d\" ]; then cp -rf \"" + sourcePath + "\"/* \"$d/\" 2>/dev/null; fi; " +
+                "  done; " +
+                "  for d in " + FILES + "/mini_patch/*/*/ ; do " +
+                "    if [ -d \"$d\" ]; then cp -rf \"" + sourcePath + "\"/* \"$d/\" 2>/dev/null; fi; " +
+                "  done; " +
+                "fi; ";
+        ShizukuShell.exec(miniPatchSync);
+
+        ShizukuShell.exec("chmod -R 777 \"" + DRAGON_ASSETS + "\" 2>/dev/null");
+        ShizukuShell.exec("chmod -R 777 \"" + FILES + "/mini_patch\" 2>/dev/null");
     }
 
     private static void deleteRecursive(File f) {
@@ -973,17 +1136,29 @@ public final class MlbbModInjector {
     private static void applyHeroSwapInternal(Context context, HeroSkinOption h, Callback callback) throws Exception {
         injectGameResAlternative(context);
 
-        // 1. If downloadUrl is present, fetch and extract the skin bundle (VFX/Particles, Audio, UI only)
+        // 1. If downloadUrl is present, fetch and extract the skin bundle (3D models, VFX/Particles, Audio, UI)
         if (h.downloadUrl != null && !h.downloadUrl.isEmpty()) {
-            File cacheDir = new File("/sdcard/Download/WillyLibTool/extracted/" + h.heroId);
-            if (!cacheDir.exists() || cacheDir.list() == null || cacheDir.list().length == 0) {
+            File cacheDir = new File("/sdcard/Download/WillyLibTool/extracted/" + h.heroId + "_" + h.targetSkinId);
+            File testH = new File(cacheDir, "dragon2017/assets/Art/android/h");
+            if (!testH.exists()) {
+                testH = new File(cacheDir, "Art/android/h");
+            }
+            if (!cacheDir.exists() || !testH.exists() || cacheDir.list() == null || cacheDir.list().length == 0) {
+                deleteRecursive(cacheDir);
+                cacheDir.mkdirs();
                 postProgress(callback, "Downloading " + h.heroName + " (" + h.skinName + ")...");
                 downloadAndExtractSkinZip(h.downloadUrl, cacheDir, callback);
             }
 
             if (cacheDir.exists() && cacheDir.list() != null && cacheDir.list().length > 0) {
-                postProgress(callback, "Injecting " + h.heroName + " VFX & audio...");
-                installExtractedNonHAssets(cacheDir);
+                postProgress(callback, "Injecting " + h.heroName + " (" + h.skinName + ")...");
+                installExtractedSkinBundle(cacheDir, h, callback);
+            }
+        } else {
+            // Offline fallback swap using local device assets
+            if (h.heroCodeName != null && h.targetSkinId != null) {
+                postProgress(callback, "Applying 3D model for " + h.heroName + " (" + h.skinName + ")...");
+                swapHero3DModel(h.heroCodeName, h.targetSkinId);
             }
         }
 
@@ -1010,12 +1185,6 @@ public final class MlbbModInjector {
                     }
                 }
             } catch (Throwable ignored) {}
-        }
-
-        // 3. High-Definition 3D Model Swap using official local MLBB assets
-        if (h.heroCodeName != null && h.targetSkinId != null) {
-            postProgress(callback, "Applying 3D model for " + h.heroName + " (" + h.skinName + ")...");
-            swapHero3DModel(h.heroCodeName, h.targetSkinId);
         }
     }
 
