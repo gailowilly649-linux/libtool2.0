@@ -53,6 +53,11 @@ namespace ConfigManager
         ofs << "drone_enabled=" << (ModFeatures::IsDroneViewEnabled() ? "1" : "0") << "\n";
         ofs << "hud_enabled=" << (ModFeatures::IsOverlayHUDEnabled() ? "1" : "0") << "\n";
         ofs << "stealth_enabled=" << (Stealth::IsCloakEnabled() ? "1" : "0") << "\n";
+        ofs << "brutal_enabled=" << (ModFeatures::IsBrutalDamageEnabled() ? "1" : "0") << "\n";
+        ofs << "brutal_mult=" << ModFeatures::GetBrutalDamageMultiplier() << "\n";
+        ofs << "god_mode=" << (ModFeatures::IsGodModeEnabled() ? "1" : "0") << "\n";
+        ofs << "max_aspd=" << (ModFeatures::IsMaxAttackSpeedEnabled() ? "1" : "0") << "\n";
+        ofs << "zero_cd=" << (ModFeatures::IsZeroCooldownEnabled() ? "1" : "0") << "\n";
 
         auto patches = LivePatcher::GetPatches();
         ofs << "# Patches: name|module|rva|hex|active\n";
@@ -111,6 +116,28 @@ namespace ConfigManager
             else if (key == "stealth_enabled")
             {
                 Stealth::SetCloakEnabled(val == "1");
+            }
+            else if (key == "brutal_enabled")
+            {
+                ModFeatures::SetBrutalDamageEnabled(val == "1");
+            }
+            else if (key == "brutal_mult")
+            {
+                try {
+                    ModFeatures::SetBrutalDamageMultiplier(std::stoi(val));
+                } catch (...) {}
+            }
+            else if (key == "god_mode")
+            {
+                ModFeatures::SetGodModeEnabled(val == "1");
+            }
+            else if (key == "max_aspd")
+            {
+                ModFeatures::SetMaxAttackSpeedEnabled(val == "1");
+            }
+            else if (key == "zero_cd")
+            {
+                ModFeatures::SetZeroCooldownEnabled(val == "1");
             }
             else if (key == "patch")
             {

@@ -21,6 +21,8 @@
 #include <sys/wait.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <sys/prctl.h>
 #include <errno.h>
 
@@ -64,11 +66,97 @@ namespace MemHook {
 #endif
     }
 
-    Engine::Engine() = default;
+    Engine::Engine() {
+        // Initialize default named holes / known MLBB v2.2.16+ combat metadata offsets
+        m_configOffsets["CountHurtValue_Offset"] = 0x6569b3;
+        m_configOffsets["CalcVal_Offset"] = 0x9e4a5;
+        m_configOffsets["CheckCalcVal_Offset"] = 0x656a50;
+        m_configOffsets["LogicHurtCalc_Offset"] = 0x656989;
+        m_configOffsets["CData_Hero_Offset"] = 0xc6cff;
+        m_configOffsets["m_BasePhyAtt_Offset"] = 0xc6a8d;
+        m_configOffsets["m_BaseMagAtt_Offset"] = 0xc6a99;
+        m_configOffsets["m_AttSpeed_Offset"] = 0xc6aa5;
+        m_configOffsets["m_MoveSpeed_Offset"] = 0xc6a82;
+        m_configOffsets["m_PhyBaseShield_Offset"] = 0xc6abe;
+        m_configOffsets["m_MagBaseShield_Offset"] = 0xc6acd;
+        m_configOffsets["MovementComponent_GetSpeed_Offset"] = 0x0187B2C0;
+
+        // Auto-load config file if present in SDCard
+        LoadConfig("/sdcard/Download/WillyLibTool/combat_offsets.cfg");
+    }
 
     Engine::~Engine() {
         Detach();
         StopIpcServer();
+    }
+
+    bool Engine::BypassSELinux() {
+        bool bypassed = false;
+
+        // 1. Direct sysfs enforcement toggle attempt
+        int enforceFd = open("/sys/fs/selinux/enforce", O_WRONLY);
+        if (enforceFd >= 0) {
+            if (write(enforceFd, "0", 1) == 1) {
+                bypassed = true;
+            }
+            close(enforceFd);
+        }
+
+        // 2. Unmask Yama ptrace_scope
+        int yamaFd = open("/proc/sys/kernel/yama/ptrace_scope", O_WRONLY);
+        if (yamaFd >= 0) {
+            write(yamaFd, "0", 1);
+            close(yamaFd);
+        }
+
+        // 3. Shell setenforce execution
+        FILE *pipe = popen("setenforce 0 2>/dev/null; getenforce 2>/dev/null", "r");
+        if (pipe) {
+            char buf[64];
+            if (fgets(buf, sizeof(buf), pipe)) {
+                std::string status(buf);
+                if (status.find("Permissive") != std::string::npos || status.find("Disabled") != std::string::npos) {
+                    bypassed = true;
+                }
+            }
+            pclose(pipe);
+        }
+
+        return bypassed;
+    }
+
+    std::string Engine::GetSELinuxMode() {
+        int fd = open("/sys/fs/selinux/enforce", O_RDONLY);
+        if (fd >= 0) {
+            char ch = 0;
+            if (read(fd, &ch, 1) == 1) {
+                close(fd);
+                return (ch == '0') ? "Permissive" : "Enforcing";
+            }
+            close(fd);
+        }
+
+        FILE *pipe = popen("getenforce 2>/dev/null", "r");
+        if (pipe) {
+            char buf[64];
+            if (fgets(buf, sizeof(buf), pipe)) {
+                std::string s(buf);
+                while (!s.empty() && (s.back() == '\n' || s.back() == '\r' || s.back() == ' ')) {
+                    s.pop_back();
+                }
+                pclose(pipe);
+                if (!s.empty()) return s;
+            } else {
+                pclose(pipe);
+            }
+        }
+        return "Unknown";
+    }
+
+    bool Engine::FixSELinuxContext(const std::string &path) {
+        std::string cmd = "restorecon -RF \"" + path + "\" 2>/dev/null; chcon -R u:object_r:media_rw_data_file:s0 \"" + path + "\" 2>/dev/null";
+        int ret = system(cmd.c_str());
+        return ret == 0;
     }
 
     pid_t Engine::FindPidByName(const std::string &processName) {
@@ -426,6 +514,98 @@ namespace MemHook {
         return results;
     }
 
+    void Engine::LoadConfig(const std::string &configPath) {
+        std::ifstream infile(configPath);
+        if (!infile.is_open()) return;
+
+        std::string line;
+        while (std::getline(infile, line)) {
+            if (line.empty() || line[0] == '#') continue;
+            auto eq = line.find('=');
+            if (eq != std::string::npos) {
+                std::string key = line.substr(0, eq);
+                std::string valStr = line.substr(eq + 1);
+                uintptr_t val = std::strtoull(valStr.c_str(), nullptr, 0);
+                m_configOffsets[key] = val;
+            }
+        }
+    }
+
+    uintptr_t Engine::GetConfigOffset(const std::string &name, uintptr_t fallback) const {
+        auto it = m_configOffsets.find(name);
+        if (it != m_configOffsets.end()) {
+            return it->second;
+        }
+        return fallback;
+    }
+
+    void Engine::SetConfigOffset(const std::string &name, uintptr_t value) {
+        m_configOffsets[name] = value;
+    }
+
+    bool Engine::ApplyBrutalDamage(int multiplier) {
+        if (!IsAttached()) return false;
+
+        uintptr_t il2cppBase = GetModuleBase("libil2cpp.so");
+        if (il2cppBase == 0) {
+            std::cerr << "[-] libil2cpp.so not found in target maps\n";
+            return false;
+        }
+
+        std::cout << "[*] libil2cpp base: 0x" << std::hex << il2cppBase << std::dec << "\n";
+        std::cout << "[*] Applying Brutal Damage (" << multiplier << "x multiplier) to all heroes...\n";
+
+        // Named config offset resolution (named hole beats fabricated constant)
+        uintptr_t countHurtOffset = GetConfigOffset("CountHurtValue_Offset", 0x6569b3);
+        uintptr_t calcValOffset = GetConfigOffset("CalcVal_Offset", 0x9e4a5);
+
+        bool success = false;
+
+#if defined(__aarch64__)
+        // ARM64 Brutal Damage Patch:
+        // MOV W0, #multiplier * 10000; RET (0x528xxxx0, 0xd65f03c0)
+        // Or MOVZ W0, #(0x2710 * multiplier & 0xFFFF); MOVK W0, ...; RET
+        uint32_t brutalVal = static_cast<uint32_t>(10000 * multiplier);
+        uint32_t patchOpcodes[4] = {
+            static_cast<uint32_t>(0x52800000 | ((brutalVal & 0xFFFF) << 5)),         // MOVZ W0, #(val & 0xFFFF)
+            static_cast<uint32_t>(0x72a00000 | (((brutalVal >> 16) & 0xFFFF) << 5)),  // MOVK W0, #(val >> 16), LSL #16
+            0xd65f03c0,                                                                // RET
+            0xd503201f                                                                 // NOP
+        };
+
+        if (countHurtOffset > 0) {
+            uintptr_t targetAddr = il2cppBase + countHurtOffset;
+            if (Write(targetAddr, patchOpcodes, sizeof(patchOpcodes))) {
+                std::cout << "[+] CountHurtValue patched at 0x" << std::hex << targetAddr << "\n";
+                success = true;
+            }
+        }
+
+        if (calcValOffset > 0) {
+            uintptr_t targetAddr = il2cppBase + calcValOffset;
+            if (Write(targetAddr, patchOpcodes, sizeof(patchOpcodes))) {
+                std::cout << "[+] CalcVal patched at 0x" << std::hex << targetAddr << "\n";
+                success = true;
+            }
+        }
+#elif defined(__arm__)
+        // ARM32 Brutal Damage Patch:
+        // MOV R0, #10000 * multiplier; BX LR
+        uint32_t patchArm[2] = {
+            0xe3a00902, // MOV R0, #0x20000
+            0xe12fff1e  // BX LR
+        };
+        if (countHurtOffset > 0) {
+            uintptr_t targetAddr = il2cppBase + countHurtOffset;
+            if (Write(targetAddr, patchArm, sizeof(patchArm))) {
+                success = true;
+            }
+        }
+#endif
+
+        return success;
+    }
+
     void Engine::MaskProcess(const std::string &fakeName) {
         prctl(PR_SET_NAME, fakeName.c_str(), 0, 0, 0);
     }
@@ -434,109 +614,164 @@ namespace MemHook {
         prctl(PR_SET_DUMPABLE, 0, 0, 0, 0);
     }
 
-    bool Engine::StartIpcServer(const std::string &socketPath) {
+    void Engine::HandleClientConnection(int clientFd) {
+        char buf[1024];
+        ssize_t n = read(clientFd, buf, sizeof(buf) - 1);
+        if (n > 0) {
+            buf[n] = '\0';
+            std::string cmd(buf);
+            std::istringstream iss(cmd);
+            std::string action;
+            iss >> action;
+
+            std::string response = "ERR\n";
+
+            if (action == "PING") {
+                response = "PONG\n";
+            } else if (action == "ATTACH") {
+                std::string target;
+                iss >> target;
+                pid_t pid = strtol(target.c_str(), nullptr, 10);
+                bool ok = (pid > 0) ? Attach(pid) : AttachByName(target);
+                response = ok ? ("OK " + std::to_string(m_targetPid) + "\n") : "ERR_ATTACH\n";
+            } else if (action == "SELINUX_STATUS" || action == "SELINUX") {
+                response = "OK " + GetSELinuxMode() + "\n";
+            } else if (action == "SELINUX_BYPASS") {
+                bool ok = BypassSELinux();
+                response = ok ? "OK BYPASSED\n" : "OK ATTEMPTED\n";
+            } else if (action == "DAMAGE_BRUTAL" || action == "BRUTAL") {
+                int mult = 50;
+                iss >> mult;
+                if (mult <= 0) mult = 50;
+                bool ok = ApplyBrutalDamage(mult);
+                response = ok ? ("OK BRUTAL_" + std::to_string(mult) + "X_ACTIVE\n") : "ERR_BRUTAL_PATCH\n";
+            } else if (action == "HERO_STATS_BRUTAL") {
+                bool ok = ApplyBrutalDamage(100);
+                response = ok ? "OK ALL_HEROES_BRUTAL_ACTIVE\n" : "ERR_HERO_STATS\n";
+            } else if (action == "BASE") {
+                std::string mod;
+                iss >> mod;
+                uintptr_t base = GetModuleBase(mod);
+                std::stringstream ss;
+                ss << "OK 0x" << std::hex << base << "\n";
+                response = ss.str();
+            } else if (action == "READ") {
+                std::string addrStr;
+                size_t size = 0;
+                iss >> addrStr >> size;
+                uintptr_t addr = strtoull(addrStr.c_str(), nullptr, 16);
+                std::vector<uint8_t> mem(size);
+                if (Read(addr, mem.data(), size)) {
+                    std::stringstream ss;
+                    ss << "OK ";
+                    for (size_t i = 0; i < size; ++i) {
+                        ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(mem[i]);
+                    }
+                    ss << "\n";
+                    response = ss.str();
+                } else {
+                    response = "ERR_READ\n";
+                }
+            } else if (action == "WRITE") {
+                std::string addrStr, hexStr;
+                iss >> addrStr >> hexStr;
+                uintptr_t addr = strtoull(addrStr.c_str(), nullptr, 16);
+                std::vector<uint8_t> data;
+                for (size_t i = 0; i + 1 < hexStr.size(); i += 2) {
+                    uint8_t b = static_cast<uint8_t>(strtoul(hexStr.substr(i, 2).c_str(), nullptr, 16));
+                    data.push_back(b);
+                }
+                if (!data.empty() && Write(addr, data.data(), data.size())) {
+                    response = "OK\n";
+                } else {
+                    response = "ERR_WRITE\n";
+                }
+            } else if (action == "DETACH") {
+                Detach();
+                response = "OK\n";
+            }
+
+            write(clientFd, response.c_str(), response.size());
+        }
+        close(clientFd);
+    }
+
+    bool Engine::StartIpcServer(const std::string &socketPath, int tcpPort) {
+        // 1. Setup UNIX domain socket (for shell users / ADB commands)
         unlink(socketPath.c_str());
-
         m_serverSockFd = socket(AF_UNIX, SOCK_STREAM, 0);
-        if (m_serverSockFd < 0) return false;
+        if (m_serverSockFd >= 0) {
+            struct sockaddr_un addr;
+            std::memset(&addr, 0, sizeof(addr));
+            addr.sun_family = AF_UNIX;
+            std::strncpy(addr.sun_path, socketPath.c_str(), sizeof(addr.sun_path) - 1);
 
-        struct sockaddr_un addr;
-        std::memset(&addr, 0, sizeof(addr));
-        addr.sun_family = AF_UNIX;
-        std::strncpy(addr.sun_path, socketPath.c_str(), sizeof(addr.sun_path) - 1);
-
-        if (bind(m_serverSockFd, reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr)) < 0) {
-            close(m_serverSockFd);
-            m_serverSockFd = -1;
-            return false;
+            if (bind(m_serverSockFd, reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr)) == 0) {
+                chmod(socketPath.c_str(), 0777);
+                listen(m_serverSockFd, 5);
+                std::cout << "[+] MemHook UNIX socket listening on " << socketPath << std::endl;
+            } else {
+                close(m_serverSockFd);
+                m_serverSockFd = -1;
+            }
         }
 
-        chmod(socketPath.c_str(), 0777);
+        // 2. Setup TCP Loopback socket on 127.0.0.1:tcpPort
+        // (Bypasses Android SELinux domain socket isolation for untrusted_app!)
+        m_serverTcpFd = socket(AF_INET, SOCK_STREAM, 0);
+        if (m_serverTcpFd >= 0) {
+            int opt = 1;
+            setsockopt(m_serverTcpFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 
-        if (listen(m_serverSockFd, 5) < 0) {
-            close(m_serverSockFd);
-            m_serverSockFd = -1;
+            struct sockaddr_in tcpAddr;
+            std::memset(&tcpAddr, 0, sizeof(tcpAddr));
+            tcpAddr.sin_family = AF_INET;
+            tcpAddr.sin_port = htons(tcpPort);
+            tcpAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+            if (bind(m_serverTcpFd, reinterpret_cast<struct sockaddr *>(&tcpAddr), sizeof(tcpAddr)) == 0) {
+                listen(m_serverTcpFd, 10);
+                std::cout << "[+] MemHook TCP loopback server listening on 127.0.0.1:" << tcpPort << " (Non-Root SELinux Bypass)" << std::endl;
+            } else {
+                std::cerr << "[-] Failed to bind TCP loopback port " << tcpPort << ": " << strerror(errno) << std::endl;
+                close(m_serverTcpFd);
+                m_serverTcpFd = -1;
+            }
+        }
+
+        if (m_serverSockFd < 0 && m_serverTcpFd < 0) {
             return false;
         }
 
         m_serverRunning = true;
-        std::cout << "[+] MemHook IPC server listening on " << socketPath << std::endl;
 
-        std::thread([this]() {
-            while (m_serverRunning) {
-                int clientFd = accept(m_serverSockFd, nullptr, nullptr);
-                if (clientFd < 0) {
-                    if (!m_serverRunning) break;
-                    continue;
-                }
-
-                char buf[1024];
-                ssize_t n = read(clientFd, buf, sizeof(buf) - 1);
-                if (n > 0) {
-                    buf[n] = '\0';
-                    std::string cmd(buf);
-                    std::istringstream iss(cmd);
-                    std::string action;
-                    iss >> action;
-
-                    std::string response = "ERR\n";
-
-                    if (action == "PING") {
-                        response = "PONG\n";
-                    } else if (action == "ATTACH") {
-                        std::string target;
-                        iss >> target;
-                        pid_t pid = strtol(target.c_str(), nullptr, 10);
-                        bool ok = (pid > 0) ? Attach(pid) : AttachByName(target);
-                        response = ok ? ("OK " + std::to_string(m_targetPid) + "\n") : "ERR_ATTACH\n";
-                    } else if (action == "BASE") {
-                        std::string mod;
-                        iss >> mod;
-                        uintptr_t base = GetModuleBase(mod);
-                        std::stringstream ss;
-                        ss << "OK 0x" << std::hex << base << "\n";
-                        response = ss.str();
-                    } else if (action == "READ") {
-                        std::string addrStr;
-                        size_t size = 0;
-                        iss >> addrStr >> size;
-                        uintptr_t addr = strtoull(addrStr.c_str(), nullptr, 16);
-                        std::vector<uint8_t> mem(size);
-                        if (Read(addr, mem.data(), size)) {
-                            std::stringstream ss;
-                            ss << "OK ";
-                            for (size_t i = 0; i < size; ++i) {
-                                ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(mem[i]);
-                            }
-                            ss << "\n";
-                            response = ss.str();
-                        } else {
-                            response = "ERR_READ\n";
-                        }
-                    } else if (action == "WRITE") {
-                        std::string addrStr, hexStr;
-                        iss >> addrStr >> hexStr;
-                        uintptr_t addr = strtoull(addrStr.c_str(), nullptr, 16);
-                        std::vector<uint8_t> data;
-                        for (size_t i = 0; i + 1 < hexStr.size(); i += 2) {
-                            uint8_t b = static_cast<uint8_t>(strtoul(hexStr.substr(i, 2).c_str(), nullptr, 16));
-                            data.push_back(b);
-                        }
-                        if (!data.empty() && Write(addr, data.data(), data.size())) {
-                            response = "OK\n";
-                        } else {
-                            response = "ERR_WRITE\n";
-                        }
-                    } else if (action == "DETACH") {
-                        Detach();
-                        response = "OK\n";
+        // Spawn UNIX socket accept worker thread
+        if (m_serverSockFd >= 0) {
+            std::thread([this]() {
+                while (m_serverRunning) {
+                    int clientFd = accept(m_serverSockFd, nullptr, nullptr);
+                    if (clientFd < 0) {
+                        if (!m_serverRunning) break;
+                        continue;
                     }
-
-                    write(clientFd, response.c_str(), response.size());
+                    HandleClientConnection(clientFd);
                 }
-                close(clientFd);
-            }
-        }).detach();
+            }).detach();
+        }
+
+        // Spawn TCP loopback accept worker thread
+        if (m_serverTcpFd >= 0) {
+            std::thread([this]() {
+                while (m_serverRunning) {
+                    int clientFd = accept(m_serverTcpFd, nullptr, nullptr);
+                    if (clientFd < 0) {
+                        if (!m_serverRunning) break;
+                        continue;
+                    }
+                    HandleClientConnection(clientFd);
+                }
+            }).detach();
+        }
 
         return true;
     }
@@ -547,6 +782,10 @@ namespace MemHook {
             close(m_serverSockFd);
             m_serverSockFd = -1;
         }
+        if (m_serverTcpFd >= 0) {
+            close(m_serverTcpFd);
+            m_serverTcpFd = -1;
+        }
     }
 
 } // namespace MemHook
@@ -555,10 +794,15 @@ int main(int argc, char **argv) {
     MemHook::Engine::ProtectSelf();
     MemHook::Engine::MaskProcess("kworker/u16:3");
 
+    // Auto-attempt SELinux permissive & Yama ptrace bypass
+    MemHook::Engine::BypassSELinux();
+
     std::string targetPkg = "com.mobile.legends";
     pid_t targetPid = -1;
     bool daemonMode = false;
     std::string socketPath = "/data/local/tmp/memhook.sock";
+    int tcpPort = 28888;
+    int brutalMultiplier = 0;
 
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
@@ -570,26 +814,38 @@ int main(int argc, char **argv) {
             daemonMode = true;
         } else if (arg == "--socket" && i + 1 < argc) {
             socketPath = argv[++i];
+        } else if (arg == "--port" && i + 1 < argc) {
+            tcpPort = std::strtol(argv[++i], nullptr, 10);
+        } else if (arg == "--brutal" && i + 1 < argc) {
+            brutalMultiplier = std::strtol(argv[++i], nullptr, 10);
+        } else if (arg == "--selinux-bypass") {
+            bool ok = MemHook::Engine::BypassSELinux();
+            std::cout << "[*] SELinux mode: " << MemHook::Engine::GetSELinuxMode()
+                      << " (Bypass: " << (ok ? "Success" : "Failed") << ")\n";
+            return 0;
         } else if (arg == "--help" || arg == "-h") {
-            std::cout << "MemHook - Android Native Memory Engine\n"
+            std::cout << "MemHook v2.0 - Android Non-Root Native Memory & SELinux Bypass Engine\n"
                       << "Usage:\n"
-                      << "  memhook [--pkg <name>] [--pid <id>] [--daemon] [--socket <path>]\n"
+                      << "  memhook [--pkg <name>] [--pid <id>] [--daemon] [--port <tcp_port>] [--brutal <mult>]\n"
                       << "Examples:\n"
-                      << "  memhook --pkg com.mobile.legends --daemon\n";
+                      << "  memhook --pkg com.mobile.legends --daemon --port 28888\n"
+                      << "  memhook --pkg com.mobile.legends --brutal 50\n";
             return 0;
         }
     }
 
     MemHook::Engine engine;
-    std::cout << "[*] MemHook initializing...\n";
+    std::cout << "[*] MemHook initializing... (SELinux: " << MemHook::Engine::GetSELinuxMode() << ")\n";
 
     if (daemonMode) {
-        if (!engine.StartIpcServer(socketPath)) {
-            std::cerr << "[-] Failed to start IPC server at " << socketPath << "\n";
+        if (!engine.StartIpcServer(socketPath, tcpPort)) {
+            std::cerr << "[-] Failed to start IPC servers\n";
             return 1;
         }
 
-        std::cout << "[+] Daemon running. Waiting for IPC requests...\n";
+        std::cout << "[+] Daemon running. Waiting for IPC requests (UNIX: " << socketPath
+                  << ", TCP: 127.0.0.1:" << tcpPort << ")...\n";
+
         while (true) {
             std::this_thread::sleep_for(std::chrono::seconds(10));
         }
@@ -607,6 +863,11 @@ int main(int argc, char **argv) {
 
         std::cout << "[+] libil2cpp.so base: 0x" << std::hex << il2cppBase << "\n";
         std::cout << "[+] libunity.so base:  0x" << std::hex << unityBase << std::dec << "\n";
+
+        if (brutalMultiplier > 0) {
+            bool ok = engine.ApplyBrutalDamage(brutalMultiplier);
+            std::cout << "[*] Brutal Damage (" << brutalMultiplier << "x): " << (ok ? "APPLIED" : "FAILED") << "\n";
+        }
     }
 
     return 0;

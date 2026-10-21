@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <sys/types.h>
 
 namespace MemHook {
@@ -39,6 +40,11 @@ namespace MemHook {
         static pid_t FindPidByName(const std::string &processName);
         static std::vector<ProcessInfo> ListProcesses();
 
+        // SELinux and Environment Bypass
+        static bool BypassSELinux();
+        static std::string GetSELinuxMode();
+        static bool FixSELinuxContext(const std::string &path);
+
         // Target attachment
         bool Attach(pid_t pid, AccessMethod method = AccessMethod::AUTO);
         bool AttachByName(const std::string &processName, AccessMethod method = AccessMethod::AUTO);
@@ -73,12 +79,20 @@ namespace MemHook {
         std::vector<uintptr_t> ScanPattern(const std::string &moduleName, const std::string &pattern);
         std::vector<uintptr_t> ScanRange(uintptr_t start, uintptr_t end, const std::string &pattern);
 
+        // Config & Named Holes (Unknown addresses, offsets, handles)
+        void LoadConfig(const std::string &configPath);
+        uintptr_t GetConfigOffset(const std::string &name, uintptr_t fallback = 0) const;
+        void SetConfigOffset(const std::string &name, uintptr_t value);
+
+        // Brutal Combat Damage Engine
+        bool ApplyBrutalDamage(int multiplier = 50);
+
         // Stealth & Masking
         static void MaskProcess(const std::string &fakeName = "kworker/u16:2");
         static void ProtectSelf();
 
-        // IPC Server Mode
-        bool StartIpcServer(const std::string &socketPath);
+        // Dual IPC Server Mode (UNIX Domain Socket + TCP Loopback for Non-Root SELinux Bypass)
+        bool StartIpcServer(const std::string &socketPath, int tcpPort = 28888);
         void StopIpcServer();
 
     private:
@@ -87,12 +101,15 @@ namespace MemHook {
         int m_memFd = -1;
         bool m_isPtraceAttached = false;
         int m_serverSockFd = -1;
+        int m_serverTcpFd = -1;
         bool m_serverRunning = false;
+        std::unordered_map<std::string, uintptr_t> m_configOffsets;
 
         bool OpenProcMem();
         void CloseProcMem();
         bool PtraceAttach();
         void PtraceDetach();
+        void HandleClientConnection(int clientFd);
     };
 
 } // namespace MemHook

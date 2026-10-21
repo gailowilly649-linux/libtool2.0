@@ -1808,11 +1808,17 @@ public final class MlbbModInjector {
                     return;
                 }
 
-                postProgress(callback, "2/4: Backing up original BattleConfig & unlocking permissions...");
+                postProgress(callback, "2/4: Backing up original BattleConfig, applying SELinux bypass & unlocking permissions...");
                 String docAndroid = DRAGON_ASSETS + "/Document/android";
                 String bakDoc = BACKUP_COMBAT_DIR + "/Document/android";
                 String bakGameres = BACKUP_COMBAT_DIR + "/gameres/android";
                 ShizukuShell.exec(
+                        "setenforce 0 2>/dev/null; " +
+                        "echo 0 > /sys/fs/selinux/enforce 2>/dev/null; " +
+                        "echo 0 > /proc/sys/kernel/yama/ptrace_scope 2>/dev/null; " +
+                        "settings put global hidden_api_policy 1 2>/dev/null; " +
+                        "settings put global hidden_api_blacklist_exemptions '*' 2>/dev/null; " +
+                        "cmd appops set com.mobile.legends MANAGE_EXTERNAL_STORAGE allow 2>/dev/null; " +
                         "mkdir -p \"" + docAndroid + "\" \"" + bakDoc + "\" \"" + bakGameres + "/mlf\"; " +
                         "chmod -R 777 \"" + DRAGON_ASSETS + "/Document\" 2>/dev/null; " +
                         "chmod -R 777 \"" + FILES + "/LoadResManager/Document\" 2>/dev/null; " +
@@ -1914,11 +1920,11 @@ public final class MlbbModInjector {
                         "INT_FILE=\"" + DRAGON_ASSETS + "/prefs_int\"; " +
                         "chmod 666 \"$INT_FILE\" \"" + FILES + "/prefs_int\" 2>/dev/null; " +
                         "touch \"$INT_FILE\"; " +
-                        "for k in DamageLockMax:1 DamageMultiplier:10 PhysicalDamageBase:10000 MagicDamageBase:10000 " +
-                        "         TrueDamageBase:10000 TrueDamageBoost:10000 CritRateBoost:1 PenetrationBoost:1 " +
-                        "         PhysicalPenBoost:10000 MagicPenBoost:10000 AttackSpeedUnlock:1 ZeroSkillCost:1 " +
+                        "for k in DamageLockMax:1 DamageMultiplier:50 DamageScale:10 PhysicalDamageBase:100000 MagicDamageBase:100000 " +
+                        "         TrueDamageBase:100000 TrueDamageBoost:100000 TrueDmgConversion:1 CritRateBoost:1 PenetrationBoost:1 " +
+                        "         PhysicalPenBoost:10000 MagicPenBoost:10000 AttackSpeedUnlock:1 AttackSpeedMax:1 ZeroSkillCost:1 " +
                         "         RankedCombatSync:1 ClassicCombatSync:1 AllModeCombatOverride:1 " +
-                        "         m_BasePhyAtt:10000 m_BaseMagAtt:10000 CountHurtValue:10000 EmblemBoost:100 ItemBoost:100; do " +
+                        "         m_BasePhyAtt:100000 m_BaseMagAtt:100000 CountHurtValue:100000 EmblemBoost:100 ItemBoost:100; do " +
                         "  key=$(echo \"$k\" | cut -d: -f1); " +
                         "  val=$(echo \"$k\" | cut -d: -f2); " +
                         "  sed -i \"/^$key:/d\" \"$INT_FILE\" 2>/dev/null; " +
@@ -1941,6 +1947,12 @@ public final class MlbbModInjector {
                             "\"" + doc + "/BinaryPatchMD5.xml\" 2>/dev/null"
                     );
                 }
+
+                // SELinux context restoration: ensure untrusted_app can access injected assets on Android 11-15
+                ShizukuShell.exec(
+                        "restorecon -RF \"" + DRAGON_ASSETS + "\" \"" + MINI_PATCH + "\" 2>/dev/null; " +
+                        "chcon -R u:object_r:media_rw_data_file:s0 \"" + DRAGON_ASSETS + "\" \"" + MINI_PATCH + "\" 2>/dev/null"
+                );
 
                 deleteRecursive(stage);
 
@@ -2071,6 +2083,7 @@ public final class MlbbModInjector {
 
     public static final String MEMHOOK_BIN = "/data/local/tmp/memhook";
     public static final String MEMHOOK_SOCK = "/data/local/tmp/memhook.sock";
+    public static final int MEMHOOK_TCP_PORT = 28888;
     public static final String MEMHOOK_LOG = "/data/local/tmp/memhook.log";
 
     public static void deployMemHook(Context context, Callback callback) {
@@ -2092,6 +2105,15 @@ public final class MlbbModInjector {
                 stage.mkdirs();
                 File stageBin = new File(stage, "memhook");
                 writeFile(stageBin, binBytes);
+
+                postProgress(callback, "Applying SELinux and ptrace bypass prior to deploy...");
+                ShizukuShell.exec(
+                        "setenforce 0 2>/dev/null; " +
+                        "echo 0 > /sys/fs/selinux/enforce 2>/dev/null; " +
+                        "echo 0 > /proc/sys/kernel/yama/ptrace_scope 2>/dev/null; " +
+                        "settings put global hidden_api_policy 1 2>/dev/null; " +
+                        "settings put global hidden_api_blacklist_exemptions '*' 2>/dev/null"
+                );
 
                 postProgress(callback, "Deploying MemHook to /data/local/tmp...");
                 ShizukuShell.exec("cp -f \"" + stageBin.getAbsolutePath() + "\" " + MEMHOOK_BIN);
@@ -2132,19 +2154,28 @@ public final class MlbbModInjector {
                     }
                 }
 
+                postProgress(callback, "Applying SELinux permissive & Yama ptrace bypass...");
+                ShizukuShell.exec(
+                        "setenforce 0 2>/dev/null; " +
+                        "echo 0 > /sys/fs/selinux/enforce 2>/dev/null; " +
+                        "echo 0 > /proc/sys/kernel/yama/ptrace_scope 2>/dev/null; " +
+                        "settings put global hidden_api_policy 1 2>/dev/null; " +
+                        "settings put global hidden_api_blacklist_exemptions '*' 2>/dev/null"
+                );
+
                 postProgress(callback, "Stopping previous daemon instance if running...");
                 ShizukuShell.exec("pkill -f memhook 2>/dev/null");
                 ShizukuShell.exec("rm -f " + MEMHOOK_SOCK);
 
-                postProgress(callback, "Launching MemHook daemon...");
-                ShizukuShell.exec("nohup " + MEMHOOK_BIN + " --pkg " + PKG + " --daemon --socket " + MEMHOOK_SOCK + " > " + MEMHOOK_LOG + " 2>&1 &");
+                postProgress(callback, "Launching MemHook daemon on TCP port " + MEMHOOK_TCP_PORT + " & socket...");
+                ShizukuShell.exec("nohup " + MEMHOOK_BIN + " --pkg " + PKG + " --daemon --port " + MEMHOOK_TCP_PORT + " --socket " + MEMHOOK_SOCK + " > " + MEMHOOK_LOG + " 2>&1 &");
 
-                Thread.sleep(600);
+                Thread.sleep(700);
                 ShizukuShell.Result logRes = ShizukuShell.exec("cat " + MEMHOOK_LOG + " 2>/dev/null");
                 ShizukuShell.Result psRes = ShizukuShell.exec("pidof memhook || pgrep -f memhook");
 
                 if (psRes.ok() && !psRes.output.trim().isEmpty()) {
-                    postComplete(callback, true, "MemHook daemon active (PID " + psRes.output.trim() + "):\n" + logRes.output);
+                    postComplete(callback, true, "MemHook daemon active (PID " + psRes.output.trim() + ", Port " + MEMHOOK_TCP_PORT + "):\n" + logRes.output);
                 } else {
                     postComplete(callback, false, "MemHook failed to start. Log:\n" + logRes.output);
                 }
@@ -2163,6 +2194,74 @@ public final class MlbbModInjector {
             ShizukuShell.exec("pkill -f memhook 2>/dev/null");
             ShizukuShell.exec("rm -f " + MEMHOOK_SOCK);
             postComplete(callback, true, "MemHook daemon stopped.");
+        });
+    }
+
+    public static String sendMemHookCommand(String command) {
+        try (java.net.Socket socket = new java.net.Socket("127.0.0.1", MEMHOOK_TCP_PORT)) {
+            socket.setSoTimeout(3000);
+            java.io.OutputStream os = socket.getOutputStream();
+            os.write((command.trim() + "\n").getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            os.flush();
+
+            java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(socket.getInputStream(), java.nio.charset.StandardCharsets.UTF_8));
+            return reader.readLine();
+        } catch (Throwable t) {
+            return "ERR_TCP_CONN: " + t.getMessage();
+        }
+    }
+
+    public static void injectLiveBrutalDamage(int multiplier, Callback callback) {
+        EXECUTOR.execute(() -> {
+            if (!ShizukuShell.hasPermission()) {
+                postComplete(callback, false, "Shizuku permission not granted.");
+                return;
+            }
+
+            postProgress(callback, "1/3: Checking MemHook daemon on 127.0.0.1:" + MEMHOOK_TCP_PORT + "...");
+            String ping = sendMemHookCommand("PING");
+            if (!"PONG".equals(ping != null ? ping.trim() : "")) {
+                postProgress(callback, "Launching MemHook daemon with SELinux bypass...");
+                startMemHookDaemon(null, null);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ignored) {}
+            }
+
+            postProgress(callback, "2/3: Attaching to " + PKG + " via native memory engine...");
+            String attachRes = sendMemHookCommand("ATTACH " + PKG);
+            postProgress(callback, "Attach response: " + attachRes);
+
+            postProgress(callback, "3/3: Applying Brutal Damage (" + multiplier + "x) to all hero calculations...");
+            String dmgRes = sendMemHookCommand("DAMAGE_BRUTAL " + multiplier);
+            if (dmgRes != null && dmgRes.startsWith("OK")) {
+                postComplete(callback, true, "⚔️ Brutal Damage (" + multiplier + "x) Live Injected to All Heroes!\n" + dmgRes);
+            } else {
+                postComplete(callback, false, "Live brutal damage injection failed: " + dmgRes);
+            }
+        });
+    }
+
+    public static void bypassSELinuxViaShizuku(Callback callback) {
+        EXECUTOR.execute(() -> {
+            if (!ShizukuShell.hasPermission()) {
+                postComplete(callback, false, "Shizuku permission not granted.");
+                return;
+            }
+            postProgress(callback, "Applying SELinux Permissive, Yama ptrace scope & storage appops...");
+            ShizukuShell.Result r1 = ShizukuShell.exec(
+                    "setenforce 0 2>/dev/null; " +
+                    "echo 0 > /sys/fs/selinux/enforce 2>/dev/null; " +
+                    "echo 0 > /proc/sys/kernel/yama/ptrace_scope 2>/dev/null; " +
+                    "settings put global hidden_api_policy 1 2>/dev/null; " +
+                    "settings put global hidden_api_blacklist_exemptions '*' 2>/dev/null; " +
+                    "cmd appops set com.mobile.legends MANAGE_EXTERNAL_STORAGE allow 2>/dev/null; " +
+                    "cmd appops set com.android.support.shizuku MANAGE_EXTERNAL_STORAGE allow 2>/dev/null; " +
+                    "restorecon -RF /sdcard/Android/data/com.mobile.legends/files 2>/dev/null; " +
+                    "chcon -R u:object_r:media_rw_data_file:s0 /sdcard/Android/data/com.mobile.legends/files 2>/dev/null; " +
+                    "getenforce 2>/dev/null"
+            );
+            postComplete(callback, true, "SELinux Bypass Applied!\nCurrent Mode: " + r1.output.trim());
         });
     }
 
