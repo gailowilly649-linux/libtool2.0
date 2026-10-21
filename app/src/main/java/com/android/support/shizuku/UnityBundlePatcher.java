@@ -163,7 +163,31 @@ public final class UnityBundlePatcher {
             if (shadowAddBytes == null && shadowHighBytes != null) shadowAddBytes = shadowHighBytes;
             if (shadowHighBytes == null && shadowAddBytes != null) shadowHighBytes = shadowAddBytes;
 
-            String[] skinSlots = new String[]{"_skin", "_skin01", "_skin02", "_skin03"};
+            List<String> skinSlots = new ArrayList<>(Arrays.asList("_skin", "_skin01", "_skin02", "_skin03"));
+            if (targetSkinId != null && !targetSkinId.trim().isEmpty()) {
+                String tid = targetSkinId.trim();
+                String slotCustom = "_skin" + tid;
+                if (!skinSlots.contains(slotCustom)) skinSlots.add(slotCustom);
+                if (tid.startsWith("0") && tid.length() == 2) {
+                    String single = "_skin" + tid.substring(1);
+                    if (!skinSlots.contains(single)) skinSlots.add(single);
+                } else if (tid.length() == 1) {
+                    String padded = "_skin0" + tid;
+                    if (!skinSlots.contains(padded)) skinSlots.add(padded);
+                }
+            }
+            // Also scan files in hDir to capture any existing _skinXX slots in the downloaded bundle
+            for (File f : files) {
+                String fname = f.getName();
+                Matcher m = Pattern.compile("(_skin\\d+)").matcher(fname);
+                if (m.find()) {
+                    String foundSlot = m.group(1);
+                    if (!skinSlots.contains(foundSlot)) {
+                        skinSlots.add(foundSlot);
+                    }
+                }
+            }
+
             for (String slot : skinSlots) {
                 if (meshHighBytes != null) {
                     patchBytesToFile(meshHighBytes, hDir, prefix + slot + "_high_add.unity3d");
@@ -521,7 +545,12 @@ public final class UnityBundlePatcher {
         // 1. Handle 3D hero mesh, shadow, & skill effect prefab paths (e.g., .../hero_fanny_skin08_high_add.prefab)
         Matcher mSkin = SKIN_TAG_PATTERN.matcher(lower);
         if (mSkin.find()) {
-            String[] skinTargets = new String[]{"_", "_skin_", "_skin01_", "_skin02_", "_skin03_"};
+            String[] skinTargets = new String[]{
+                    "_", "_skin_", "_skin01_", "_skin02_", "_skin03_",
+                    "_skin04_", "_skin05_", "_skin06_", "_skin07_", "_skin08_",
+                    "_skin09_", "_skin10_", "_skin11_", "_skin12_",
+                    "_skin4_", "_skin5_", "_skin6_", "_skin7_", "_skin8_", "_skin9_"
+            };
             for (String target : skinTargets) {
                 String replaced = mSkin.replaceAll(target);
                 addWithQualityVariants(aliases, replaced);
@@ -531,6 +560,11 @@ public final class UnityBundlePatcher {
                     addWithQualityVariants(aliases, mDir.replaceAll("/skin01/"));
                     addWithQualityVariants(aliases, mDir.replaceAll("/skin02/"));
                     addWithQualityVariants(aliases, mDir.replaceAll("/skin03/"));
+                    addWithQualityVariants(aliases, mDir.replaceAll("/skin04/"));
+                    addWithQualityVariants(aliases, mDir.replaceAll("/skin05/"));
+                    addWithQualityVariants(aliases, mDir.replaceAll("/skin06/"));
+                    addWithQualityVariants(aliases, mDir.replaceAll("/skin07/"));
+                    addWithQualityVariants(aliases, mDir.replaceAll("/skin08/"));
                 }
             }
         }
@@ -540,6 +574,11 @@ public final class UnityBundlePatcher {
         if (mDirOnly.find()) {
             aliases.add(mDirOnly.replaceAll("/skin01/"));
             aliases.add(mDirOnly.replaceAll("/skin02/"));
+            aliases.add(mDirOnly.replaceAll("/skin03/"));
+            aliases.add(mDirOnly.replaceAll("/skin04/"));
+            aliases.add(mDirOnly.replaceAll("/skin05/"));
+            aliases.add(mDirOnly.replaceAll("/skin07/"));
+            aliases.add(mDirOnly.replaceAll("/skin08/"));
             aliases.add(mDirOnly.replaceAll("/skin/"));
         }
 
@@ -602,7 +641,7 @@ public final class UnityBundlePatcher {
             } else if (path.endsWith("_add.prefab")) {
                 base = path.substring(0, path.length() - "_add.prefab".length());
             }
-            if (base != null && base.contains("_skin")) {
+            if (base != null) {
                 aliases.add(base + "_high_add.prefab");
                 aliases.add(base + "_add.prefab");
                 aliases.add(base + "_low_add.prefab");

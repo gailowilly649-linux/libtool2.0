@@ -131,11 +131,11 @@ public final class ShizukuPanel {
         if (btnDrone5x != null) btnDrone5x.setOnClickListener(v -> MlbbModInjector.applyDroneView(activity, 5, panelCallback));
         if (btnDroneReset != null) btnDroneReset.setOnClickListener(v -> MlbbModInjector.restoreDefaultDrone(panelCallback));
         if (btnUnlockAllSkins != null) btnUnlockAllSkins.setOnClickListener(v -> MlbbModInjector.unlockAllHeroSkins(activity, panelCallback));
-        if (btnRestoreAllSkins != null) btnRestoreAllSkins.setOnClickListener(v -> MlbbModInjector.restoreAllHeroSkins(panelCallback));
+        if (btnRestoreAllSkins != null) btnRestoreAllSkins.setOnClickListener(v -> MlbbModInjector.restoreAllHeroSkins(activity, panelCallback));
         if (btnCombatDamage != null) btnCombatDamage.setOnClickListener(v -> MlbbModInjector.injectCombatDamage(activity, panelCallback));
         if (btnRestoreCombatDamage != null) btnRestoreCombatDamage.setOnClickListener(v -> MlbbModInjector.restoreCombatDamage(panelCallback));
         if (btnMapSkins != null) btnMapSkins.setOnClickListener(v -> MlbbModInjector.injectMapAndSkins(activity, panelCallback));
-        if (btnRestoreMap != null) btnRestoreMap.setOnClickListener(v -> MlbbModInjector.restoreDefaultMapAndSkins(panelCallback));
+        if (btnRestoreMap != null) btnRestoreMap.setOnClickListener(v -> MlbbModInjector.restoreDefaultMapAndSkins(activity, panelCallback));
 
         bindRoleButton(activity, R.id.btnMainRoleJungle, "Jungle", panelCallback);
         bindRoleButton(activity, R.id.btnMainRoleMage, "Mage", panelCallback);

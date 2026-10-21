@@ -405,7 +405,7 @@ public class OverlayService extends Service {
         if (btnRestoreAllSkins != null) {
             btnRestoreAllSkins.setOnClickListener(v -> {
                 txtStatus.setText("Restoring all hero skins...");
-                MlbbModInjector.restoreAllHeroSkins(modCallback);
+                MlbbModInjector.restoreAllHeroSkins(OverlayService.this, modCallback);
             });
         }
 
@@ -456,7 +456,7 @@ public class OverlayService extends Service {
         if (btnRestoreMapSkins != null) {
             btnRestoreMapSkins.setOnClickListener(v -> {
                 txtStatus.setText("Restoring stock map & skins...");
-                MlbbModInjector.restoreDefaultMapAndSkins(modCallback);
+                MlbbModInjector.restoreDefaultMapAndSkins(OverlayService.this, modCallback);
             });
         }
 

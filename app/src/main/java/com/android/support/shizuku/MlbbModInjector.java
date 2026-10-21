@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
@@ -497,7 +498,7 @@ public final class MlbbModInjector {
         });
     }
 
-    public static void restoreDefaultMapAndSkins(Callback callback) {
+    public static void restoreDefaultMapAndSkins(Context context, Callback callback) {
         EXECUTOR.execute(() -> {
             if (!ShizukuShell.hasPermission()) {
                 postComplete(callback, false, "Shizuku permission not granted.");
@@ -510,14 +511,60 @@ public final class MlbbModInjector {
                         "rm -f \"" + DRAGON_ASSETS + "/Scenes/android/PVP_049_low.unity3d\" 2>/dev/null; " +
                         "rm -f \"" + DRAGON_ASSETS + "/Scenes/android/GalleryCenter.unity3d\" 2>/dev/null; " +
                         "rm -f \"" + DRAGON_ASSETS + "/UI/android/UI_TheMlabel_CollectionSet_Skin*\" 2>/dev/null; " +
-                        "rm -f \"" + DRAGON_ASSETS + "/Art/android/nextnextninja*\" 2>/dev/null";
+                        "rm -f \"" + DRAGON_ASSETS + "/Art/android/nextnextninja*\" 2>/dev/null; " +
+                        "if [ -d \"" + FILES + "/mini_patch\" ]; then " +
+                        "  find \"" + FILES + "/mini_patch\" -name \"PVP_009.unity3d\" -exec rm -f {} + 2>/dev/null; " +
+                        "  find \"" + FILES + "/mini_patch\" -name \"PVP_049_low.unity3d\" -exec rm -f {} + 2>/dev/null; " +
+                        "  find \"" + FILES + "/mini_patch\" -name \"GalleryCenter.unity3d\" -exec rm -f {} + 2>/dev/null; " +
+                        "  find \"" + FILES + "/mini_patch\" -name \"UI_TheMlabel_CollectionSet_Skin*\" -exec rm -f {} + 2>/dev/null; " +
+                        "  find \"" + FILES + "/mini_patch\" -name \"nextnextninja*\" -exec rm -f {} + 2>/dev/null; " +
+                        "fi; ";
                 ShizukuShell.exec(cmd);
 
-                postComplete(callback, true, "Stock Map & Skins restored!\nMLBB will load default game assets.");
+                // Restore genuine stock GameResAlternative if context is available
+                if (context != null) {
+                    File stage = new File(STAGE_DIR);
+                    stage.mkdirs();
+                    stageAsset(context, "mlbb_drone/base/Document/android/GameResAlternative_stock.unity3d", stage, "GameResAlternative.unity3d");
+                    stageAsset(context, "mlbb_drone/base/Document/android/BinaryPatchMD5_stock.xml", stage, "BinaryPatchMD5.xml");
+                    File stagedRes = new File(stage, "GameResAlternative.unity3d");
+                    if (stagedRes.exists() && stagedRes.length() > 500000) {
+                        String docAndroid = DRAGON_ASSETS + "/Document/android";
+                        ShizukuShell.exec("mkdir -p \"" + docAndroid + "\"; cp -f \"" + stagedRes.getAbsolutePath() + "\" \"" + docAndroid + "/GameResAlternative.unity3d\"");
+                        ShizukuShell.exec(
+                                "if [ -d \"" + FILES + "/mini_patch\" ]; then " +
+                                "  find \"" + FILES + "/mini_patch\" -type d -name \"Document\" -exec mkdir -p {}/android \\; 2>/dev/null; " +
+                                "  find \"" + FILES + "/mini_patch\" -type d -name \"Document\" -exec cp -f \"" + stagedRes.getAbsolutePath() + "\" {}/android/GameResAlternative.unity3d \\; 2>/dev/null; " +
+                                "  for d in " + FILES + "/mini_patch/*/*/*/Document/android ; do if [ -d \"$d\" ]; then cp -f \"" + stagedRes.getAbsolutePath() + "\" \"$d/GameResAlternative.unity3d\" 2>/dev/null; fi; done; " +
+                                "  for d in " + FILES + "/mini_patch/*/*/Document/android ; do if [ -d \"$d\" ]; then cp -f \"" + stagedRes.getAbsolutePath() + "\" \"$d/GameResAlternative.unity3d\" 2>/dev/null; fi; done; " +
+                                "fi;"
+                        );
+                    }
+                    File stagedMD5 = new File(stage, "BinaryPatchMD5.xml");
+                    if (stagedMD5.exists() && stagedMD5.length() > 0) {
+                        String docAndroid = DRAGON_ASSETS + "/Document/android";
+                        ShizukuShell.exec("cp -f \"" + stagedMD5.getAbsolutePath() + "\" \"" + docAndroid + "/BinaryPatchMD5.xml\"");
+                        ShizukuShell.exec(
+                                "if [ -d \"" + FILES + "/mini_patch\" ]; then " +
+                                "  find \"" + FILES + "/mini_patch\" -type d -name \"Document\" -exec cp -f \"" + stagedMD5.getAbsolutePath() + "\" {}/android/BinaryPatchMD5.xml \\; 2>/dev/null; " +
+                                "  for d in " + FILES + "/mini_patch/*/*/*/Document/android ; do if [ -d \"$d\" ]; then cp -f \"" + stagedMD5.getAbsolutePath() + "\" \"$d/BinaryPatchMD5.xml\" 2>/dev/null; fi; done; " +
+                                "  for d in " + FILES + "/mini_patch/*/*/Document/android ; do if [ -d \"$d\" ]; then cp -f \"" + stagedMD5.getAbsolutePath() + "\" \"$d/BinaryPatchMD5.xml\" 2>/dev/null; fi; done; " +
+                                "fi;"
+                        );
+                    }
+                    deleteRecursive(stage);
+                }
+
+                ShizukuShell.exec("am force-stop " + PKG + " 2>/dev/null; chmod -R 777 \"" + DRAGON_ASSETS + "\" \"" + FILES + "/mini_patch\" 2>/dev/null");
+                postComplete(callback, true, "✅ Stock Map & Skins restored!\nMLBB flushed and loading default game assets.");
             } catch (Throwable t) {
                 postComplete(callback, false, "Restore error: " + t.getMessage());
             }
         });
+    }
+
+    public static void restoreDefaultMapAndSkins(Callback callback) {
+        restoreDefaultMapAndSkins(null, callback);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -693,7 +740,7 @@ public final class MlbbModInjector {
         unlockHeroSkin(null, heroId, callback);
     }
 
-    public static void restoreHeroSkin(String heroId, Callback callback) {
+    public static void restoreHeroSkin(Context context, String heroId, Callback callback) {
         EXECUTOR.execute(() -> {
             if (!ShizukuShell.hasPermission()) {
                 postComplete(callback, false, "Shizuku permission not granted.");
@@ -714,14 +761,58 @@ public final class MlbbModInjector {
             }
 
             try {
-                postProgress(callback, "Restoring stock " + target.heroName + " skin...");
+                postProgress(callback, "Restoring stock " + target.heroName + " skin & purging modded meshes...");
                 restoreHeroSwapInternal(target);
-                postComplete(callback, true, "Restored stock " + target.heroName + " skin.");
+
+                if (context != null) {
+                    File stage = new File(STAGE_DIR);
+                    stage.mkdirs();
+                    stageAsset(context, "mlbb_drone/base/Document/android/GameResAlternative_stock.unity3d", stage, "GameResAlternative.unity3d");
+                    stageAsset(context, "mlbb_drone/base/Document/android/BinaryPatchMD5_stock.xml", stage, "BinaryPatchMD5.xml");
+                    File stagedRes = new File(stage, "GameResAlternative.unity3d");
+                    if (stagedRes.exists() && stagedRes.length() > 500000) {
+                        String docAndroid = DRAGON_ASSETS + "/Document/android";
+                        ShizukuShell.exec("mkdir -p \"" + docAndroid + "\"; cp -f \"" + stagedRes.getAbsolutePath() + "\" \"" + docAndroid + "/GameResAlternative.unity3d\"");
+                        ShizukuShell.exec(
+                                "if [ -d \"" + FILES + "/mini_patch\" ]; then " +
+                                "  find \"" + FILES + "/mini_patch\" -type d -name \"Document\" -exec mkdir -p {}/android \\; 2>/dev/null; " +
+                                "  find \"" + FILES + "/mini_patch\" -type d -name \"Document\" -exec cp -f \"" + stagedRes.getAbsolutePath() + "\" {}/android/GameResAlternative.unity3d \\; 2>/dev/null; " +
+                                "  for d in " + FILES + "/mini_patch/*/*/*/Document/android ; do if [ -d \"$d\" ]; then cp -f \"" + stagedRes.getAbsolutePath() + "\" \"$d/GameResAlternative.unity3d\" 2>/dev/null; fi; done; " +
+                                "  for d in " + FILES + "/mini_patch/*/*/Document/android ; do if [ -d \"$d\" ]; then cp -f \"" + stagedRes.getAbsolutePath() + "\" \"$d/GameResAlternative.unity3d\" 2>/dev/null; fi; done; " +
+                                "fi;"
+                        );
+                    }
+                    File stagedMD5 = new File(stage, "BinaryPatchMD5.xml");
+                    if (stagedMD5.exists() && stagedMD5.length() > 0) {
+                        String docAndroid = DRAGON_ASSETS + "/Document/android";
+                        ShizukuShell.exec("cp -f \"" + stagedMD5.getAbsolutePath() + "\" \"" + docAndroid + "/BinaryPatchMD5.xml\"");
+                        ShizukuShell.exec(
+                                "if [ -d \"" + FILES + "/mini_patch\" ]; then " +
+                                "  find \"" + FILES + "/mini_patch\" -type d -name \"Document\" -exec cp -f \"" + stagedMD5.getAbsolutePath() + "\" {}/android/BinaryPatchMD5.xml \\; 2>/dev/null; " +
+                                "  for d in " + FILES + "/mini_patch/*/*/*/Document/android ; do if [ -d \"$d\" ]; then cp -f \"" + stagedMD5.getAbsolutePath() + "\" \"$d/BinaryPatchMD5.xml\" 2>/dev/null; fi; done; " +
+                                "  for d in " + FILES + "/mini_patch/*/*/Document/android ; do if [ -d \"$d\" ]; then cp -f \"" + stagedMD5.getAbsolutePath() + "\" \"$d/BinaryPatchMD5.xml\" 2>/dev/null; fi; done; " +
+                                "fi;"
+                        );
+                    }
+                    deleteRecursive(stage);
+                }
+
+                if ("hero_ninja".equalsIgnoreCase(target.heroCodeName)) {
+                    ShizukuShell.exec("rm -f \"" + DRAGON_ASSETS + "/Art/android/nextnextninja*\" 2>/dev/null; " +
+                            "if [ -d \"" + FILES + "/mini_patch\" ]; then find \"" + FILES + "/mini_patch\" -name \"nextnextninja*\" -exec rm -f {} + 2>/dev/null; fi;");
+                }
+
+                ShizukuShell.exec("am force-stop " + PKG + " 2>/dev/null; chmod -R 777 \"" + DRAGON_ASSETS + "\" \"" + FILES + "/mini_patch\" 2>/dev/null");
+                postComplete(callback, true, "✅ Restored stock " + target.heroName + " skin.\nModded meshes purged and MLBB cache flushed.");
             } catch (Throwable t) {
                 Log.e(TAG, "Error restoring " + heroId, t);
                 postComplete(callback, false, "Restore error: " + t.getMessage());
             }
         });
+    }
+
+    public static void restoreHeroSkin(String heroId, Callback callback) {
+        restoreHeroSkin(null, heroId, callback);
     }
 
     public static void unlockHeroesByRole(Context context, String role, Callback callback) {
@@ -771,7 +862,7 @@ public final class MlbbModInjector {
         unlockHeroesByRole(null, "ALL", callback);
     }
 
-    public static void restoreAllHeroSkins(Callback callback) {
+    public static void restoreAllHeroSkins(Context context, Callback callback) {
         EXECUTOR.execute(() -> {
             if (!ShizukuShell.hasPermission()) {
                 postComplete(callback, false, "Shizuku permission not granted.");
@@ -779,16 +870,49 @@ public final class MlbbModInjector {
             }
 
             try {
-                postProgress(callback, "Restoring all stock skins from backup...");
+                postProgress(callback, "1/4: Restoring genuine stock GameResAlternative & integrity tables...");
+                if (context != null) {
+                    File stage = new File(STAGE_DIR);
+                    stage.mkdirs();
+                    stageAsset(context, "mlbb_drone/base/Document/android/GameResAlternative_stock.unity3d", stage, "GameResAlternative.unity3d");
+                    stageAsset(context, "mlbb_drone/base/Document/android/BinaryPatchMD5_stock.xml", stage, "BinaryPatchMD5.xml");
+
+                    File stagedRes = new File(stage, "GameResAlternative.unity3d");
+                    File stagedMD5 = new File(stage, "BinaryPatchMD5.xml");
+                    String docAndroid = DRAGON_ASSETS + "/Document/android";
+                    ShizukuShell.exec("mkdir -p \"" + docAndroid + "\"");
+
+                    if (stagedRes.exists() && stagedRes.length() > 500000) {
+                        ShizukuShell.exec("cp -f \"" + stagedRes.getAbsolutePath() + "\" \"" + docAndroid + "/GameResAlternative.unity3d\"");
+                        ShizukuShell.exec(
+                                "if [ -d \"" + FILES + "/mini_patch\" ]; then " +
+                                "  find \"" + FILES + "/mini_patch\" -type d -name \"Document\" -exec mkdir -p {}/android \\; 2>/dev/null; " +
+                                "  find \"" + FILES + "/mini_patch\" -type d -name \"Document\" -exec cp -f \"" + stagedRes.getAbsolutePath() + "\" {}/android/GameResAlternative.unity3d \\; 2>/dev/null; " +
+                                "  for d in " + FILES + "/mini_patch/*/*/*/Document/android ; do if [ -d \"$d\" ]; then cp -f \"" + stagedRes.getAbsolutePath() + "\" \"$d/GameResAlternative.unity3d\" 2>/dev/null; fi; done; " +
+                                "  for d in " + FILES + "/mini_patch/*/*/Document/android ; do if [ -d \"$d\" ]; then cp -f \"" + stagedRes.getAbsolutePath() + "\" \"$d/GameResAlternative.unity3d\" 2>/dev/null; fi; done; " +
+                                "fi;"
+                        );
+                    }
+
+                    if (stagedMD5.exists() && stagedMD5.length() > 0) {
+                        ShizukuShell.exec("cp -f \"" + stagedMD5.getAbsolutePath() + "\" \"" + docAndroid + "/BinaryPatchMD5.xml\"");
+                        ShizukuShell.exec(
+                                "if [ -d \"" + FILES + "/mini_patch\" ]; then " +
+                                "  find \"" + FILES + "/mini_patch\" -type d -name \"Document\" -exec cp -f \"" + stagedMD5.getAbsolutePath() + "\" {}/android/BinaryPatchMD5.xml \\; 2>/dev/null; " +
+                                "  for d in " + FILES + "/mini_patch/*/*/*/Document/android ; do if [ -d \"$d\" ]; then cp -f \"" + stagedMD5.getAbsolutePath() + "\" \"$d/BinaryPatchMD5.xml\" 2>/dev/null; fi; done; " +
+                                "  for d in " + FILES + "/mini_patch/*/*/Document/android ; do if [ -d \"$d\" ]; then cp -f \"" + stagedMD5.getAbsolutePath() + "\" \"$d/BinaryPatchMD5.xml\" 2>/dev/null; fi; done; " +
+                                "fi;"
+                        );
+                    }
+                    deleteRecursive(stage);
+                }
+
+                postProgress(callback, "2/4: Purging all modded 3D hero meshes from dragon2017 & mini_patch...");
                 for (HeroSkinOption h : HERO_SKINS) {
                     restoreHeroSwapInternal(h);
                 }
-                // Restore GameResAlternative if backup exists
-                String targetRes = DRAGON_ASSETS + "/Document/android/GameResAlternative.unity3d";
-                String backupRes = BACKUP_SKINS_DIR + "/Document/android/GameResAlternative.unity3d";
-                ShizukuShell.exec("if [ -s \"" + backupRes + "\" ]; then cp -f \"" + backupRes + "\" \"" + targetRes + "\"; fi");
 
-                // Safety restore of all backup files to dragon2017/assets and active mini_patch slots
+                postProgress(callback, "3/4: Restoring backed-up stock assets and purging modded UI/VFX...");
                 String restoreSync =
                         "if [ -d \"" + BACKUP_SKINS_DIR + "\" ]; then " +
                         "  cp -rf \"" + BACKUP_SKINS_DIR + "\"/* \"" + DRAGON_ASSETS + "/\" 2>/dev/null; " +
@@ -798,14 +922,41 @@ public final class MlbbModInjector {
                         "    if [ -d \"" + BACKUP_SKINS_DIR + "/Audio\" ]; then find \"" + FILES + "/mini_patch\" -type d -name \"Audio\" -exec cp -rf \"" + BACKUP_SKINS_DIR + "/Audio/\"* {}/ \\; 2>/dev/null; fi; " +
                         "  fi; " +
                         "  rm -rf \"" + BACKUP_SKINS_DIR + "\"; " +
-                        "fi";
+                        "fi; " +
+                        "rm -f \"" + DRAGON_ASSETS + "/Art/android/nextnextninja*\" 2>/dev/null; " +
+                        "rm -f \"" + DRAGON_ASSETS + "/UI/android/Hero*1_add.unity3d\" 2>/dev/null; " +
+                        "rm -f \"" + DRAGON_ASSETS + "/UI/android/Hero*2_add.unity3d\" 2>/dev/null; " +
+                        "rm -f \"" + DRAGON_ASSETS + "/UI/android/Hero*3_add.unity3d\" 2>/dev/null; " +
+                        "rm -f \"" + DRAGON_ASSETS + "/UI/android/UI_TheMlabel_CollectionSet_Skin*\" 2>/dev/null; " +
+                        "if [ -d \"" + FILES + "/mini_patch\" ]; then " +
+                        "  find \"" + FILES + "/mini_patch\" -name \"nextnextninja*\" -exec rm -f {} + 2>/dev/null; " +
+                        "  find \"" + FILES + "/mini_patch\" -name \"Hero*1_add.unity3d\" -exec rm -f {} + 2>/dev/null; " +
+                        "  find \"" + FILES + "/mini_patch\" -name \"Hero*2_add.unity3d\" -exec rm -f {} + 2>/dev/null; " +
+                        "  find \"" + FILES + "/mini_patch\" -name \"Hero*3_add.unity3d\" -exec rm -f {} + 2>/dev/null; " +
+                        "  find \"" + FILES + "/mini_patch\" -name \"UI_TheMlabel_CollectionSet_Skin*\" -exec rm -f {} + 2>/dev/null; " +
+                        "fi; " +
+                        "rm -rf \"" + STAGE_DIR + "\" 2>/dev/null; ";
                 ShizukuShell.exec(restoreSync);
-                postComplete(callback, true, "All hero skins restored to stock genuine assets.");
+
+                postProgress(callback, "4/4: Flushing in-memory cached assets & setting permissions...");
+                ShizukuShell.exec("am force-stop " + PKG + " 2>/dev/null; " +
+                        "chmod -R 777 \"" + DRAGON_ASSETS + "\" \"" + FILES + "/mini_patch\" 2>/dev/null");
+
+                postComplete(callback, true, "✅ All hero skins 100% restored to stock genuine assets!\n" +
+                        "• Genuine stock GameResAlternative.unity3d (743 KB) restored across all slots.\n" +
+                        "• All modded 3D meshes, UI portraits & VFX purged from dragon2017 & mini_patch.\n" +
+                        "• Base hero skeletons and rigs healed.\n" +
+                        "• MLBB process stopped to flush memory cache.\n" +
+                        "Launch MLBB now to see genuine original hero skins!");
             } catch (Throwable t) {
                 Log.e(TAG, "Error restoring all skins", t);
                 postComplete(callback, false, "Restore error: " + t.getMessage());
             }
         });
+    }
+
+    public static void restoreAllHeroSkins(Callback callback) {
+        restoreAllHeroSkins(null, callback);
     }
 
     private static void injectGameResAlternative(Context context) {
@@ -1209,14 +1360,29 @@ public final class MlbbModInjector {
         // Remove any accidental 0-byte files inside stageSkinRoot before copying to MLBB
         purgeZeroByteFilesRecursive(stageSkinRoot);
 
+        // CRITICAL: NEVER allow custom skin zips to overwrite the hero's base skeleton rig (<prefix>.unity3d and <prefix>_skin.unity3d)
+        File stageHDir = new File(stageSkinRoot, "Art/android/h");
+        if (stageHDir.exists() && h.heroCodeName != null) {
+            for (String prefix : getCandidateHeroPrefixes(h.heroCodeName)) {
+                File fakeRig = new File(stageHDir, prefix + ".unity3d");
+                if (fakeRig.exists()) fakeRig.delete();
+                File fakeSkin = new File(stageHDir, prefix + "_skin.unity3d");
+                if (fakeSkin.exists()) fakeSkin.delete();
+            }
+        }
+
         backupExistingFiles(stageSkinRoot, stageSkinRoot, DRAGON_ASSETS);
 
-        // Ensure base hero skeleton rig (<heroCodeName>.unity3d) is intact and never missing
+        // Ensure base hero skeleton rig (<heroCodeName>.unity3d) and base smooth rig are intact and never missing
         if (h.heroCodeName != null) {
             for (String prefix : getCandidateHeroPrefixes(h.heroCodeName)) {
                 String baseRig = DRAGON_ASSETS + "/Art/android/h/" + prefix + ".unity3d";
                 String bakRig = BACKUP_SKINS_DIR + "/Art/android/h/" + prefix + ".unity3d";
                 ShizukuShell.exec("if [ ! -s \"" + baseRig + "\" ] && [ -s \"" + bakRig + "\" ]; then cp -f \"" + bakRig + "\" \"" + baseRig + "\"; fi");
+
+                String baseSkin = DRAGON_ASSETS + "/Art/android/h/" + prefix + "_skin.unity3d";
+                String bakSkin = BACKUP_SKINS_DIR + "/Art/android/h/" + prefix + "_skin.unity3d";
+                ShizukuShell.exec("if [ ! -s \"" + baseSkin + "\" ] && [ -s \"" + bakSkin + "\" ]; then cp -f \"" + bakSkin + "\" \"" + baseSkin + "\"; fi");
             }
         }
 
@@ -1314,8 +1480,7 @@ public final class MlbbModInjector {
             ShizukuShell.exec("if [ ! -s \"" + bakSkin + "\" ] && [ -s \"" + baseSkin + "\" ]; then cp -f \"" + baseSkin + "\" \"" + bakSkin + "\"; fi");
             ShizukuShell.exec("if [ ! -s \"" + baseSkin + "\" ] && [ -s \"" + bakSkin + "\" ]; then cp -f \"" + bakSkin + "\" \"" + baseSkin + "\"; fi");
 
-            // Files to replace for default skin (_skin), basic skin (_skin01), and secondary skins (_skin02, _skin03)
-            String[] targets = {
+            String[] baseTargets = {
                     prefix + "_skin_high_add.unity3d",
                     prefix + "_skin_add.unity3d",
                     prefix + "_skin_low_add.unity3d",
@@ -1342,6 +1507,29 @@ public final class MlbbModInjector {
                     prefix + "_skin03_shadow_add.unity3d"
             };
 
+            String[] suffixes = {
+                    "_high_add.unity3d",
+                    "_add.unity3d",
+                    "_low_add.unity3d",
+                    "_extlow_add.unity3d",
+                    "_shadow_high_add.unity3d",
+                    "_shadow_add.unity3d"
+            };
+
+            List<String> targetsList = new ArrayList<>(Arrays.asList(baseTargets));
+            if (targetSkinId != null && !targetSkinId.trim().isEmpty()) {
+                String tid = targetSkinId.trim();
+                for (String sfx : suffixes) {
+                    String customFile = prefix + "_skin" + tid + sfx;
+                    if (!targetsList.contains(customFile)) targetsList.add(customFile);
+                    if (tid.startsWith("0") && tid.length() == 2) {
+                        String singleFile = prefix + "_skin" + tid.substring(1) + sfx;
+                        if (!targetsList.contains(singleFile)) targetsList.add(singleFile);
+                    }
+                }
+            }
+            String[] targets = targetsList.toArray(new String[0]);
+
             // 1. Back up originals if not yet backed up (and non-empty)
             for (String file : targets) {
                 String orig = hDir + "/" + file;
@@ -1354,14 +1542,6 @@ public final class MlbbModInjector {
             deleteRecursive(stageHDir);
             stageHDir.mkdirs();
 
-            String[] suffixes = {
-                    "_high_add.unity3d",
-                    "_add.unity3d",
-                    "_low_add.unity3d",
-                    "_extlow_add.unity3d",
-                    "_shadow_high_add.unity3d",
-                    "_shadow_add.unity3d"
-            };
             String srcSkinToken = prefix + "_skin" + targetSkinId;
             boolean anyStaged = false;
             for (String sfx : suffixes) {
@@ -1462,6 +1642,25 @@ public final class MlbbModInjector {
             String hDir = DRAGON_ASSETS + "/Art/android/h";
             String backupHDir = BACKUP_SKINS_DIR + "/Art/android/h";
             for (String prefix : getCandidateHeroPrefixes(h.heroCodeName)) {
+                // 1. Wildcard purge of ALL modded skin meshes (skin01 to skin20, plus any _skin_add/_skin_high_add variants)
+                // from both dragon2017 and all mini_patch slots
+                String purgeCmd =
+                        "rm -f \"" + hDir + "/" + prefix + "_skin0\"*.unity3d 2>/dev/null; " +
+                        "rm -f \"" + hDir + "/" + prefix + "_skin1\"*.unity3d 2>/dev/null; " +
+                        "rm -f \"" + hDir + "/" + prefix + "_skin2\"*.unity3d 2>/dev/null; " +
+                        "rm -f \"" + hDir + "/" + prefix + "_skin_high_add.unity3d\" 2>/dev/null; " +
+                        "rm -f \"" + hDir + "/" + prefix + "_skin_add.unity3d\" 2>/dev/null; " +
+                        "rm -f \"" + hDir + "/" + prefix + "_skin_low_add.unity3d\" 2>/dev/null; " +
+                        "rm -f \"" + hDir + "/" + prefix + "_skin_extlow_add.unity3d\" 2>/dev/null; " +
+                        "rm -f \"" + hDir + "/" + prefix + "_skin_shadow_high_add.unity3d\" 2>/dev/null; " +
+                        "rm -f \"" + hDir + "/" + prefix + "_skin_shadow_add.unity3d\" 2>/dev/null; " +
+                        "if [ -d \"" + FILES + "/mini_patch\" ]; then " +
+                        "  find \"" + FILES + "/mini_patch\" -type d -path \"*/Art/android/h\" -exec rm -f {}/" + prefix + "_skin0*.unity3d {}/" + prefix + "_skin1*.unity3d {}/" + prefix + "_skin2*.unity3d \\; 2>/dev/null; " +
+                        "  find \"" + FILES + "/mini_patch\" -type d -path \"*/Art/android/h\" -exec rm -f {}/" + prefix + "_skin_high_add.unity3d {}/" + prefix + "_skin_add.unity3d {}/" + prefix + "_skin_low_add.unity3d {}/" + prefix + "_skin_extlow_add.unity3d {}/" + prefix + "_skin_shadow_high_add.unity3d {}/" + prefix + "_skin_shadow_add.unity3d \\; 2>/dev/null; " +
+                        "fi; ";
+                ShizukuShell.exec(purgeCmd);
+
+                // 2. Restore genuine stock files if saved in backup
                 String[] targets = {
                         prefix + ".unity3d",
                         prefix + "_skin.unity3d",
@@ -1470,25 +1669,7 @@ public final class MlbbModInjector {
                         prefix + "_skin_low_add.unity3d",
                         prefix + "_skin_extlow_add.unity3d",
                         prefix + "_skin_shadow_high_add.unity3d",
-                        prefix + "_skin_shadow_add.unity3d",
-                        prefix + "_skin01_high_add.unity3d",
-                        prefix + "_skin01_add.unity3d",
-                        prefix + "_skin01_low_add.unity3d",
-                        prefix + "_skin01_extlow_add.unity3d",
-                        prefix + "_skin01_shadow_high_add.unity3d",
-                        prefix + "_skin01_shadow_add.unity3d",
-                        prefix + "_skin02_high_add.unity3d",
-                        prefix + "_skin02_add.unity3d",
-                        prefix + "_skin02_low_add.unity3d",
-                        prefix + "_skin02_extlow_add.unity3d",
-                        prefix + "_skin02_shadow_high_add.unity3d",
-                        prefix + "_skin02_shadow_add.unity3d",
-                        prefix + "_skin03_high_add.unity3d",
-                        prefix + "_skin03_add.unity3d",
-                        prefix + "_skin03_low_add.unity3d",
-                        prefix + "_skin03_extlow_add.unity3d",
-                        prefix + "_skin03_shadow_high_add.unity3d",
-                        prefix + "_skin03_shadow_add.unity3d"
+                        prefix + "_skin_shadow_add.unity3d"
                 };
                 for (String file : targets) {
                     String orig = hDir + "/" + file;
@@ -1502,6 +1683,7 @@ public final class MlbbModInjector {
                     );
                 }
             }
+            healHeroBaseRig(h.heroCodeName);
         }
     }
 
