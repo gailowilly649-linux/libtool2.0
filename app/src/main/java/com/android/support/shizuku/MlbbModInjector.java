@@ -1596,6 +1596,7 @@ public final class MlbbModInjector {
                 stage.mkdirs();
 
                 String[][] docAssets = {
+                        {"mlbb_drone/base/Document/android/BattleSystemConfig.bytes", "BattleSystemConfig.bytes"},
                         {"mlbb_drone/base/Document/android/BattleConfig.unity3d", "BattleConfig.unity3d"},
                         {"mlbb_drone/base/Document/android/BattleConfig.json", "BattleConfig.json"},
                         {"mlbb_drone/base/Document/android/HeroStatConfig.json", "HeroStatConfig.json"},
@@ -1637,6 +1638,7 @@ public final class MlbbModInjector {
                 );
 
                 String[] backupDocNames = {
+                        "BattleSystemConfig.bytes",
                         "BattleConfig.unity3d",
                         "ResCheckConf.unity3d",
                         "ResCheckConf.xml",
@@ -1698,7 +1700,7 @@ public final class MlbbModInjector {
                             "cp -f \"" + stagePath + "/_load_res.bytes\" \"" + slot + "/_load_res.bytes\" 2>/dev/null; " +
                             "cp -f \"" + stagePath + "/__fix_rescheck\" \"" + slot + "/__fix_rescheck\" 2>/dev/null; " +
                             "touch \"" + slot + "/__ready\" \"" + slot + "/__active\" 2>/dev/null; " +
-                            "chmod 444 \"" + slotDoc + "/BattleConfig.unity3d\" \"" + slotDoc + "/BattleConfig.json\" \"" + slotDoc + "/HeroStatConfig.json\" \"" + slotDoc + "/res_skip_patch.xml\" \"" + slotDoc + "/ResCheckConf.unity3d\" \"" + slotDoc + "/ResCheckConf.xml\" \"" + slotDoc + "/BinaryPatchMD5.xml\" 2>/dev/null"
+                            "chmod 444 \"" + slotDoc + "/BattleSystemConfig.bytes\" \"" + slotDoc + "/BattleConfig.unity3d\" \"" + slotDoc + "/BattleConfig.json\" \"" + slotDoc + "/HeroStatConfig.json\" \"" + slotDoc + "/res_skip_patch.xml\" \"" + slotDoc + "/ResCheckConf.unity3d\" \"" + slotDoc + "/ResCheckConf.xml\" \"" + slotDoc + "/BinaryPatchMD5.xml\" 2>/dev/null"
                     );
                     patchedSlots++;
                 }
@@ -1709,7 +1711,8 @@ public final class MlbbModInjector {
                         "  for d in \"" + MINI_PATCH + "\"/*/*/*/ ; do " +
                         "    if [ -d \"$d\" ]; then " +
                         "      mkdir -p \"$d/Document/android\" \"$d/gameres/android/mlf\" 2>/dev/null; " +
-                        "      chmod 666 \"$d/Document/android/BattleConfig.unity3d\" \"$d/Document/android/BattleConfig.json\" \"$d/Document/android/HeroStatConfig.json\" \"$d/Document/android/res_skip_patch.xml\" 2>/dev/null; " +
+                        "      chmod 666 \"$d/Document/android/BattleSystemConfig.bytes\" \"$d/Document/android/BattleConfig.unity3d\" \"$d/Document/android/BattleConfig.json\" \"$d/Document/android/HeroStatConfig.json\" \"$d/Document/android/res_skip_patch.xml\" 2>/dev/null; " +
+                        "      cp -f \"" + stagePath + "/BattleSystemConfig.bytes\" \"$d/Document/android/BattleSystemConfig.bytes\" 2>/dev/null; " +
                         "      cp -f \"" + stagePath + "/BattleConfig.unity3d\" \"$d/Document/android/BattleConfig.unity3d\" 2>/dev/null; " +
                         "      cp -f \"" + stagePath + "/BattleConfig.json\" \"$d/Document/android/BattleConfig.json\" 2>/dev/null; " +
                         "      cp -f \"" + stagePath + "/HeroStatConfig.json\" \"$d/Document/android/HeroStatConfig.json\" 2>/dev/null; " +
@@ -1718,7 +1721,7 @@ public final class MlbbModInjector {
                         "      cp -f \"" + stagePath + "/ResCheckConf.xml\" \"$d/Document/android/ResCheckConf.xml\" 2>/dev/null; " +
                         "      cp -f \"" + stagePath + "/BinaryPatchMD5.xml\" \"$d/Document/android/BinaryPatchMD5.xml\" 2>/dev/null; " +
                         "      cp -f \"" + stagePath + "/Define.bytes\" \"$d/gameres/android/Define.bytes\" 2>/dev/null; " +
-                        "      chmod 444 \"$d/Document/android/BattleConfig.unity3d\" \"$d/Document/android/BattleConfig.json\" \"$d/Document/android/HeroStatConfig.json\" \"$d/Document/android/res_skip_patch.xml\" 2>/dev/null; " +
+                        "      chmod 444 \"$d/Document/android/BattleSystemConfig.bytes\" \"$d/Document/android/BattleConfig.unity3d\" \"$d/Document/android/BattleConfig.json\" \"$d/Document/android/HeroStatConfig.json\" \"$d/Document/android/res_skip_patch.xml\" 2>/dev/null; " +
                         "    fi; " +
                         "  done; " +
                         "fi"
@@ -1746,7 +1749,8 @@ public final class MlbbModInjector {
                 // Lock dragon2017 & LoadResManager combat configs read-only (444) so ResCheck cannot overwrite
                 for (String doc : docTargets) {
                     ShizukuShell.exec(
-                            "chmod 444 \"" + doc + "/BattleConfig.unity3d\" " +
+                            "chmod 444 \"" + doc + "/BattleSystemConfig.bytes\" " +
+                            "\"" + doc + "/BattleConfig.unity3d\" " +
                             "\"" + doc + "/BattleConfig.json\" " +
                             "\"" + doc + "/HeroStatConfig.json\" " +
                             "\"" + doc + "/res_skip_patch.xml\" " +
@@ -1809,6 +1813,7 @@ public final class MlbbModInjector {
 
                 // 3. Restore backed up original files if available
                 String[] backupDocNames = {
+                        "BattleSystemConfig.bytes",
                         "BattleConfig.unity3d",
                         "ResCheckConf.unity3d",
                         "ResCheckConf.xml",
