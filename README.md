@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⚡ Willy LibTool (`Android-LibTool-New`)
+# ⚡ libtool0.2 (`Android-LibTool-New`)
 
 **Advanced Android Shizuku Asset Injector, UnityFS v7 Binary Patcher & Native C++17 IL2CPP Reverse Engineering Suite**
 
