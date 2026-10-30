@@ -249,30 +249,6 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Display Refresh Rate:"
-                    android:textColor="#D8DEE9"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/txtRefreshInfo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="-"
-                    android:textColor="#A0A5B5"
-                    android:textSize="13sp" />
-            </LinearLayout>
-
             <Button
                 android:id="@+id/btnShizukuGrant"
                 android:layout_width="match_parent"
@@ -284,24 +260,6 @@
                 android:textStyle="bold" />
 
             <Button
-                android:id="@+id/btnBackup"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="8dp"
-                android:background="#1E232E"
-                android:text="BACKUP MLBB SETTINGS"
-                android:textColor="#ECEFF4" />
-
-            <Button
-                android:id="@+id/btnRestore"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="8dp"
-                android:background="#1E232E"
-                android:text="RESTORE FROM BACKUP"
-                android:textColor="#ECEFF4" />
-
-            <Button
                 android:id="@+id/btnCleanCache"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
@@ -311,12 +269,12 @@
                 android:textColor="#ECEFF4" />
 
             <Button
-                android:id="@+id/btnRefreshRate"
+                android:id="@+id/btnMainSpoofRog10"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginTop="8dp"
                 android:background="#1E3324"
-                android:text="⚡ UNLOCK REAL 165 FPS &amp; ULTRA GRAPHICS (NON-ROOT)"
+                android:text="🔥 SPOOF ASUS ROG 10 PRO+ &amp; 165 HZ"
                 android:textColor="#00E676"
                 android:textStyle="bold" />
 
@@ -390,148 +348,6 @@
                 android:textColor="#D8DEE9"
                 android:textSize="11sp" />
 
-            <!-- 40+ Hero Skins Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="UNLOCK HERO SKINS (40+ HEROES)"
-                android:textColor="#FFD54F"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="Jungle • Mage • Tank • Marksman • Support • Fighter (Collector / Legend / Collab)"
-                android:textColor="#81A1C1"
-                android:textSize="10sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btnMainUnlockAllSkins"
-                    android:layout_width="0dp"
-                    android:layout_height="44dp"
-                    android:layout_weight="1"
-                    android:background="#1E3324"
-                    android:text="★ UNLOCK ALL 40+ SKINS"
-                    android:textColor="#00E676"
-                    android:textSize="11sp"
-                    android:textStyle="bold" />
-
-                <Button
-                    android:id="@+id/btnMainRestoreAllSkins"
-                    android:layout_width="0dp"
-                    android:layout_height="44dp"
-                    android:layout_marginStart="6dp"
-                    android:layout_weight="1"
-                    android:background="#331E1E"
-                    android:text="RESTORE ALL SKINS"
-                    android:textColor="#FF5252"
-                    android:textSize="11sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <!-- Role Batch Unlock Buttons -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="BATCH UNLOCK BY ROLE"
-                android:textColor="#D8DEE9"
-                android:textSize="9sp"
-                android:textStyle="bold" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btnMainRoleJungle"
-                    android:layout_width="0dp"
-                    android:layout_height="34dp"
-                    android:layout_weight="1"
-                    android:background="#1E232E"
-                    android:text="⚡ JUNGLE"
-                    android:textColor="#88C0D0"
-                    android:textSize="9sp"
-                    android:textStyle="bold" />
-
-                <Button
-                    android:id="@+id/btnMainRoleMage"
-                    android:layout_width="0dp"
-                    android:layout_height="34dp"
-                    android:layout_marginStart="3dp"
-                    android:layout_weight="1"
-                    android:background="#1E232E"
-                    android:text="⚡ MAGE"
-                    android:textColor="#B48EAD"
-                    android:textSize="9sp"
-                    android:textStyle="bold" />
-
-                <Button
-                    android:id="@+id/btnMainRoleTank"
-                    android:layout_width="0dp"
-                    android:layout_height="34dp"
-                    android:layout_marginStart="3dp"
-                    android:layout_weight="1"
-                    android:background="#1E232E"
-                    android:text="⚡ TANK"
-                    android:textColor="#EBCB8B"
-                    android:textSize="9sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btnMainRoleMM"
-                    android:layout_width="0dp"
-                    android:layout_height="34dp"
-                    android:layout_weight="1"
-                    android:background="#1E232E"
-                    android:text="⚡ MM"
-                    android:textColor="#A3BE8C"
-                    android:textSize="9sp"
-                    android:textStyle="bold" />
-
-                <Button
-                    android:id="@+id/btnMainRoleSupport"
-                    android:layout_width="0dp"
-                    android:layout_height="34dp"
-                    android:layout_marginStart="3dp"
-                    android:layout_weight="1"
-                    android:background="#1E232E"
-                    android:text="⚡ SUPPORT"
-                    android:textColor="#8FBCBB"
-                    android:textSize="9sp"
-                    android:textStyle="bold" />
-
-                <Button
-                    android:id="@+id/btnMainRoleFighter"
-                    android:layout_width="0dp"
-                    android:layout_height="34dp"
-                    android:layout_marginStart="3dp"
-                    android:layout_weight="1"
-                    android:background="#1E232E"
-                    android:text="⚡ FIGHTER"
-                    android:textColor="#D08770"
-                    android:textSize="9sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
             <!-- Combat Damage & Stats Row (Shizuku No-Root) -->
             <TextView
                 android:layout_width="wrap_content"
@@ -575,45 +391,6 @@
                     android:layout_weight="1"
                     android:background="#1E232E"
                     android:text="RESTORE DAMAGE"
-                    android:textColor="#D8DEE9"
-                    android:textSize="11sp" />
-            </LinearLayout>
-
-            <!-- Map & Skins Row -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="MAP ASSETS &amp; SKINS"
-                android:textColor="#00E5FF"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btnMainMapSkins"
-                    android:layout_width="0dp"
-                    android:layout_height="44dp"
-                    android:layout_weight="1"
-                    android:background="#1E232E"
-                    android:text="INJECT MAP + SKINS"
-                    android:textColor="#FFD54F"
-                    android:textSize="11sp"
-                    android:textStyle="bold" />
-
-                <Button
-                    android:id="@+id/btnMainRestoreMap"
-                    android:layout_width="0dp"
-                    android:layout_height="44dp"
-                    android:layout_marginStart="6dp"
-                    android:layout_weight="1"
-                    android:background="#1E232E"
-                    android:text="RESTORE MAP"
                     android:textColor="#D8DEE9"
                     android:textSize="11sp" />
             </LinearLayout>

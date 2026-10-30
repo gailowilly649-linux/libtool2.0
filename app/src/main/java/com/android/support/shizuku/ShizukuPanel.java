@@ -38,9 +38,6 @@ public final class ShizukuPanel {
     private static final String BACKUP_DIR = "/sdcard/WillyLibTool/backups";
 
     private static final String PREFS = "shizuku_tools";
-    private static final String KEY_RR_FORCED = "rr_forced";
-    private static final String KEY_OLD_PEAK = "old_peak_refresh_rate";
-    private static final String KEY_OLD_MIN = "old_min_refresh_rate";
 
     private static final String[][] CACHE_TARGETS = {
             {"Unity Cache", FILES + "/UnityCache"},
@@ -55,24 +52,17 @@ public final class ShizukuPanel {
     private final Handler main = new Handler(Looper.getMainLooper());
 
     private final TextView txtStatus;
-    private final TextView txtRefresh;
     private final TextView txtLog;
     private final Button btnGrant;
-    private final Button btnBackup;
-    private final Button btnRestore;
     private final Button btnClean;
-    private final Button btnRefreshRate;
     private final Button btnDrone2x;
     private final Button btnDrone3x;
     private final Button btnDrone4x;
     private final Button btnDrone5x;
     private final Button btnDroneReset;
-    private final Button btnUnlockAllSkins;
-    private final Button btnRestoreAllSkins;
     private final Button btnCombatDamage;
     private final Button btnRestoreCombatDamage;
-    private final Button btnMapSkins;
-    private final Button btnRestoreMap;
+    private final Button btnMainSpoofRog10;
 
     private final Shizuku.OnBinderReceivedListener binderReceived = this::postUpdate;
     private final Shizuku.OnBinderDeadListener binderDead = this::postUpdate;
@@ -87,31 +77,42 @@ public final class ShizukuPanel {
         this.activity = activity;
         this.prefs = activity.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         txtStatus = activity.findViewById(R.id.txtShizukuStatus);
-        txtRefresh = activity.findViewById(R.id.txtRefreshInfo);
         txtLog = activity.findViewById(R.id.txtShizukuLog);
         btnGrant = activity.findViewById(R.id.btnShizukuGrant);
-        btnBackup = activity.findViewById(R.id.btnBackup);
-        btnRestore = activity.findViewById(R.id.btnRestore);
         btnClean = activity.findViewById(R.id.btnCleanCache);
-        btnRefreshRate = activity.findViewById(R.id.btnRefreshRate);
 
         btnDrone2x = activity.findViewById(R.id.btnMainDrone2x);
         btnDrone3x = activity.findViewById(R.id.btnMainDrone3x);
         btnDrone4x = activity.findViewById(R.id.btnMainDrone4x);
         btnDrone5x = activity.findViewById(R.id.btnMainDrone5x);
         btnDroneReset = activity.findViewById(R.id.btnMainDroneReset);
-        btnUnlockAllSkins = activity.findViewById(R.id.btnMainUnlockAllSkins);
-        btnRestoreAllSkins = activity.findViewById(R.id.btnMainRestoreAllSkins);
         btnCombatDamage = activity.findViewById(R.id.btnMainCombatDamage);
         btnRestoreCombatDamage = activity.findViewById(R.id.btnMainRestoreCombatDamage);
-        btnMapSkins = activity.findViewById(R.id.btnMainMapSkins);
-        btnRestoreMap = activity.findViewById(R.id.btnMainRestoreMap);
+        btnMainSpoofRog10 = activity.findViewById(R.id.btnMainSpoofRog10);
 
         btnGrant.setOnClickListener(v -> onGrant());
-        btnBackup.setOnClickListener(v -> onBackup());
-        btnRestore.setOnClickListener(v -> onRestore());
-        btnClean.setOnClickListener(v -> onClean());
-        btnRefreshRate.setOnClickListener(v -> onRefreshRate());
+        if (btnClean != null) btnClean.setOnClickListener(v -> onClean());
+        if (btnMainSpoofRog10 != null) {
+            btnMainSpoofRog10.setOnClickListener(v -> {
+                boolean active = "SPOOF ACTIVE".equals(btnMainSpoofRog10.getTag());
+                MlbbModInjector.applyRog10ProSpoof(activity, !active, new MlbbModInjector.Callback() {
+                    @Override
+                    public void onProgress(String message) {
+                        log(message);
+                    }
+
+                    @Override
+                    public void onComplete(boolean success, String message) {
+                        if (success) {
+                            btnMainSpoofRog10.setTag(!active ? "SPOOF ACTIVE" : null);
+                            btnMainSpoofRog10.setText(!active ? "RESTORE DEFAULT IDENTITY (ROG 10 ACTIVE)" : "🔥 SPOOF ASUS ROG 10 PRO+ & 165 HZ");
+                            btnMainSpoofRog10.setTextColor(!active ? Color.parseColor("#FF5252") : Color.parseColor("#00E676"));
+                        }
+                        log((success ? "✅ " : "❌ ") + message);
+                    }
+                });
+            });
+        }
 
         MlbbModInjector.Callback panelCallback = new MlbbModInjector.Callback() {
             @Override
@@ -130,19 +131,8 @@ public final class ShizukuPanel {
         if (btnDrone4x != null) btnDrone4x.setOnClickListener(v -> MlbbModInjector.applyDroneView(activity, 4, panelCallback));
         if (btnDrone5x != null) btnDrone5x.setOnClickListener(v -> MlbbModInjector.applyDroneView(activity, 5, panelCallback));
         if (btnDroneReset != null) btnDroneReset.setOnClickListener(v -> MlbbModInjector.restoreDefaultDrone(panelCallback));
-        if (btnUnlockAllSkins != null) btnUnlockAllSkins.setOnClickListener(v -> MlbbModInjector.unlockAllHeroSkins(activity, panelCallback));
-        if (btnRestoreAllSkins != null) btnRestoreAllSkins.setOnClickListener(v -> MlbbModInjector.restoreAllHeroSkins(activity, panelCallback));
         if (btnCombatDamage != null) btnCombatDamage.setOnClickListener(v -> MlbbModInjector.injectCombatDamage(activity, panelCallback));
         if (btnRestoreCombatDamage != null) btnRestoreCombatDamage.setOnClickListener(v -> MlbbModInjector.restoreCombatDamage(panelCallback));
-        if (btnMapSkins != null) btnMapSkins.setOnClickListener(v -> MlbbModInjector.injectMapAndSkins(activity, panelCallback));
-        if (btnRestoreMap != null) btnRestoreMap.setOnClickListener(v -> MlbbModInjector.restoreDefaultMapAndSkins(activity, panelCallback));
-
-        bindRoleButton(activity, R.id.btnMainRoleJungle, "Jungle", panelCallback);
-        bindRoleButton(activity, R.id.btnMainRoleMage, "Mage", panelCallback);
-        bindRoleButton(activity, R.id.btnMainRoleTank, "Tank", panelCallback);
-        bindRoleButton(activity, R.id.btnMainRoleMM, "Marksman", panelCallback);
-        bindRoleButton(activity, R.id.btnMainRoleSupport, "Support", panelCallback);
-        bindRoleButton(activity, R.id.btnMainRoleFighter, "Fighter", panelCallback);
 
         try {
             Shizuku.addBinderReceivedListenerSticky(binderReceived);
@@ -161,16 +151,6 @@ public final class ShizukuPanel {
         } catch (Throwable ignored) {
         }
         worker.shutdownNow();
-    }
-
-    private void bindRoleButton(android.app.Activity activity, int resId, String role, MlbbModInjector.Callback callback) {
-        android.view.View btn = activity.findViewById(resId);
-        if (btn != null) {
-            btn.setOnClickListener(v -> {
-                log("Unlocking " + role + " skins...");
-                MlbbModInjector.unlockHeroesByRole(activity, role, callback);
-            });
-        }
     }
 
     // ---------------------------------------------------------------- status
@@ -196,30 +176,16 @@ public final class ShizukuPanel {
             btnGrant.setText("SHIZUKU CONNECTED");
         }
         btnGrant.setEnabled(!granted);
-        btnBackup.setEnabled(granted);
-        btnRestore.setEnabled(granted);
-        btnClean.setEnabled(granted);
-        btnRefreshRate.setEnabled(granted);
+        if (btnClean != null) btnClean.setEnabled(granted);
 
         if (btnDrone2x != null) btnDrone2x.setEnabled(granted);
         if (btnDrone3x != null) btnDrone3x.setEnabled(granted);
         if (btnDrone4x != null) btnDrone4x.setEnabled(granted);
         if (btnDrone5x != null) btnDrone5x.setEnabled(granted);
         if (btnDroneReset != null) btnDroneReset.setEnabled(granted);
-        if (btnUnlockAllSkins != null) btnUnlockAllSkins.setEnabled(granted);
-        if (btnRestoreAllSkins != null) btnRestoreAllSkins.setEnabled(granted);
         if (btnCombatDamage != null) btnCombatDamage.setEnabled(granted);
         if (btnRestoreCombatDamage != null) btnRestoreCombatDamage.setEnabled(granted);
-        if (btnMapSkins != null) btnMapSkins.setEnabled(granted);
-        if (btnRestoreMap != null) btnRestoreMap.setEnabled(granted);
-
-        float current = currentRefreshRate();
-        float max = maxRefreshRate();
-        txtRefresh.setText(String.format(Locale.US, "%.0f Hz (max %.0f Hz) • Engine: 165 FPS Ready", current, max));
-        boolean forced = prefs.getBoolean(KEY_RR_FORCED, false);
-        btnRefreshRate.setText(forced ? "RESTORE DEFAULT 60 FPS (165 ACTIVE)"
-                : "⚡ UNLOCK REAL 165 FPS & ULTRA GRAPHICS (NON-ROOT)");
-        btnRefreshRate.setTextColor(forced ? Color.parseColor("#FF5252") : Color.parseColor("#00E676"));
+        if (btnMainSpoofRog10 != null) btnMainSpoofRog10.setEnabled(granted);
     }
 
     private void onGrant() {
@@ -239,52 +205,6 @@ public final class ShizukuPanel {
             return;
         }
         ShizukuShell.requestPermission();
-    }
-
-    // ---------------------------------------------------------------- backup / restore
-
-    private void onBackup() {
-        String ts = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-        String out = BACKUP_DIR + "/mlbb_settings_" + ts + ".tar";
-        // Only the small top-level config/state files + ModeVersion; the multi-GB asset folders are excluded.
-        String cmd = "mkdir -p " + ShizukuShell.q(BACKUP_DIR)
-                + " && cd " + ShizukuShell.q(FILES)
-                + " && list=$(find " + ASSETS_REL + " -maxdepth 1 -type f)"
-                + " && if [ -d ModeVersion ]; then list=\"$list ModeVersion\"; fi"
-                + " && [ -n \"$list\" ] && tar -cf " + ShizukuShell.q(out) + " $list"
-                + " && echo \"Saved: " + out + "\" && ls -la " + ShizukuShell.q(out);
-        run("Backing up MLBB settings...", cmd, null);
-    }
-
-    private void onRestore() {
-        runForResult("ls -1t " + ShizukuShell.q(BACKUP_DIR) + "/*.tar 2>/dev/null", res -> {
-            if (!res.ok() || res.output.isEmpty()) {
-                log("No backups found in " + BACKUP_DIR);
-                return;
-            }
-            String[] files = res.output.split("\n");
-            String[] labels = new String[files.length];
-            for (int i = 0; i < files.length; i++) {
-                labels[i] = files[i].substring(files[i].lastIndexOf('/') + 1);
-            }
-            new AlertDialog.Builder(activity)
-                    .setTitle("Restore which backup?")
-                    .setItems(labels, (d, which) -> confirmRestore(files[which].trim(), labels[which]))
-                    .setNegativeButton("Cancel", null)
-                    .show();
-        });
-    }
-
-    private void confirmRestore(String path, String label) {
-        new AlertDialog.Builder(activity)
-                .setTitle("Restore " + label + "?")
-                .setMessage("Mobile Legends will be force-stopped and its settings files overwritten with this backup.")
-                .setPositiveButton("Restore", (d, w) -> run("Restoring " + label + "...",
-                        "am force-stop " + PKG
-                                + " && tar -xf " + ShizukuShell.q(path) + " -C " + ShizukuShell.q(FILES)
-                                + " && echo 'Restore complete.'", null))
-                .setNegativeButton("Cancel", null)
-                .show();
     }
 
     // ---------------------------------------------------------------- cache cleaner
@@ -339,61 +259,6 @@ public final class ShizukuPanel {
         return kb + " KB";
     }
 
-    // ---------------------------------------------------------------- refresh rate
-
-    private void onRefreshRate() {
-        boolean forced = prefs.getBoolean(KEY_RR_FORCED, false);
-        setBusy(true);
-        MlbbModInjector.unlockReal165Fps(activity, !forced, new MlbbModInjector.Callback() {
-            @Override
-            public void onProgress(String message) {
-                log(message);
-            }
-
-            @Override
-            public void onComplete(boolean success, String message) {
-                setBusy(false);
-                if (success) {
-                    prefs.edit().putBoolean(KEY_RR_FORCED, !forced).apply();
-                }
-                log((success ? "✅ " : "❌ ") + message);
-                postUpdate();
-            }
-        });
-    }
-
-    private static String restoreSettingCmd(String key, String old) {
-        if (old == null || old.isEmpty() || "null".equals(old)) {
-            return "settings delete system " + key;
-        }
-        return "settings put system " + key + " " + ShizukuShell.q(old);
-    }
-
-    @SuppressWarnings("deprecation")
-    private Display getDisplayCompat() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            return activity.getDisplay();
-        }
-        return activity.getWindowManager().getDefaultDisplay();
-    }
-
-    private float currentRefreshRate() {
-        Display d = getDisplayCompat();
-        return d != null ? d.getRefreshRate() : 60f;
-    }
-
-    private float maxRefreshRate() {
-        Display d = getDisplayCompat();
-        if (d == null) return 60f;
-        float max = d.getRefreshRate();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            for (Display.Mode m : d.getSupportedModes()) {
-                max = Math.max(max, m.getRefreshRate());
-            }
-        }
-        return max;
-    }
-
     // ---------------------------------------------------------------- plumbing
 
     private interface Callback {
@@ -428,10 +293,7 @@ public final class ShizukuPanel {
 
     private void setBusy(boolean busy) {
         boolean granted = ShizukuShell.hasPermission();
-        btnBackup.setEnabled(!busy && granted);
-        btnRestore.setEnabled(!busy && granted);
-        btnClean.setEnabled(!busy && granted);
-        btnRefreshRate.setEnabled(!busy && granted);
+        if (btnClean != null) btnClean.setEnabled(!busy && granted);
     }
 
     private void log(String msg) {

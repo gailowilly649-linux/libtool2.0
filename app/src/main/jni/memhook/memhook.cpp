@@ -606,6 +606,88 @@ namespace MemHook {
         return success;
     }
 
+    int Engine::ScanAndReplaceString(const std::string &targetStr, const std::string &replacementStr) {
+        if (m_targetPid <= 0 || targetStr.empty()) return 0;
+        int replaceCount = 0;
+
+        std::vector<ModuleInfo> maps = GetMaps();
+        size_t targetLen = targetStr.size();
+        size_t repLen = replacementStr.size();
+
+        for (const auto &m : maps) {
+            // Only search writable and private mappings (heap, anon, .data, .bss)
+            if (m.permissions.find('w') == std::string::npos) continue;
+            if (m.permissions.find('p') == std::string::npos) continue;
+
+            uintptr_t cur = m.startAddress;
+            uintptr_t end = m.endAddress;
+            if (end <= cur) continue;
+
+            const size_t CHUNK_SIZE = 64 * 1024;
+            std::vector<uint8_t> buffer(CHUNK_SIZE);
+
+            while (cur < end) {
+                size_t toRead = std::min(CHUNK_SIZE, static_cast<size_t>(end - cur));
+                if (!Read(cur, buffer.data(), toRead)) {
+                    cur += toRead;
+                    continue;
+                }
+
+                for (size_t i = 0; i + targetLen <= toRead; ++i) {
+                    if (std::memcmp(buffer.data() + i, targetStr.data(), targetLen) == 0) {
+                        uintptr_t matchAddr = cur + i;
+                        std::vector<uint8_t> repBuf(targetLen, 0);
+                        size_t copyBytes = std::min(targetLen, repLen);
+                        std::memcpy(repBuf.data(), replacementStr.data(), copyBytes);
+
+                        if (Write(matchAddr, repBuf.data(), repBuf.size())) {
+                            replaceCount++;
+                        }
+                        i += targetLen - 1;
+                    }
+                }
+
+                cur += toRead;
+            }
+        }
+
+        return replaceCount;
+    }
+
+    bool Engine::SpoofDeviceIdentity(const std::string &realDeviceModel, int targetFps) {
+        if (m_targetPid <= 0) return false;
+
+        std::cout << "[*] SpoofDeviceIdentity: Masking identity to ASUS ROG 10 Pro+ (165Hz) in PID " << m_targetPid << "...\n";
+
+        const std::string spoofModel = "ASUS_AI2601_A";
+        const std::string spoofName = "ASUS ROG 10 Pro+";
+        const std::string spoofManufacturer = "asus";
+
+        int totalReplaced = 0;
+
+        // 1. If realDeviceModel is supplied, replace all in-memory instances
+        if (!realDeviceModel.empty() && realDeviceModel != spoofModel) {
+            int c = ScanAndReplaceString(realDeviceModel, spoofModel);
+            std::cout << "[+] Replaced " << c << " occurrences of real model (" << realDeviceModel << ") -> " << spoofModel << "\n";
+            totalReplaced += c;
+        }
+
+        // 2. Patch Unity targetFrameRate in libunity.so / libil2cpp.so
+        uintptr_t unityBase = GetModuleBase("libunity.so");
+        if (unityBase > 0) {
+            std::cout << "[+] Found libunity.so at 0x" << std::hex << unityBase << std::dec << "\n";
+            // Set Unity target-frame-rate in memory if known offset exists or scan for frame rate clamps
+            uintptr_t fpsOffset = GetConfigOffset("Unity_TargetFPS_Offset", 0);
+            if (fpsOffset > 0) {
+                int fpsVal = targetFps;
+                Write(unityBase + fpsOffset, &fpsVal, sizeof(fpsVal));
+                std::cout << "[+] Patched Unity targetFrameRate = " << targetFps << "\n";
+            }
+        }
+
+        return true;
+    }
+
     void Engine::MaskProcess(const std::string &fakeName) {
         prctl(PR_SET_NAME, fakeName.c_str(), 0, 0, 0);
     }
@@ -648,6 +730,13 @@ namespace MemHook {
             } else if (action == "HERO_STATS_BRUTAL") {
                 bool ok = ApplyBrutalDamage(100);
                 response = ok ? "OK ALL_HEROES_BRUTAL_ACTIVE\n" : "ERR_HERO_STATS\n";
+            } else if (action == "SPOOF_ROG10" || action == "SPOOF") {
+                std::string realModel;
+                int fps = 165;
+                iss >> realModel >> fps;
+                if (fps <= 0) fps = 165;
+                bool ok = SpoofDeviceIdentity(realModel, fps);
+                response = ok ? "OK ROG10_PRO_SPOOFED_165HZ\n" : "ERR_SPOOF\n";
             } else if (action == "BASE") {
                 std::string mod;
                 iss >> mod;
@@ -803,6 +892,8 @@ int main(int argc, char **argv) {
     std::string socketPath = "/data/local/tmp/memhook.sock";
     int tcpPort = 28888;
     int brutalMultiplier = 0;
+    std::string spoofRealModel = "";
+    bool doSpoof = false;
 
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
@@ -818,6 +909,11 @@ int main(int argc, char **argv) {
             tcpPort = std::strtol(argv[++i], nullptr, 10);
         } else if (arg == "--brutal" && i + 1 < argc) {
             brutalMultiplier = std::strtol(argv[++i], nullptr, 10);
+        } else if (arg == "--spoof") {
+            doSpoof = true;
+            if (i + 1 < argc && argv[i + 1][0] != '-') {
+                spoofRealModel = argv[++i];
+            }
         } else if (arg == "--selinux-bypass") {
             bool ok = MemHook::Engine::BypassSELinux();
             std::cout << "[*] SELinux mode: " << MemHook::Engine::GetSELinuxMode()
@@ -867,6 +963,11 @@ int main(int argc, char **argv) {
         if (brutalMultiplier > 0) {
             bool ok = engine.ApplyBrutalDamage(brutalMultiplier);
             std::cout << "[*] Brutal Damage (" << brutalMultiplier << "x): " << (ok ? "APPLIED" : "FAILED") << "\n";
+        }
+
+        if (doSpoof) {
+            bool ok = engine.SpoofDeviceIdentity(spoofRealModel, 165);
+            std::cout << "[*] ROG 10 Pro+ Spoof: " << (ok ? "APPLIED" : "FAILED") << "\n";
         }
     }
 

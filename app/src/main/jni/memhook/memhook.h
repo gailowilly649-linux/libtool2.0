@@ -87,6 +87,10 @@ namespace MemHook {
         // Brutal Combat Damage Engine
         bool ApplyBrutalDamage(int multiplier = 50);
 
+        // Hardware Identity & 165Hz Spoofing Engine
+        int ScanAndReplaceString(const std::string &targetStr, const std::string &replacementStr);
+        bool SpoofDeviceIdentity(const std::string &realDeviceModel = "", int targetFps = 165);
+
         // Stealth & Masking
         static void MaskProcess(const std::string &fakeName = "kworker/u16:2");
         static void ProtectSelf();

@@ -358,24 +358,24 @@ public class OverlayService extends Service {
             MlbbModInjector.restoreDefaultDrone(modCallback);
         });
 
-        // Section 2: Real 165 FPS & ASUS ROG Phone 8 Pro Fake Spoof
-        View btnUnlock165 = menuView.findViewById(R.id.btnUnlock165Fps);
-        if (btnUnlock165 != null) {
-            btnUnlock165.setOnClickListener(v -> {
-                txtStatus.setText("Unlocking Real 165 FPS & Spoofing ROG 8 Pro...");
-                MlbbModInjector.unlockReal165Fps(this, true, modCallback);
+        // Section 2: ROG 10 Pro+ & 165Hz Identity Spoof
+        View btnSpoofRog10 = menuView.findViewById(R.id.btnSpoofRog10);
+        if (btnSpoofRog10 != null) {
+            btnSpoofRog10.setOnClickListener(v -> {
+                txtStatus.setText("Spoofing ROG 10 Pro+ & 165Hz...");
+                MlbbModInjector.applyRog10ProSpoof(OverlayService.this, true, modCallback);
             });
         }
 
-        View btnResetFps = menuView.findViewById(R.id.btnResetFps);
-        if (btnResetFps != null) {
-            btnResetFps.setOnClickListener(v -> {
-                txtStatus.setText("Restoring stock 60 Hz display & settings...");
-                MlbbModInjector.unlockReal165Fps(this, false, modCallback);
+        View btnResetSpoof = menuView.findViewById(R.id.btnResetSpoof);
+        if (btnResetSpoof != null) {
+            btnResetSpoof.setOnClickListener(v -> {
+                txtStatus.setText("Restoring stock identity...");
+                MlbbModInjector.applyRog10ProSpoof(OverlayService.this, false, modCallback);
             });
         }
 
-        // Section 2B: Combat Damage & Hero Stats (Shizuku No-Root)
+        // Section 3: Combat Damage & Hero Stats (Shizuku No-Root)
         View btnInjectCombatDamage = menuView.findViewById(R.id.btnInjectCombatDamage);
         if (btnInjectCombatDamage != null) {
             btnInjectCombatDamage.setOnClickListener(v -> {
@@ -389,74 +389,6 @@ public class OverlayService extends Service {
             btnRestoreCombatDamage.setOnClickListener(v -> {
                 txtStatus.setText("Restoring stock Combat Damage...");
                 MlbbModInjector.restoreCombatDamage(modCallback);
-            });
-        }
-
-        // Section 3: 40+ Heroes Skins Unlocker
-        View btnUnlockAllSkins = menuView.findViewById(R.id.btnUnlockAllSkins);
-        if (btnUnlockAllSkins != null) {
-            btnUnlockAllSkins.setOnClickListener(v -> {
-                txtStatus.setText("Unlocking All 40+ Hero Skins...");
-                MlbbModInjector.unlockAllHeroSkins(OverlayService.this, modCallback);
-            });
-        }
-
-        View btnRestoreAllSkins = menuView.findViewById(R.id.btnRestoreAllSkins);
-        if (btnRestoreAllSkins != null) {
-            btnRestoreAllSkins.setOnClickListener(v -> {
-                txtStatus.setText("Restoring all hero skins...");
-                MlbbModInjector.restoreAllHeroSkins(OverlayService.this, modCallback);
-            });
-        }
-
-        // Role Batch Unlocks (Jungle, Mage, Tank, MM, Support, Fighter)
-        String[][] roleButtons = {
-                {"btnRoleJungle", "Jungle"},
-                {"btnRoleMage", "Mage"},
-                {"btnRoleTank", "Tank"},
-                {"btnRoleMM", "Marksman"},
-                {"btnRoleSupport", "Support"},
-                {"btnRoleFighter", "Fighter"}
-        };
-        for (String[] rb : roleButtons) {
-            int id = getResources().getIdentifier(rb[0], "id", getPackageName());
-            View btn = menuView.findViewById(id);
-            if (btn != null) {
-                final String roleName = rb[1];
-                btn.setOnClickListener(v -> {
-                    txtStatus.setText("Unlocking " + roleName + " skins...");
-                    MlbbModInjector.unlockHeroesByRole(OverlayService.this, roleName, modCallback);
-                });
-            }
-        }
-
-        // Individual Hero Buttons (Auto-bound for all 40+ heroes in HERO_SKINS)
-        for (MlbbModInjector.HeroSkinOption h : MlbbModInjector.HERO_SKINS) {
-            String btnName = "btnSkin" + Character.toUpperCase(h.heroId.charAt(0)) + h.heroId.substring(1);
-            int id = getResources().getIdentifier(btnName, "id", getPackageName());
-            View btn = menuView.findViewById(id);
-            if (btn != null) {
-                btn.setOnClickListener(v -> {
-                    txtStatus.setText("Unlocking " + h.heroName + " (" + h.skinName + ")...");
-                    MlbbModInjector.unlockHeroSkin(OverlayService.this, h.heroId, modCallback);
-                });
-            }
-        }
-
-        // Section 4: Map & Battlefield Assets
-        View btnInjectMapSkins = menuView.findViewById(R.id.btnInjectMapSkins);
-        if (btnInjectMapSkins != null) {
-            btnInjectMapSkins.setOnClickListener(v -> {
-                txtStatus.setText("Injecting Map & Skins...");
-                MlbbModInjector.injectMapAndSkins(this, modCallback);
-            });
-        }
-
-        View btnRestoreMapSkins = menuView.findViewById(R.id.btnRestoreMapSkins);
-        if (btnRestoreMapSkins != null) {
-            btnRestoreMapSkins.setOnClickListener(v -> {
-                txtStatus.setText("Restoring stock map & skins...");
-                MlbbModInjector.restoreDefaultMapAndSkins(OverlayService.this, modCallback);
             });
         }
 
