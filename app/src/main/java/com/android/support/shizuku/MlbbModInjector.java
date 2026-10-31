@@ -180,122 +180,64 @@ public final class MlbbModInjector {
 
             try {
                 if (enable) {
-                    postProgress(callback, "1/4: Locking display & SurfaceFlinger to 165Hz Extreme...");
-                    String realModel = android.os.Build.MODEL;
-                    if (realModel == null || realModel.isEmpty()) {
-                        realModel = "Android";
-                    }
+                    postProgress(callback, "1/5: Executing Universal Android Device & Identity Masker...");
+                    MlbbSpoofMaskingEnforcer.executeFullMasking(context, new MlbbSpoofMaskingEnforcer.EnforceCallback() {
+                        @Override
+                        public void onStep(String message) {
+                            postProgress(callback, message);
+                        }
 
-                    // 1. Force Android Game Manager, SurfaceFlinger & display controllers to 165 Hz
-                    String displayCmd = 
-                            "cmd game mode performance " + PKG + " 2>/dev/null; " +
-                            "cmd game set --fps 165 " + PKG + " 2>/dev/null; " +
-                            "cmd power set-fixed-performance-mode-enabled true 2>/dev/null; " +
-                            "device_config put game_overlay " + PKG + " mode=2,fps=165:mode=3,fps=165 2>/dev/null; " +
-                            "settings put system custom_mode 2; " +
-                            "settings put system screen_refresh_rate 165; " +
-                            "settings put system peak_refresh_rate 165.0; " +
-                            "settings put system min_refresh_rate 165.0; " +
-                            "settings put system user_refresh_rate 165; " +
-                            "settings put system tran_refresh_mode 165; " +
-                            "settings put system tran_refresh_rate 165; " +
-                            "settings put system tran_screen_refresh_rate_mode 165; " +
-                            "settings put system refresh_rate_setting 165; " +
-                            "settings put system tecno_refresh_rate 165; " +
-                            "settings put system infinix_refresh_rate 165; " +
-                            "settings put system max_refresh_rate 165; " +
-                            "settings put system game_fps_override 165; " +
-                            "settings put system display_refresh_rate 165; " +
-                            "settings put system asus_fps 165; " +
-                            "settings put system asus_refresh_rate 165; " +
-                            "settings put system ro.surface_flinger.set_idle_timer_ms 0; " +
-                            "settings put system ro.surface_flinger.set_touch_timer_ms 0; " +
-                            "settings put global peak_refresh_rate 165.0; " +
-                            "settings put global min_refresh_rate 165.0; " +
-                            "settings put global user_refresh_rate 165; " +
-                            "settings put global game_overlay_refresh_rate 165; " +
-                            "settings put global preferred_refresh_rate 165; " +
-                            "settings put global force_refresh_rate 165; " +
-                            "settings put global refresh_rate_force_high 1; " +
-                            "settings put global game_refresh_rate_pkgs " + PKG + "; " +
-                            "settings put global game_refresh_rate_values 165; " +
-                            "settings put secure refresh_rate_mode 2; " +
-                            "settings put secure user_refresh_rate 165";
-                    ShizukuShell.exec(displayCmd);
+                        @Override
+                        public void onComplete(boolean success, String summary) {
+                            if (!success) {
+                                postComplete(callback, false, summary);
+                                return;
+                            }
 
-                    postProgress(callback, "2/4: Generating Unity 165 FPS boot.config pipeline...");
-                    String bootContent = "wait-for-native-debugger=0\n"
-                            + "target-frame-rate=165\n"
-                            + "v-sync-count=0\n"
-                            + "gfx-enable-native-gfx-jobs=1\n";
-                    File stage = new File(STAGE_DIR);
-                    stage.mkdirs();
-                    File bootFile = new File(stage, "boot.config");
-                    writeFile(bootFile, bootContent.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                            postProgress(callback, "Deploying MemHook live memory identity spoofer daemon...");
+                            String realModel = android.os.Build.MODEL;
+                            if (realModel == null || realModel.isEmpty()) realModel = "Android";
 
-                    String bootPath = bootFile.getAbsolutePath();
-                    ShizukuShell.exec("cp -f \"" + bootPath + "\" \"" + FILES + "/boot.config\"");
-                    ShizukuShell.exec("cp -f \"" + bootPath + "\" \"" + DRAGON_ASSETS + "/boot.config\"");
+                            File stage = new File(STAGE_DIR);
+                            stage.mkdirs();
+                            byte[] binBytes = readAsset(context, "memhook/arm64-v8a/memhook");
+                            if (binBytes != null && binBytes.length > 0) {
+                                File stageBin = new File(stage, "memhook");
+                                try {
+                                    writeFile(stageBin, binBytes);
+                                    ShizukuShell.exec("cp -f \"" + stageBin.getAbsolutePath() + "\" \"" + MEMHOOK_BIN + "\" 2>/dev/null; "
+                                            + "chmod 755 \"" + MEMHOOK_BIN + "\" 2>/dev/null");
+                                } catch (Throwable ignored) {}
+                            }
 
-                    List<String> slots = discoverActiveSlots();
-                    for (String slot : slots) {
-                        ShizukuShell.exec("cp -f \"" + bootPath + "\" \"" + slot + "/boot.config\" 2>/dev/null");
-                    }
+                            ShizukuShell.exec("pkill -f memhook 2>/dev/null; sleep 0.2");
+                            String runMemhookCmd = "nohup " + MEMHOOK_BIN + " --pkg " + PKG + " --daemon --spoof \"" + realModel + "\" > " + MEMHOOK_LOG + " 2>&1 &";
+                            ShizukuShell.exec(runMemhookCmd);
+                            deleteRecursive(stage);
 
-                    postProgress(callback, "3/4: Setting up Anti-Reset & ResCheck bypass...");
-                    String resSkipXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-                            + "<root>\n"
-                            + "  <skip_check enable=\"true\" />\n"
-                            + "  <item name=\"boot.config\" skipFix=\"1\" />\n"
-                            + "  <item name=\"Document\" skipFix=\"1\" />\n"
-                            + "</root>";
-                    File skipFile = new File(stage, "res_skip_patch.xml");
-                    writeFile(skipFile, resSkipXml.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-                    ShizukuShell.exec("cp -f \"" + skipFile.getAbsolutePath() + "\" \"" + DRAGON_ASSETS + "/Document/android/res_skip_patch.xml\"");
-
-                    postProgress(callback, "4/4: Deploying MemHook live RAM identity spoofer daemon...");
-                    byte[] binBytes = readAsset(context, "memhook/arm64-v8a/memhook");
-                    if (binBytes != null && binBytes.length > 0) {
-                        File stageBin = new File(stage, "memhook");
-                        writeFile(stageBin, binBytes);
-                        ShizukuShell.exec("cp -f \"" + stageBin.getAbsolutePath() + "\" \"" + MEMHOOK_BIN + "\" 2>/dev/null; "
-                                + "chmod 755 \"" + MEMHOOK_BIN + "\" 2>/dev/null");
-                    }
-
-                    // Start MemHook live identity masker daemon for MLBB
-                    ShizukuShell.exec("pkill -f memhook 2>/dev/null; sleep 0.2");
-                    String runMemhookCmd = "nohup " + MEMHOOK_BIN + " --pkg " + PKG + " --daemon --spoof \"" + realModel + "\" > " + MEMHOOK_LOG + " 2>&1 &";
-                    ShizukuShell.exec(runMemhookCmd);
-
-                    deleteRecursive(stage);
-
-                    postComplete(callback, true,
-                            "🔥 ROG Phone 10 Pro+ (165Hz) Spoof Active!\n" +
-                            "• Masked Model: " + FAKE_SPOOF_MODEL + "\n" +
-                            "• Brand: ASUS ROG (Snapdragon 8 Elite Gen 2)\n" +
-                            "• Display Lock: 165Hz Extreme\n" +
-                            "• VSync: Disabled • Target FPS: 165\n" +
-                            "• Live RAM Masker: RUNNING\n" +
-                            "Launch MLBB to enjoy Ultra/Super Frame Rate!");
+                            postComplete(callback, true,
+                                    "🔥 Universal Hardware & MLBB Masking Active!\n" +
+                                    "• Android ID & AAID: Randomized & Cloaked\n" +
+                                    "• Model: ASUS ROG Phone 8 Pro (ASUS_AI2401_A)\n" +
+                                    "• GPU: Adreno (TM) 750 (165Hz)\n" +
+                                    "• Cross-Version Compat: Android 7 - 16 Full Support\n" +
+                                    "• Unity Target FPS: 165 • VSync: Disabled");
+                        }
+                    });
                 } else {
-                    postProgress(callback, "Restoring stock identity & display settings...");
+                    postProgress(callback, "Restoring stock identity & display settings across all Android tiers...");
                     ShizukuShell.exec("pkill -f memhook 2>/dev/null");
+                    MlbbSpoofMaskingEnforcer.restoreDefaultEnvironment(new MlbbSpoofMaskingEnforcer.EnforceCallback() {
+                        @Override
+                        public void onStep(String message) {
+                            postProgress(callback, message);
+                        }
 
-                    // Revert display & GameManager
-                    String revertCmd = 
-                            "cmd game reset " + PKG + " 2>/dev/null; " +
-                            "cmd power set-fixed-performance-mode-enabled false 2>/dev/null; " +
-                            "device_config delete game_overlay " + PKG + " 2>/dev/null; " +
-                            "settings put system peak_refresh_rate 60.0; " +
-                            "settings put system min_refresh_rate 60.0; " +
-                            "settings put system user_refresh_rate 60; " +
-                            "settings put global peak_refresh_rate 60.0; " +
-                            "settings put global min_refresh_rate 60.0; " +
-                            "settings put global user_refresh_rate 60; " +
-                            "rm -f \"" + FILES + "/boot.config\" \"" + DRAGON_ASSETS + "/boot.config\" 2>/dev/null";
-                    ShizukuShell.exec(revertCmd);
-
-                    postComplete(callback, true, "Stock device identity & default 60Hz display restored!");
+                        @Override
+                        public void onComplete(boolean success, String summary) {
+                            postComplete(callback, success, summary);
+                        }
+                    });
                 }
             } catch (Throwable t) {
                 Log.e(TAG, "ROG 10 Pro spoof error", t);

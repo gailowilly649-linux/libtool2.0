@@ -93,3 +93,17 @@ lint/tmp/
 
 # Android Profiling
 *.hprof
+
+# Python virtual environment
+.venv/
+venv/
+ENV/
+*.pyc
+__pycache__/
+
+# Editor & workspace files
+.vscode/
+.android/
+
+# Transient task prompts and notes
+prompt.txt
