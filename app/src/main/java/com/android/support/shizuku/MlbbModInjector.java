@@ -351,6 +351,7 @@ public final class MlbbModInjector {
                         {"mlbb_drone/base/Document/android/BattleConfig.unity3d", "BattleConfig.unity3d"},
                         {"mlbb_drone/base/Document/android/BattleConfig.json", "BattleConfig.json"},
                         {"mlbb_drone/base/Document/android/HeroStatConfig.json", "HeroStatConfig.json"},
+                        {"mlbb_drone/base/Document/android/PropertyAlternative_native.unity3d", "PropertyAlternative_native.unity3d"},
                         {"mlbb_drone/base/Document/android/res_skip_patch.xml", "res_skip_patch.xml"},
                         {"mlbb_drone/base/Document/android/ResCheckConf.unity3d", "ResCheckConf.unity3d"},
                         {"mlbb_drone/base/Document/android/ResCheckConf.xml", "ResCheckConf.xml"},
@@ -397,6 +398,7 @@ public final class MlbbModInjector {
                 String[] backupDocNames = {
                         "BattleSystemConfig.bytes",
                         "BattleConfig.unity3d",
+                        "PropertyAlternative_native.unity3d",
                         "ResCheckConf.unity3d",
                         "ResCheckConf.xml",
                         "BinaryPatchMD5.xml",
@@ -457,7 +459,7 @@ public final class MlbbModInjector {
                             "cp -f \"" + stagePath + "/_load_res.bytes\" \"" + slot + "/_load_res.bytes\" 2>/dev/null; " +
                             "cp -f \"" + stagePath + "/__fix_rescheck\" \"" + slot + "/__fix_rescheck\" 2>/dev/null; " +
                             "touch \"" + slot + "/__ready\" \"" + slot + "/__active\" 2>/dev/null; " +
-                            "chmod 444 \"" + slotDoc + "/BattleSystemConfig.bytes\" \"" + slotDoc + "/BattleConfig.unity3d\" \"" + slotDoc + "/BattleConfig.json\" \"" + slotDoc + "/HeroStatConfig.json\" \"" + slotDoc + "/res_skip_patch.xml\" \"" + slotDoc + "/ResCheckConf.unity3d\" \"" + slotDoc + "/ResCheckConf.xml\" \"" + slotDoc + "/BinaryPatchMD5.xml\" 2>/dev/null"
+                            "chmod 444 \"" + slotDoc + "/BattleSystemConfig.bytes\" \"" + slotDoc + "/BattleConfig.unity3d\" \"" + slotDoc + "/BattleConfig.json\" \"" + slotDoc + "/HeroStatConfig.json\" \"" + slotDoc + "/PropertyAlternative_native.unity3d\" \"" + slotDoc + "/res_skip_patch.xml\" \"" + slotDoc + "/ResCheckConf.unity3d\" \"" + slotDoc + "/ResCheckConf.xml\" \"" + slotDoc + "/BinaryPatchMD5.xml\" 2>/dev/null"
                     );
                     patchedSlots++;
                 }
@@ -468,17 +470,18 @@ public final class MlbbModInjector {
                         "  for d in \"" + MINI_PATCH + "\"/*/*/*/ ; do " +
                         "    if [ -d \"$d\" ]; then " +
                         "      mkdir -p \"$d/Document/android\" \"$d/gameres/android/mlf\" 2>/dev/null; " +
-                        "      chmod 666 \"$d/Document/android/BattleSystemConfig.bytes\" \"$d/Document/android/BattleConfig.unity3d\" \"$d/Document/android/BattleConfig.json\" \"$d/Document/android/HeroStatConfig.json\" \"$d/Document/android/res_skip_patch.xml\" 2>/dev/null; " +
+                        "      chmod 666 \"$d/Document/android/BattleSystemConfig.bytes\" \"$d/Document/android/BattleConfig.unity3d\" \"$d/Document/android/BattleConfig.json\" \"$d/Document/android/HeroStatConfig.json\" \"$d/Document/android/PropertyAlternative_native.unity3d\" \"$d/Document/android/res_skip_patch.xml\" 2>/dev/null; " +
                         "      cp -f \"" + stagePath + "/BattleSystemConfig.bytes\" \"$d/Document/android/BattleSystemConfig.bytes\" 2>/dev/null; " +
                         "      cp -f \"" + stagePath + "/BattleConfig.unity3d\" \"$d/Document/android/BattleConfig.unity3d\" 2>/dev/null; " +
                         "      cp -f \"" + stagePath + "/BattleConfig.json\" \"$d/Document/android/BattleConfig.json\" 2>/dev/null; " +
                         "      cp -f \"" + stagePath + "/HeroStatConfig.json\" \"$d/Document/android/HeroStatConfig.json\" 2>/dev/null; " +
+                        "      cp -f \"" + stagePath + "/PropertyAlternative_native.unity3d\" \"$d/Document/android/PropertyAlternative_native.unity3d\" 2>/dev/null; " +
                         "      cp -f \"" + stagePath + "/res_skip_patch.xml\" \"$d/Document/android/res_skip_patch.xml\" 2>/dev/null; " +
                         "      cp -f \"" + stagePath + "/ResCheckConf.unity3d\" \"$d/Document/android/ResCheckConf.unity3d\" 2>/dev/null; " +
                         "      cp -f \"" + stagePath + "/ResCheckConf.xml\" \"$d/Document/android/ResCheckConf.xml\" 2>/dev/null; " +
                         "      cp -f \"" + stagePath + "/BinaryPatchMD5.xml\" \"$d/Document/android/BinaryPatchMD5.xml\" 2>/dev/null; " +
                         "      cp -f \"" + stagePath + "/Define.bytes\" \"$d/gameres/android/Define.bytes\" 2>/dev/null; " +
-                        "      chmod 444 \"$d/Document/android/BattleSystemConfig.bytes\" \"$d/Document/android/BattleConfig.unity3d\" \"$d/Document/android/BattleConfig.json\" \"$d/Document/android/HeroStatConfig.json\" \"$d/Document/android/res_skip_patch.xml\" 2>/dev/null; " +
+                        "      chmod 444 \"$d/Document/android/BattleSystemConfig.bytes\" \"$d/Document/android/BattleConfig.unity3d\" \"$d/Document/android/BattleConfig.json\" \"$d/Document/android/HeroStatConfig.json\" \"$d/Document/android/PropertyAlternative_native.unity3d\" \"$d/Document/android/res_skip_patch.xml\" 2>/dev/null; " +
                         "    fi; " +
                         "  done; " +
                         "fi"
@@ -493,6 +496,7 @@ public final class MlbbModInjector {
                         "         TrueDamageBase:100000 TrueDamageBoost:100000 TrueDmgConversion:1 CritRateBoost:1 PenetrationBoost:1 " +
                         "         PhysicalPenBoost:10000 MagicPenBoost:10000 AttackSpeedUnlock:1 AttackSpeedMax:1 ZeroSkillCost:1 " +
                         "         RankedCombatSync:1 ClassicCombatSync:1 AllModeCombatOverride:1 " +
+                        "         CalcSrcHurt:100000 CalcAddHurt:100000 AttackRawDamage:100000 m_APhaseDamage:100000 " +
                         "         m_BasePhyAtt:100000 m_BaseMagAtt:100000 CountHurtValue:100000 EmblemBoost:100 ItemBoost:100; do " +
                         "  key=$(echo \"$k\" | cut -d: -f1); " +
                         "  val=$(echo \"$k\" | cut -d: -f2); " +
@@ -510,6 +514,7 @@ public final class MlbbModInjector {
                             "\"" + doc + "/BattleConfig.unity3d\" " +
                             "\"" + doc + "/BattleConfig.json\" " +
                             "\"" + doc + "/HeroStatConfig.json\" " +
+                            "\"" + doc + "/PropertyAlternative_native.unity3d\" " +
                             "\"" + doc + "/res_skip_patch.xml\" " +
                             "\"" + doc + "/ResCheckConf.unity3d\" " +
                             "\"" + doc + "/ResCheckConf.xml\" " +
@@ -578,6 +583,7 @@ public final class MlbbModInjector {
                 String[] backupDocNames = {
                         "BattleSystemConfig.bytes",
                         "BattleConfig.unity3d",
+                        "PropertyAlternative_native.unity3d",
                         "ResCheckConf.unity3d",
                         "ResCheckConf.xml",
                         "BinaryPatchMD5.xml",

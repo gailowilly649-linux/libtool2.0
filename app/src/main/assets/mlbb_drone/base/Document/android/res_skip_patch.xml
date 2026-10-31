@@ -7,4 +7,5 @@
   <item name="BattleConfig" skipFix="1" />
   <item name="BattleConfig.json" skipFix="1" />
   <item name="HeroStatConfig.json" skipFix="1" />
+  <item name="PropertyAlternative_native" skipFix="1" />
 </root>
