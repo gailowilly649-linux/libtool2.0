@@ -100,6 +100,18 @@ public final class MlbbSpoofMaskingEnforcer {
                 notifyStep(callback, "[1/5] Injecting randomized SSAID (" + randomAndroidId + ") and Advertising ID...");
                 applyIdentityIds(randomAndroidId, randomAaid);
 
+                // Apply In-Process Java ART / Reflection hook
+                DeviceIdentityHooker.applyInProcessSpoof(
+                        DeviceIdentityConfig.MODEL,
+                        DeviceIdentityConfig.MANUFACTURER,
+                        DeviceIdentityConfig.BRAND,
+                        DeviceIdentityConfig.PRODUCT_DEVICE,
+                        DeviceIdentityConfig.PRODUCT_DEVICE,
+                        DeviceIdentityConfig.HARDWARE,
+                        DeviceIdentityConfig.BOARD,
+                        DeviceIdentityConfig.FINGERPRINT
+                );
+
                 notifyStep(callback, "[2/5] Setting up multi-vendor 165Hz display and hidden API exemptions...");
                 applyDisplayAndSystemSettings();
 
@@ -292,6 +304,7 @@ public final class MlbbSpoofMaskingEnforcer {
 
             try {
                 notifyStep(callback, "Restoring stock Android settings and display refresh rates...");
+                DeviceIdentityHooker.revertInProcessSpoof();
                 String cmd = 
                         "cmd game reset " + TARGET_PKG + " 2>/dev/null; " +
                         "cmd power set-fixed-performance-mode-enabled false 2>/dev/null; " +

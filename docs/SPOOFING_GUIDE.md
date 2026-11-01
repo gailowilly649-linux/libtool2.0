@@ -36,7 +36,14 @@ Ang engine na ito ay dinisenyo upang mag-operate nang **rootless** gamit ang Shi
   - `generateRandomAndroidId()`: Gumagawa ng bagong 16-hex character ID gamit ang `SecureRandom`.
   - `generateRandomAaid()`: Gumagawa ng bagong random UUID para sa Google Advertising ID.
 
-### 2. `app/src/main/java/com/android/support/shizuku/MlbbModInjector.java`
+### 2. `app/src/main/java/com/android/support/shizuku/DeviceIdentityHooker.java`
+- **Tungkulin:** Non-Root In-Process Java ART & Reflection Hooking engine.
+- **Dynamic Field Mutation:** Direkta nitong binabago sa memory ng process ang mga final static fields ng `android.os.Build`:
+  - `Build.MODEL`, `Build.MANUFACTURER`, `Build.BRAND`, `Build.DEVICE`, `Build.PRODUCT`, `Build.HARDWARE`, `Build.BOARD`, `Build.FINGERPRINT`, `Build.SOC_MODEL`.
+- **Double-Reflection Hidden API Exemption:** Ina-unlock ang `dalvik.system.VMRuntime.setHiddenApiExemptions` gamit ang meta-reflection upang walang reflection restriction error sa Android 9 hanggang Android 16.
+- **System Properties Override:** Ino-override ang `ro.product.*` properties sa runtime gamit ang `android.os.SystemProperties.set` reflection.
+
+### 3. `app/src/main/java/com/android/support/shizuku/MlbbModInjector.java`
 - **Tungkulin:** Ini-integrate ang masking enforcer sa UI, Floating Menu, at ShizukuPanel.
 - Sa method na `applyRog10ProSpoof(context, enable, callback)`, tinatawag nito ang buong 5-step universal masking procedure bago mag-deploy ng native RAM hooks.
 
