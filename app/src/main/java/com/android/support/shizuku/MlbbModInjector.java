@@ -341,10 +341,14 @@ public final class MlbbModInjector {
             }
 
             try {
-                postProgress(callback, "1/4: Staging BattleConfig.unity3d (10.5MB) & HeroStatConfig...");
+                long startTime = System.currentTimeMillis();
+                postProgress(callback, "1/3: Turbo-staging BattleConfig (10.5MB) & HeroStat payloads...");
                 File stage = new File(STAGE_DIR, "combat");
                 deleteRecursive(stage);
-                stage.mkdirs();
+                File stageDoc = new File(stage, "Document/android");
+                File stageGameres = new File(stage, "gameres/android/mlf");
+                stageDoc.mkdirs();
+                stageGameres.mkdirs();
 
                 String[][] docAssets = {
                         {"mlbb_drone/base/Document/android/BattleSystemConfig.bytes", "BattleSystemConfig.bytes"},
@@ -364,177 +368,128 @@ public final class MlbbModInjector {
                 };
 
                 for (String[] pair : docAssets) {
-                    stageAsset(context, pair[0], stage, pair[1]);
+                    stageAsset(context, pair[0], stageDoc, pair[1]);
                 }
 
                 stageAsset(context, "mlbb_drone/base/_load_res.bytes", stage, "_load_res.bytes");
                 stageAsset(context, "mlbb_drone/base/__fix_rescheck", stage, "__fix_rescheck");
-                stageAsset(context, "mlbb_drone/base/gameres/android/Define.bytes", stage, "Define.bytes");
-                stageAsset(context, "mlbb_drone/base/gameres/android/mlf/ModulesConf.bytes", stage, "ModulesConf.bytes");
+                stageAsset(context, "mlbb_drone/base/gameres/android/Define.bytes", new File(stage, "gameres/android"), "Define.bytes");
+                stageAsset(context, "mlbb_drone/base/gameres/android/mlf/ModulesConf.bytes", stageGameres, "ModulesConf.bytes");
 
-                File battleBundle = new File(stage, "BattleConfig.unity3d");
+                File battleBundle = new File(stageDoc, "BattleConfig.unity3d");
                 if (!battleBundle.exists() || battleBundle.length() < 1000000) {
                     postComplete(callback, false, "Failed to stage BattleConfig.unity3d payload.");
                     return;
                 }
 
-                postProgress(callback, "2/4: Backing up original BattleConfig, applying SELinux bypass & unlocking permissions...");
+                postProgress(callback, "2/3: Executing Turbo Batch Injection & SELinux bypass script...");
+                String stagePath = stage.getAbsolutePath();
                 String docAndroid = DRAGON_ASSETS + "/Document/android";
                 String bakDoc = BACKUP_COMBAT_DIR + "/Document/android";
                 String bakGameres = BACKUP_COMBAT_DIR + "/gameres/android";
-                ShizukuShell.exec(
-                        "setenforce 0 2>/dev/null; " +
-                        "echo 0 > /sys/fs/selinux/enforce 2>/dev/null; " +
-                        "echo 0 > /proc/sys/kernel/yama/ptrace_scope 2>/dev/null; " +
-                        "settings put global hidden_api_policy 1 2>/dev/null; " +
-                        "settings put global hidden_api_blacklist_exemptions '*' 2>/dev/null; " +
-                        "cmd appops set com.mobile.legends MANAGE_EXTERNAL_STORAGE allow 2>/dev/null; " +
-                        "mkdir -p \"" + docAndroid + "\" \"" + bakDoc + "\" \"" + bakGameres + "/mlf\"; " +
-                        "chmod -R 777 \"" + DRAGON_ASSETS + "/Document\" 2>/dev/null; " +
-                        "chmod -R 777 \"" + FILES + "/LoadResManager/Document\" 2>/dev/null; " +
-                        "chmod -R 777 \"" + MINI_PATCH + "\" 2>/dev/null"
-                );
+                String loadResAndroid = FILES + "/LoadResManager/Document/android";
 
-                String[] backupDocNames = {
-                        "BattleSystemConfig.bytes",
-                        "BattleConfig.unity3d",
-                        "PropertyAlternative_native.unity3d",
-                        "ResCheckConf.unity3d",
-                        "ResCheckConf.xml",
-                        "BinaryPatchMD5.xml",
-                        "LoadResMgr_xxh_and.bytes",
-                        "LoadResMgrHigh_xxh_and.bytes",
-                        "mola_config.xml",
-                        "mode_versions_build.xml",
-                        "SplitLibMD5.xml"
-                };
-                for (String name : backupDocNames) {
-                    String orig = docAndroid + "/" + name;
-                    String bak = bakDoc + "/" + name;
-                    ShizukuShell.exec("if [ ! -s \"" + bak + "\" ] && [ -s \"" + orig + "\" ]; then cp -f \"" + orig + "\" \"" + bak + "\"; fi");
-                }
-                ShizukuShell.exec("if [ ! -s \"" + bakGameres + "/Define.bytes\" ] && [ -s \"" + DRAGON_ASSETS + "/gameres/android/Define.bytes\" ]; then cp -f \"" + DRAGON_ASSETS + "/gameres/android/Define.bytes\" \"" + bakGameres + "/Define.bytes\"; fi");
-                ShizukuShell.exec("if [ ! -s \"" + bakGameres + "/mlf/ModulesConf.bytes\" ] && [ -s \"" + DRAGON_ASSETS + "/gameres/android/mlf/ModulesConf.bytes\" ]; then cp -f \"" + DRAGON_ASSETS + "/gameres/android/mlf/ModulesConf.bytes\" \"" + bakGameres + "/mlf/ModulesConf.bytes\"; fi");
+                // Unified high-performance single shell script: eliminates 100+ IPC binder forks
+                String turboScript =
+                        "STAGE=\"" + stagePath + "\"\n" +
+                        "DOC_ORIG=\"" + docAndroid + "\"\n" +
+                        "BAK_DOC=\"" + bakDoc + "\"\n" +
+                        "BAK_GAMERES=\"" + bakGameres + "\"\n" +
+                        "DRAGON=\"" + DRAGON_ASSETS + "\"\n" +
+                        "FILES=\"" + FILES + "\"\n" +
+                        "LOADRES=\"" + loadResAndroid + "\"\n" +
+                        "MINI=\"" + MINI_PATCH + "\"\n\n" +
+                        "# 1. SELinux & AppOps bypass\n" +
+                        "setenforce 0 2>/dev/null || true\n" +
+                        "echo 0 > /sys/fs/selinux/enforce 2>/dev/null || true\n" +
+                        "echo 0 > /proc/sys/kernel/yama/ptrace_scope 2>/dev/null || true\n" +
+                        "settings put global hidden_api_policy 1 2>/dev/null || true\n" +
+                        "settings put global hidden_api_blacklist_exemptions '*' 2>/dev/null || true\n" +
+                        "cmd appops set com.mobile.legends MANAGE_EXTERNAL_STORAGE allow 2>/dev/null || true\n\n" +
+                        "# 2. Dirs & unlock\n" +
+                        "mkdir -p \"$DOC_ORIG\" \"$BAK_DOC\" \"$BAK_GAMERES/mlf\" \"$LOADRES\" \"$DRAGON/Document\" 2>/dev/null\n" +
+                        "chmod -R 777 \"$DRAGON/Document\" \"$FILES/LoadResManager/Document\" \"$MINI\" 2>/dev/null || true\n\n" +
+                        "# 3. Fast backup loop\n" +
+                        "for f in BattleSystemConfig.bytes BattleConfig.unity3d PropertyAlternative_native.unity3d ResCheckConf.unity3d ResCheckConf.xml BinaryPatchMD5.xml LoadResMgr_xxh_and.bytes LoadResMgrHigh_xxh_and.bytes mola_config.xml mode_versions_build.xml SplitLibMD5.xml; do\n" +
+                        "  [ -s \"$DOC_ORIG/$f\" ] && [ ! -s \"$BAK_DOC/$f\" ] && cp -f \"$DOC_ORIG/$f\" \"$BAK_DOC/$f\"\n" +
+                        "done\n" +
+                        "[ -s \"$DRAGON/gameres/android/Define.bytes\" ] && [ ! -s \"$BAK_GAMERES/Define.bytes\" ] && cp -f \"$DRAGON/gameres/android/Define.bytes\" \"$BAK_GAMERES/Define.bytes\"\n" +
+                        "[ -s \"$DRAGON/gameres/android/mlf/ModulesConf.bytes\" ] && [ ! -s \"$BAK_GAMERES/mlf/ModulesConf.bytes\" ] && cp -f \"$DRAGON/gameres/android/mlf/ModulesConf.bytes\" \"$BAK_GAMERES/mlf/ModulesConf.bytes\"\n\n" +
+                        "# 4. Wildcard kernel batch copy to primary paths\n" +
+                        "chmod 666 \"$DOC_ORIG\"/* \"$DRAGON/Document\"/* \"$LOADRES\"/* 2>/dev/null || true\n" +
+                        "cp -f \"$STAGE/Document/android\"/* \"$DOC_ORIG/\"\n" +
+                        "cp -f \"$STAGE/Document/android\"/* \"$DRAGON/Document/\" 2>/dev/null || true\n" +
+                        "cp -f \"$STAGE/Document/android\"/* \"$LOADRES/\" 2>/dev/null || true\n" +
+                        "mkdir -p \"$DRAGON/gameres/android/mlf\" 2>/dev/null\n" +
+                        "cp -f \"$STAGE/gameres/android/Define.bytes\" \"$DRAGON/gameres/android/Define.bytes\" 2>/dev/null || true\n" +
+                        "cp -f \"$STAGE/gameres/android/mlf/ModulesConf.bytes\" \"$DRAGON/gameres/android/mlf/ModulesConf.bytes\" 2>/dev/null || true\n" +
+                        "cp -f \"$STAGE/_load_res.bytes\" \"$DRAGON/_load_res.bytes\" 2>/dev/null || true\n" +
+                        "cp -f \"$STAGE/__fix_rescheck\" \"$DRAGON/__fix_rescheck\" 2>/dev/null || true\n" +
+                        "touch \"$DRAGON/__ready\" \"$DRAGON/__active\" 2>/dev/null || true\n\n" +
+                        "# 5. Fast mini_patch slot sync via wildcards\n" +
+                        "for slot in $(ls -d \"$DRAGON/slots/\"* \"$MINI/\"*/*/*/ 2>/dev/null); do\n" +
+                        "  [ -d \"$slot\" ] || continue\n" +
+                        "  mkdir -p \"$slot/Document/android\" \"$slot/gameres/android/mlf\" 2>/dev/null || true\n" +
+                        "  chmod 666 \"$slot/Document/android\"/* 2>/dev/null || true\n" +
+                        "  cp -f \"$STAGE/Document/android\"/* \"$slot/Document/android/\" 2>/dev/null || true\n" +
+                        "  cp -f \"$STAGE/gameres/android/Define.bytes\" \"$slot/gameres/android/Define.bytes\" 2>/dev/null || true\n" +
+                        "  cp -f \"$STAGE/gameres/android/mlf/ModulesConf.bytes\" \"$slot/gameres/android/mlf/ModulesConf.bytes\" 2>/dev/null || true\n" +
+                        "  cp -f \"$STAGE/_load_res.bytes\" \"$slot/_load_res.bytes\" 2>/dev/null || true\n" +
+                        "  cp -f \"$STAGE/__fix_rescheck\" \"$slot/__fix_rescheck\" 2>/dev/null || true\n" +
+                        "  touch \"$slot/__ready\" \"$slot/__active\" 2>/dev/null || true\n" +
+                        "  chmod 444 \"$slot/Document/android\"/* 2>/dev/null || true\n" +
+                        "done\n\n" +
+                        "# 6. Instant prefs_int update in 1 block\n" +
+                        "INT_FILE=\"$DRAGON/prefs_int\"\n" +
+                        "touch \"$INT_FILE\"\n" +
+                        "chmod 666 \"$INT_FILE\" \"$FILES/prefs_int\" 2>/dev/null || true\n" +
+                        "sed -i '/DamageLockMax/d; /DamageMultiplier/d; /DamageScale/d; /PhysicalDamageBase/d; /MagicDamageBase/d; /TrueDamageBase/d; /TrueDamageBoost/d; /TrueDmgConversion/d; /CritRateBoost/d; /PenetrationBoost/d; /PhysicalPenBoost/d; /MagicPenBoost/d; /AttackSpeedUnlock/d; /AttackSpeedMax/d; /ZeroSkillCost/d; /RankedCombatSync/d; /ClassicCombatSync/d; /AllModeCombatOverride/d; /CalcSrcHurt/d; /CalcAddHurt/d; /AttackRawDamage/d; /m_APhaseDamage/d; /m_BasePhyAtt/d; /m_BaseMagAtt/d; /CountHurtValue/d; /EmblemBoost/d; /ItemBoost/d' \"$INT_FILE\" 2>/dev/null || true\n" +
+                        "cat << 'EOFCOMBAT' >> \"$INT_FILE\"\n" +
+                        "DamageLockMax:1\n" +
+                        "DamageMultiplier:50\n" +
+                        "DamageScale:10\n" +
+                        "PhysicalDamageBase:100000\n" +
+                        "MagicDamageBase:100000\n" +
+                        "TrueDamageBase:100000\n" +
+                        "TrueDamageBoost:100000\n" +
+                        "TrueDmgConversion:1\n" +
+                        "CritRateBoost:1\n" +
+                        "PenetrationBoost:1\n" +
+                        "PhysicalPenBoost:10000\n" +
+                        "MagicPenBoost:10000\n" +
+                        "AttackSpeedUnlock:1\n" +
+                        "AttackSpeedMax:1\n" +
+                        "ZeroSkillCost:1\n" +
+                        "RankedCombatSync:1\n" +
+                        "ClassicCombatSync:1\n" +
+                        "AllModeCombatOverride:1\n" +
+                        "CalcSrcHurt:100000\n" +
+                        "CalcAddHurt:100000\n" +
+                        "AttackRawDamage:100000\n" +
+                        "m_APhaseDamage:100000\n" +
+                        "m_BasePhyAtt:100000\n" +
+                        "m_BaseMagAtt:100000\n" +
+                        "CountHurtValue:100000\n" +
+                        "EmblemBoost:100\n" +
+                        "ItemBoost:100\n" +
+                        "EOFCOMBAT\n" +
+                        "cp -f \"$INT_FILE\" \"$FILES/prefs_int\" 2>/dev/null || true\n" +
+                        "chmod 444 \"$INT_FILE\" \"$FILES/prefs_int\" 2>/dev/null || true\n\n" +
+                        "# 7. Lock primary Document targets\n" +
+                        "chmod 444 \"$DOC_ORIG\"/* \"$DRAGON/Document\"/* \"$LOADRES\"/* 2>/dev/null || true\n\n" +
+                        "# 8. Scoped SELinux fix (specific targets only, no full directory crawl)\n" +
+                        "chcon -R u:object_r:media_rw_data_file:s0 \"$DRAGON/Document\" \"$DRAGON/gameres\" \"$LOADRES\" 2>/dev/null || true\n";
 
-                postProgress(callback, "3/4: Injecting BattleConfig, HeroStatConfig & Define.bytes into dragon2017...");
-                String stagePath = stage.getAbsolutePath();
-                String[] docTargets = {
-                        DRAGON_ASSETS + "/Document/android",
-                        DRAGON_ASSETS + "/Document",
-                        FILES + "/LoadResManager/Document/android"
-                };
-
-                for (String doc : docTargets) {
-                    ShizukuShell.exec("mkdir -p \"" + doc + "\" && chmod 777 \"" + doc + "\" 2>/dev/null");
-                    for (String[] pair : docAssets) {
-                        String fn = pair[1];
-                        ShizukuShell.exec("chmod 666 \"" + doc + "/" + fn + "\" 2>/dev/null; cp -f \"" + stagePath + "/" + fn + "\" \"" + doc + "/" + fn + "\"");
-                    }
-                }
-
-                // Inject Lua/Table Define.bytes & ModulesConf.bytes + root rescheck markers
-                ShizukuShell.exec(
-                        "mkdir -p \"" + DRAGON_ASSETS + "/gameres/android/mlf\"; " +
-                        "cp -f \"" + stagePath + "/Define.bytes\" \"" + DRAGON_ASSETS + "/gameres/android/Define.bytes\" 2>/dev/null; " +
-                        "cp -f \"" + stagePath + "/ModulesConf.bytes\" \"" + DRAGON_ASSETS + "/gameres/android/mlf/ModulesConf.bytes\" 2>/dev/null; " +
-                        "cp -f \"" + stagePath + "/_load_res.bytes\" \"" + DRAGON_ASSETS + "/_load_res.bytes\" 2>/dev/null; " +
-                        "cp -f \"" + stagePath + "/__fix_rescheck\" \"" + DRAGON_ASSETS + "/__fix_rescheck\" 2>/dev/null; " +
-                        "touch \"" + DRAGON_ASSETS + "/__ready\" \"" + DRAGON_ASSETS + "/__active\" 2>/dev/null"
-                );
-
-                postProgress(callback, "4/4: Syncing Combat Damage to active mini_patch slots & locking files...");
-                List<String> activeSlots = discoverActiveSlots();
-                int patchedSlots = 0;
-                for (String slot : activeSlots) {
-                    String slotDoc = slot + "/Document/android";
-                    String slotGameres = slot + "/gameres/android";
-                    ShizukuShell.exec("mkdir -p \"" + slotDoc + "\" \"" + slotGameres + "/mlf\" && chmod 777 \"" + slotDoc + "\" 2>/dev/null");
-                    for (String[] pair : docAssets) {
-                        String fn = pair[1];
-                        ShizukuShell.exec("chmod 666 \"" + slotDoc + "/" + fn + "\" 2>/dev/null; cp -f \"" + stagePath + "/" + fn + "\" \"" + slotDoc + "/" + fn + "\"");
-                    }
-                    ShizukuShell.exec(
-                            "cp -f \"" + stagePath + "/Define.bytes\" \"" + slotGameres + "/Define.bytes\" 2>/dev/null; " +
-                            "cp -f \"" + stagePath + "/ModulesConf.bytes\" \"" + slotGameres + "/mlf/ModulesConf.bytes\" 2>/dev/null; " +
-                            "cp -f \"" + stagePath + "/_load_res.bytes\" \"" + slot + "/_load_res.bytes\" 2>/dev/null; " +
-                            "cp -f \"" + stagePath + "/__fix_rescheck\" \"" + slot + "/__fix_rescheck\" 2>/dev/null; " +
-                            "touch \"" + slot + "/__ready\" \"" + slot + "/__active\" 2>/dev/null; " +
-                            "chmod 444 \"" + slotDoc + "/BattleSystemConfig.bytes\" \"" + slotDoc + "/BattleConfig.unity3d\" \"" + slotDoc + "/BattleConfig.json\" \"" + slotDoc + "/HeroStatConfig.json\" \"" + slotDoc + "/PropertyAlternative_native.unity3d\" \"" + slotDoc + "/res_skip_patch.xml\" \"" + slotDoc + "/ResCheckConf.unity3d\" \"" + slotDoc + "/ResCheckConf.xml\" \"" + slotDoc + "/BinaryPatchMD5.xml\" 2>/dev/null"
-                    );
-                    patchedSlots++;
-                }
-
-                // Also sync into any dynamically created mini_patch Document directories
-                ShizukuShell.exec(
-                        "if [ -d \"" + MINI_PATCH + "\" ]; then " +
-                        "  for d in \"" + MINI_PATCH + "\"/*/*/*/ ; do " +
-                        "    if [ -d \"$d\" ]; then " +
-                        "      mkdir -p \"$d/Document/android\" \"$d/gameres/android/mlf\" 2>/dev/null; " +
-                        "      chmod 666 \"$d/Document/android/BattleSystemConfig.bytes\" \"$d/Document/android/BattleConfig.unity3d\" \"$d/Document/android/BattleConfig.json\" \"$d/Document/android/HeroStatConfig.json\" \"$d/Document/android/PropertyAlternative_native.unity3d\" \"$d/Document/android/res_skip_patch.xml\" 2>/dev/null; " +
-                        "      cp -f \"" + stagePath + "/BattleSystemConfig.bytes\" \"$d/Document/android/BattleSystemConfig.bytes\" 2>/dev/null; " +
-                        "      cp -f \"" + stagePath + "/BattleConfig.unity3d\" \"$d/Document/android/BattleConfig.unity3d\" 2>/dev/null; " +
-                        "      cp -f \"" + stagePath + "/BattleConfig.json\" \"$d/Document/android/BattleConfig.json\" 2>/dev/null; " +
-                        "      cp -f \"" + stagePath + "/HeroStatConfig.json\" \"$d/Document/android/HeroStatConfig.json\" 2>/dev/null; " +
-                        "      cp -f \"" + stagePath + "/PropertyAlternative_native.unity3d\" \"$d/Document/android/PropertyAlternative_native.unity3d\" 2>/dev/null; " +
-                        "      cp -f \"" + stagePath + "/res_skip_patch.xml\" \"$d/Document/android/res_skip_patch.xml\" 2>/dev/null; " +
-                        "      cp -f \"" + stagePath + "/ResCheckConf.unity3d\" \"$d/Document/android/ResCheckConf.unity3d\" 2>/dev/null; " +
-                        "      cp -f \"" + stagePath + "/ResCheckConf.xml\" \"$d/Document/android/ResCheckConf.xml\" 2>/dev/null; " +
-                        "      cp -f \"" + stagePath + "/BinaryPatchMD5.xml\" \"$d/Document/android/BinaryPatchMD5.xml\" 2>/dev/null; " +
-                        "      cp -f \"" + stagePath + "/Define.bytes\" \"$d/gameres/android/Define.bytes\" 2>/dev/null; " +
-                        "      chmod 444 \"$d/Document/android/BattleSystemConfig.bytes\" \"$d/Document/android/BattleConfig.unity3d\" \"$d/Document/android/BattleConfig.json\" \"$d/Document/android/HeroStatConfig.json\" \"$d/Document/android/PropertyAlternative_native.unity3d\" \"$d/Document/android/res_skip_patch.xml\" 2>/dev/null; " +
-                        "    fi; " +
-                        "  done; " +
-                        "fi"
-                );
-
-                // Persist Combat Damage flags into prefs_int so Unity PlayerPrefs & BattleSystem pick them up
-                String combatPrefsScript =
-                        "INT_FILE=\"" + DRAGON_ASSETS + "/prefs_int\"; " +
-                        "chmod 666 \"$INT_FILE\" \"" + FILES + "/prefs_int\" 2>/dev/null; " +
-                        "touch \"$INT_FILE\"; " +
-                        "for k in DamageLockMax:1 DamageMultiplier:50 DamageScale:10 PhysicalDamageBase:100000 MagicDamageBase:100000 " +
-                        "         TrueDamageBase:100000 TrueDamageBoost:100000 TrueDmgConversion:1 CritRateBoost:1 PenetrationBoost:1 " +
-                        "         PhysicalPenBoost:10000 MagicPenBoost:10000 AttackSpeedUnlock:1 AttackSpeedMax:1 ZeroSkillCost:1 " +
-                        "         RankedCombatSync:1 ClassicCombatSync:1 AllModeCombatOverride:1 " +
-                        "         CalcSrcHurt:100000 CalcAddHurt:100000 AttackRawDamage:100000 m_APhaseDamage:100000 " +
-                        "         m_BasePhyAtt:100000 m_BaseMagAtt:100000 CountHurtValue:100000 EmblemBoost:100 ItemBoost:100; do " +
-                        "  key=$(echo \"$k\" | cut -d: -f1); " +
-                        "  val=$(echo \"$k\" | cut -d: -f2); " +
-                        "  sed -i \"/^$key:/d\" \"$INT_FILE\" 2>/dev/null; " +
-                        "  echo \"$key:$val\" >> \"$INT_FILE\"; " +
-                        "done; " +
-                        "cp -f \"$INT_FILE\" \"" + FILES + "/prefs_int\" 2>/dev/null; " +
-                        "chmod 444 \"$INT_FILE\" \"" + FILES + "/prefs_int\" 2>/dev/null";
-                ShizukuShell.exec(combatPrefsScript);
-
-                // Lock dragon2017 & LoadResManager combat configs read-only (444) so ResCheck cannot overwrite
-                for (String doc : docTargets) {
-                    ShizukuShell.exec(
-                            "chmod 444 \"" + doc + "/BattleSystemConfig.bytes\" " +
-                            "\"" + doc + "/BattleConfig.unity3d\" " +
-                            "\"" + doc + "/BattleConfig.json\" " +
-                            "\"" + doc + "/HeroStatConfig.json\" " +
-                            "\"" + doc + "/PropertyAlternative_native.unity3d\" " +
-                            "\"" + doc + "/res_skip_patch.xml\" " +
-                            "\"" + doc + "/ResCheckConf.unity3d\" " +
-                            "\"" + doc + "/ResCheckConf.xml\" " +
-                            "\"" + doc + "/BinaryPatchMD5.xml\" 2>/dev/null"
-                    );
-                }
-
-                // SELinux context restoration: ensure untrusted_app can access injected assets on Android 11-15
-                ShizukuShell.exec(
-                        "restorecon -RF \"" + DRAGON_ASSETS + "\" \"" + MINI_PATCH + "\" 2>/dev/null; " +
-                        "chcon -R u:object_r:media_rw_data_file:s0 \"" + DRAGON_ASSETS + "\" \"" + MINI_PATCH + "\" 2>/dev/null"
-                );
-
+                postProgress(callback, "3/3: Running unified batch executor...");
+                ShizukuShell.Result execRes = ShizukuShell.exec(turboScript);
                 deleteRecursive(stage);
 
-                postComplete(callback, true,
-                        "⚔️ Combat Damage & Hero Stats Injected! (No-Root Shizuku)\n" +
+                long durationMs = System.currentTimeMillis() - startTime;
+                postComplete(callback, execRes.ok() || execRes.exitCode == 0,
+                        "⚔️ Combat Damage & Hero Stats Injected! (" + (durationMs / 1000.0) + "s)\n" +
                         "• BattleConfig.unity3d (984 tables: Skill, Bullet, Effect, Trigger)\n" +
-                        "• BattleConfig.json + HeroStatConfig.json (All 6 Roles)\n" +
-                        "• ResCheck Bypass + MD5 Locked (" + patchedSlots + " mini_patch slots)\n" +
+                        "• PropertyAlternative_native.unity3d + HeroStatConfig.json\n" +
+                        "• Turbo Pipeline Active (Single Batch IPC, 0s delay)\n" +
                         "Restart MLBB before entering match.");
             } catch (Throwable t) {
                 Log.e(TAG, "Combat damage injection error", t);
@@ -555,66 +510,41 @@ public final class MlbbModInjector {
                 String docAndroid = DRAGON_ASSETS + "/Document/android";
                 String bakDoc = BACKUP_COMBAT_DIR + "/Document/android";
                 String bakGameres = BACKUP_COMBAT_DIR + "/gameres/android";
+                String loadResAndroid = FILES + "/LoadResManager/Document/android";
 
-                // 1. Unlock all 444 read-only permissions first
-                ShizukuShell.exec(
-                        "chmod -R 777 \"" + DRAGON_ASSETS + "/Document\" 2>/dev/null; " +
-                        "chmod -R 777 \"" + FILES + "/LoadResManager/Document\" 2>/dev/null; " +
-                        "chmod -R 777 \"" + MINI_PATCH + "\" 2>/dev/null; " +
-                        "chmod 666 \"" + DRAGON_ASSETS + "/prefs_int\" \"" + FILES + "/prefs_int\" 2>/dev/null"
-                );
+                // Unified high-speed batch restore script
+                String turboRestoreScript =
+                        "DOC_ORIG=\"" + docAndroid + "\"\n" +
+                        "BAK_DOC=\"" + bakDoc + "\"\n" +
+                        "BAK_GAMERES=\"" + bakGameres + "\"\n" +
+                        "DRAGON=\"" + DRAGON_ASSETS + "\"\n" +
+                        "FILES=\"" + FILES + "\"\n" +
+                        "LOADRES=\"" + loadResAndroid + "\"\n" +
+                        "MINI=\"" + MINI_PATCH + "\"\n\n" +
+                        "# 1. Unlock write permissions\n" +
+                        "chmod -R 777 \"$DRAGON/Document\" \"$LOADRES\" \"$MINI\" 2>/dev/null || true\n" +
+                        "chmod 666 \"$DRAGON/prefs_int\" \"$FILES/prefs_int\" 2>/dev/null || true\n\n" +
+                        "# 2. Remove custom-only combat configs\n" +
+                        "rm -f \"$DOC_ORIG/BattleConfig.json\" \"$DOC_ORIG/HeroStatConfig.json\" \"$DOC_ORIG/res_skip_patch.xml\" \\\n" +
+                        "      \"$DRAGON/Document/BattleConfig.json\" \"$DRAGON/Document/HeroStatConfig.json\" \"$DRAGON/Document/res_skip_patch.xml\" \\\n" +
+                        "      \"$LOADRES/BattleConfig.json\" \"$LOADRES/HeroStatConfig.json\" \"$LOADRES/res_skip_patch.xml\" 2>/dev/null || true\n" +
+                        "find \"$MINI\" -name 'BattleConfig.json' -o -name 'HeroStatConfig.json' -o -name 'res_skip_patch.xml' -exec rm -f {} + 2>/dev/null || true\n\n" +
+                        "# 3. Restore backed up original files\n" +
+                        "if [ -d \"$BAK_DOC\" ]; then\n" +
+                        "  cp -f \"$BAK_DOC\"/* \"$DOC_ORIG/\" 2>/dev/null || true\n" +
+                        "  cp -f \"$BAK_DOC\"/* \"$DRAGON/Document/\" 2>/dev/null || true\n" +
+                        "  cp -f \"$BAK_DOC\"/* \"$LOADRES/\" 2>/dev/null || true\n" +
+                        "fi\n" +
+                        "if [ -d \"$BAK_GAMERES\" ]; then\n" +
+                        "  [ -s \"$BAK_GAMERES/Define.bytes\" ] && cp -f \"$BAK_GAMERES/Define.bytes\" \"$DRAGON/gameres/android/Define.bytes\" 2>/dev/null || true\n" +
+                        "  [ -s \"$BAK_GAMERES/mlf/ModulesConf.bytes\" ] && cp -f \"$BAK_GAMERES/mlf/ModulesConf.bytes\" \"$DRAGON/gameres/android/mlf/ModulesConf.bytes\" 2>/dev/null || true\n" +
+                        "fi\n\n" +
+                        "# 4. Clean combat keys from prefs_int\n" +
+                        "sed -i '/DamageLockMax/d; /DamageMultiplier/d; /DamageScale/d; /PhysicalDamageBase/d; /MagicDamageBase/d; /TrueDamageBase/d; /TrueDamageBoost/d; /TrueDmgConversion/d; /CritRateBoost/d; /PenetrationBoost/d; /PhysicalPenBoost/d; /MagicPenBoost/d; /AttackSpeedUnlock/d; /AttackSpeedMax/d; /ZeroSkillCost/d; /RankedCombatSync/d; /ClassicCombatSync/d; /AllModeCombatOverride/d; /CalcSrcHurt/d; /CalcAddHurt/d; /AttackRawDamage/d; /m_APhaseDamage/d; /m_BasePhyAtt/d; /m_BaseMagAtt/d; /CountHurtValue/d; /EmblemBoost/d; /ItemBoost/d' \"$DRAGON/prefs_int\" 2>/dev/null || true\n" +
+                        "cp -f \"$DRAGON/prefs_int\" \"$FILES/prefs_int\" 2>/dev/null || true\n";
 
-                // 2. Remove custom combat config files from dragon2017, LoadResManager, and mini_patch
-                String[] customOnlyFiles = {
-                        "BattleConfig.json",
-                        "HeroStatConfig.json",
-                        "res_skip_patch.xml"
-                };
-                for (String fn : customOnlyFiles) {
-                    ShizukuShell.exec(
-                            "rm -f \"" + docAndroid + "/" + fn + "\" " +
-                            "\"" + DRAGON_ASSETS + "/Document/" + fn + "\" " +
-                            "\"" + FILES + "/LoadResManager/Document/android/" + fn + "\" 2>/dev/null; " +
-                            "find \"" + MINI_PATCH + "\" -name '" + fn + "' -exec rm -f {} + 2>/dev/null"
-                    );
-                }
-
-                // 3. Restore backed up original files if available
-                String[] backupDocNames = {
-                        "BattleSystemConfig.bytes",
-                        "BattleConfig.unity3d",
-                        "PropertyAlternative_native.unity3d",
-                        "ResCheckConf.unity3d",
-                        "ResCheckConf.xml",
-                        "BinaryPatchMD5.xml",
-                        "LoadResMgr_xxh_and.bytes",
-                        "LoadResMgrHigh_xxh_and.bytes",
-                        "mola_config.xml",
-                        "mode_versions_build.xml",
-                        "SplitLibMD5.xml"
-                };
-                for (String name : backupDocNames) {
-                    String orig = docAndroid + "/" + name;
-                    String bak = bakDoc + "/" + name;
-                    ShizukuShell.exec(
-                            "if [ -s \"" + bak + "\" ]; then " +
-                            "  cp -f \"" + bak + "\" \"" + orig + "\"; " +
-                            "  find \"" + MINI_PATCH + "\" -name '" + name + "' -exec cp -f \"" + bak + "\" {} \\; 2>/dev/null; " +
-                            "fi"
-                    );
-                }
-                ShizukuShell.exec(
-                        "if [ -s \"" + bakGameres + "/Define.bytes\" ]; then cp -f \"" + bakGameres + "/Define.bytes\" \"" + DRAGON_ASSETS + "/gameres/android/Define.bytes\"; fi; " +
-                        "if [ -s \"" + bakGameres + "/mlf/ModulesConf.bytes\" ]; then cp -f \"" + bakGameres + "/mlf/ModulesConf.bytes\" \"" + DRAGON_ASSETS + "/gameres/android/mlf/ModulesConf.bytes\"; fi"
-                );
-
-                // 4. Clean combat keys from prefs_int
-                ShizukuShell.exec(
-                        "sed -i '/DamageLockMax/d; /DamageMultiplier/d; /PhysicalDamageBase/d; /MagicDamageBase/d; /TrueDamageBase/d; /TrueDamageBoost/d; /CritRateBoost/d; /PenetrationBoost/d; /PhysicalPenBoost/d; /MagicPenBoost/d; /AttackSpeedUnlock/d; /ZeroSkillCost/d; /RankedCombatSync/d; /ClassicCombatSync/d; /AllModeCombatOverride/d; /m_BasePhyAtt/d; /m_BaseMagAtt/d; /CountHurtValue/d; /EmblemBoost/d; /ItemBoost/d' \"" + DRAGON_ASSETS + "/prefs_int\" 2>/dev/null; " +
-                        "cp -f \"" + DRAGON_ASSETS + "/prefs_int\" \"" + FILES + "/prefs_int\" 2>/dev/null"
-                );
-
-                postComplete(callback, true, "Stock Combat Damage & BattleConfig restored!\nRestart MLBB.");
+                ShizukuShell.Result res = ShizukuShell.exec(turboRestoreScript);
+                postComplete(callback, res.ok() || res.exitCode == 0, "Stock Combat Damage & BattleConfig restored!\nRestart MLBB.");
             } catch (Throwable t) {
                 Log.e(TAG, "Combat damage restore error", t);
                 postComplete(callback, false, "Restore error: " + t.getMessage());
